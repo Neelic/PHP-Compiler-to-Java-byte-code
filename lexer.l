@@ -1,79 +1,76 @@
 %option noyywrap
 %option never-interactive
-%x SEMICOLON
-%x VARIABLE
-%x GENERAL_STRING
-%x SINGLE_QUOTE_STRING
-%x DOUBLE_QUOTE_STRING 
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+%}
 
 %{
-    #include <stdio.h>
-    int yyerror(char* errormsg);
+// Define the token types
+#define TOKEN_VAR 1
+#define TOKEN_FUNCTION 2
+#define TOKEN_IF 3
+#define TOKEN_ELSE 4
+#define TOKEN_WHILE 5
+#define TOKEN_ECHO 6
+#define TOKEN_STRING 7
+#define TOKEN_NUMBER 8
+
+// Helper function to handle tokens
+void handleToken(int tokenType, const char* lexeme) {
+switch(tokenType) {
+case TOKEN_VAR:
+printf("Variable: %s\n", lexeme);
+break;
+case TOKEN_FUNCTION:
+printf("Function: %s\n", lexeme);
+break;
+case TOKEN_IF:
+printf("If statement\n");
+break;
+case TOKEN_ELSE:
+printf("Else statement\n");
+break;
+case TOKEN_WHILE:
+printf("While loop\n");
+break;
+case TOKEN_ECHO:
+printf("Echo statement\n");
+break;
+case TOKEN_STRING:
+printf("String: %s\n", lexeme);
+break;
+case TOKEN_NUMBER:
+printf("Number: %s\n", lexeme);
+break;
+default:
+printf("Unknown token\n");
+}
+}
 %}
 
 %%
 
-%{
-    char str[1000];
-%}
+\$[a-zA-Z_][a-zA-Z0-9_]* { handleToken(TOKEN_VAR, yytext); }
+[a-zA-Z_][a-zA-Z0-9_]*\( { handleToken(TOKEN_FUNCTION, yytext); }
+if { handleToken(TOKEN_IF, NULL); }
+else { handleToken(TOKEN_ELSE, NULL); }
+while { handleToken(TOKEN_WHILE, NULL); }
+echo { handleToken(TOKEN_ECHO, NULL); }
+\"[^\"]*\" { handleToken(TOKEN_STRING, yytext); }
+[0-9]+ { handleToken(TOKEN_NUMBER, yytext); }
+\n { /* Ignore newline */ }
 
-[\t\n]+
-
-\; {
-    str[0] = 0;
-    BEGIN(SEMICOLON)
-}
-
-<SEMICOLON>\* {printf("found semicolon literal: %s\n", yytext);}
-
-\$^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$ {
-    str[0] = 0;
-    BEGIN(VARIABLE);
-}
-
-<VARIABLE>.* {printf("found variable literal: %s\n", yytext);}
-
-<GENERAL_STRING>\\n {strcat(str, "\n");}
-<GENERAL_STRING>\\\\ {strcat(str, "\\");}
-<GENERAL_STRING>\\\" {strcat(str, "\"");}
-<GENERAL_STRING>\n {yyerror("ERROR! line break inside literal");}
-<GENERAL_STRING><<EOF>> {yyerror("ERROR! unclosed ");}
-
-\' {
-    str[0] = 0;
-    BEGIN(SINGLE_QUOTE_STRING,GENERAL_STRING);
-}
-
-<SINGLE_QUOTE_STRING,GENERAL_STRING>[^\'\\\n]+ {strcat(str, yytext);} 
-<SINGLE_QUOTE_STRING,GENERAL_STRING>\' { 
-    printf("found string literal: %s\n", str);
-    BEGIN(INITIAL);
-}
-
-\" {
-    str[0] = 0;
-    BEGIN(DOUBLE_QUOTE_STRING,GENERAL_STRING);
-}
-
-<DOUBLE_QUOTE_STRING,GENERAL_STRING>[^\"\\\n]+ {strcat(str, yytext);}
-<DOUBLE_QUOTE_STRING,GENERAL_STRING>\$^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$ {
-    strcat(str, "");
-    BEGIN(VARIABLE);
-    BEGIN(DOUBLE_QUOTE_STRING,GENERAL_STRING);
-}
-<DOUBLE_QUOTE_STRING,GENERAL_STRING>\" { 
-    printf("found string literal: %s\n", str);
-    BEGIN(INITIAL);
-}
-
+. { /* Ignore all other characters */ }
 %%
 
-int main(int argc, char* acrgv) {
-    printf("HELLO\n");
-    return 0;
-}
+int main(void) {
+yyin = fopen("example.php", "r");
 
-int yyerror(char* errormsg) {
-    printf("%s\n", errormsg);
-    exit(1);
+// Call the lexer
+yylex();
+
+fclose(yyin);
+return 0;
 }
