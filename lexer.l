@@ -1,14 +1,21 @@
 %option noyywrap
 %option never-interactive
-%x SEMICOLON
-%x VARIABLE
+
 %x GENERAL_STRING
 %x SINGLE_QUOTE_STRING
-%x DOUBLE_QUOTE_STRING 
+%x DOUBLE_QUOTE_STRING
+
+DIGIT [0-9]
+EXPONENT [eE][+-]?[1-9]{DIGIT}*(_{DIGIT}+)*
+IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 
 %{
     #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+
     int yyerror(char* errormsg);
+    int lineCount = 0;
 %}
 
 %%
@@ -17,21 +24,9 @@
     char str[1000];
 %}
 
-[\t\n]+
+";" {printf("found semicolon literal: %s\n", yytext);}
 
-\; {
-    str[0] = 0;
-    BEGIN(SEMICOLON)
-}
-
-<SEMICOLON>\* {printf("found semicolon literal: %s\n", yytext);}
-
-\$^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$ {
-    str[0] = 0;
-    BEGIN(VARIABLE);
-}
-
-<VARIABLE>.* {printf("found variable literal: %s\n", yytext);}
+\$^[a-zA-Z_][a-zA-Z0-9_]* {printf("found variable literal: %s\n", yytext);}
 
 <GENERAL_STRING>\\n {strcat(str, "\n");}
 <GENERAL_STRING>\\\\ {strcat(str, "\\");}
@@ -41,27 +36,32 @@
 
 \' {
     str[0] = 0;
-    BEGIN(SINGLE_QUOTE_STRING,GENERAL_STRING);
+    BEGIN(SINGLE_QUOTE_STRING);
 }
 
-<SINGLE_QUOTE_STRING,GENERAL_STRING>[^\'\\\n]+ {strcat(str, yytext);} 
-<SINGLE_QUOTE_STRING,GENERAL_STRING>\' { 
+<SINGLE_QUOTE_STRING>[^\'\\\n]+ {strcat(str, yytext);} 
+<SINGLE_QUOTE_STRING>\' { 
     printf("found string literal: %s\n", str);
     BEGIN(INITIAL);
 }
 
 \" {
-    str[0] = 0;
-    BEGIN(DOUBLE_QUOTE_STRING,GENERAL_STRING);
+    str[0] = "\0";
+    BEGIN(DOUBLE_QUOTE_STRING);
 }
 
-<DOUBLE_QUOTE_STRING,GENERAL_STRING>[^\"\\\n]+ {strcat(str, yytext);}
-<DOUBLE_QUOTE_STRING,GENERAL_STRING>\$^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*$ {
+<DOUBLE_QUOTE_STRING>[^\"\\\n]+ {strcat(str, yytext);}
+<DOUBLE_QUOTE_STRING>\\n {strcat(str, "\n");}
+<DOUBLE_QUOTE_STRING>\\\\ {strcat(str, "\\");}
+<DOUBLE_QUOTE_STRING>\\\" {strcat(str, "\"");}
+<DOUBLE_QUOTE_STRING>\n {yyerror("Line break inside literal");}
+<DOUBLE_QUOTE_STRING><<EOF>> {yyerror("Unclosed string");}
+<DOUBLE_QUOTE_STRING>\$^[a-zA-Z_][a-zA-Z0-9_]*$ {
     strcat(str, "");
     BEGIN(VARIABLE);
-    BEGIN(DOUBLE_QUOTE_STRING,GENERAL_STRING);
+    BEGIN(DOUBLE_QUOTE_STRING);
 }
-<DOUBLE_QUOTE_STRING,GENERAL_STRING>\" { 
+<DOUBLE_QUOTE_STRING>\" { 
     printf("found string literal: %s\n", str);
     BEGIN(INITIAL);
 }
@@ -69,11 +69,29 @@
 %%
 
 int main(int argc, char* acrgv) {
-    printf("HELLO\n");
+    if (argc != 2) {
+        printf("You need to specify file name");
+        return 1;
+    }
+
+    const char *filename = argv[1];
+    
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("File opening error");
+        return 1;
+    }
+
+    yyin = file;
+
+    while (yylex() != 0);
+
+    fclose(file);
+
     return 0;
 }
 
 int yyerror(char* errormsg) {
-    printf("%s\n", errormsg);
+    printf("ERROR! %s\n", errormsg);
     exit(1);
 }
