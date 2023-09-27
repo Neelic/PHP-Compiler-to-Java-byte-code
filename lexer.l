@@ -3,8 +3,8 @@
 
 %x SINGLE_QUOTE_STRING
 %x DOUBLE_QUOTE_STRING
+%x MULTILINE_COMMENT
 
-VARIABLE \$[a-zA-Z_][a-zA-Z0-9_]*
 DIGIT [0-9]
 EXPONENT [eE][+-]?[1-9]{DIGIT}*(_{DIGIT}+)*
 IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
@@ -27,6 +27,9 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 null		{printf("Found keyword: %s\n", yytext);}
 NIL		    {printf("Found keyword: %s\n", yytext);}
 NAN		    {printf("Found keyword: %s\n", yytext);}
+const		{printf("Found keyword: %s\n", yytext);}
+global		{printf("Found keyword: %s\n", yytext);}
+use		    {printf("Found keyword: %s\n", yytext);}
 new		    {printf("Found keyword: %s\n", yytext);}
 class		{printf("Found keyword: %s\n", yytext);}
 private		{printf("Found keyword: %s\n", yytext);}
@@ -48,10 +51,8 @@ match		{printf("Found keyword: %s\n", yytext);}
 true        {printf("Found keyword: %s\n", yytext);}
 false       {printf("Found keyword: %s\n", yytext);}
 
-"->"		{printf("Found special symbol: %s\n", yytext);}
-"=>"		{printf("Found special symbol: %s\n", yytext);}
+"|"		    {printf("Found special symbol: %s\n", yytext);}
 ";"         {printf("Found special symbol: %s\n", yytext);}
-"."		    {printf("Found special symbol: %s\n", yytext);}
 "("		    {printf("Found special symbol: %s\n", yytext);}
 ")"		    {printf("Found special symbol: %s\n", yytext);}
 "["		    {printf("Found special symbol: %s\n", yytext);}
@@ -67,21 +68,58 @@ false       {printf("Found keyword: %s\n", yytext);}
 "**"        {printf("Found arithmetic operation: %s\n", yytext);}
 "/"         {printf("Found arithmetic operation: %s\n", yytext);}
 "%"         {printf("Found arithmetic operation: %s\n", yytext);}
+"="         {printf("Found arithmetic operation: %s\n", yytext);}
+"+="        {printf("Found arithmetic operation: %s\n", yytext);}
+"-="        {printf("Found arithmetic operation: %s\n", yytext);}
+"*="        {printf("Found arithmetic operation: %s\n", yytext);}
+"/="        {printf("Found arithmetic operation: %s\n", yytext);}
+"%="        {printf("Found arithmetic operation: %s\n", yytext);}
+"**="       {printf("Found arithmetic operation: %s\n", yytext);}
 
+"=="        {printf("Found operation: %s\n", yytext);}
+"!="        {printf("Found operation: %s\n", yytext);}
+">"         {printf("Found operation: %s\n", yytext);}
+"<"         {printf("Found operation: %s\n", yytext);}
+">="        {printf("Found operation: %s\n", yytext);}
+"<="        {printf("Found operation: %s\n", yytext);}
+"==="       {printf("Found operation: %s\n", yytext);}
+"&&"        {printf("Found operation: %s\n", yytext);}
+"||"        {printf("Found operation: %s\n", yytext);}
+"!"         {printf("Found operation: %s\n", yytext);}
 
-{VARIABLE}  {printf("Found variable literal: %s\n", yytext);}
+"->"		{printf("Found operation: %s\n", yytext);}
+"=>"		{printf("Found operation: %s\n", yytext);}
+"..."       {printf("Found operation: %s\n", yytext);}
+"$" 		{printf("Found operation: %s\n", yytext);}
+"::"        {printf("Found operation: %s\n", yytext);}
+"."		    {printf("Found operation: %s\n", yytext);}
+
+\\n           {lineCount += 1;}
+"<?"          {printf("Found start php code section: %s\n", yytext);}
+"<?php"       {printf("Found start php code section: %s\n", yytext);}
+"?>"          {printf("Found end php code section: %s\n", yytext);}
+{IDENTIFIER}  {printf("Found identifier: %s\n", yytext);}
+#.*           {printf("Found single-line comment: %s\n", yytext + 1);}
+\/\/.*        {printf("Found single-line comment: %s\n", yytext + 2);}
+{DIGIT}+      {printf("Found integer number: %s\n", yytext);}
+
+<INITIAL>"/*" {
+    BEGIN(MULTILINE_COMMENT);
+    printf("Found multiline comment:\n");
+}
 
 \' {
-    str[0] = "\0";
+    str[0] = '\0';
     BEGIN(SINGLE_QUOTE_STRING);
 }
 
 \" {
-    str[0] = "\0";
+    str[0] = '\0';
     BEGIN(DOUBLE_QUOTE_STRING);
 }
 
-\\n         {lineCount += 1;}
+<MULTILINE_COMMENT>.|\n {printf("%s", yytext);}
+<MULTILINE_COMMENT>"*/" {BEGIN(INITIAL);}
 
 <SINGLE_QUOTE_STRING>[^\'\\\n]+ {strcat(str, yytext);} 
 <SINGLE_QUOTE_STRING>\' { 
@@ -95,7 +133,8 @@ false       {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\\" {strcat(str, "\"");}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\n {yyerror("Line break inside literal", lineCount);}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\<\<EOF\>\> {yyerror("Unclosed string", lineCount);}
-<DOUBLE_QUOTE_STRING>{VARIABLE} {
+<DOUBLE_QUOTE_STRING>{IDENTIFIER} {
+    //TODO Сделать обработку интерполяции строки
     strcat(str, " variable! ");
 }
 <DOUBLE_QUOTE_STRING>\" { 
