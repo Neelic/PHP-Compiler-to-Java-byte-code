@@ -18,7 +18,7 @@ class Person
 }
 
 // Creating instances of the Person class
-$person1 = new Person("John", 25);
+$person1 = new Person("John", 2.5);
 $person2 = new Person("Jane", 30);
 
 $persons = [$person1, $person2];
@@ -45,9 +45,9 @@ do {
 // Conditionals - if-else statement
 $age = 40;
 if ($age > 30) {
-    echo "You are over 30 years old." . PHP_EOL;
+    echo "You are over $age years old." . PHP_EOL;
 } else {
-    echo "You are under 30 years old." . PHP_EOL;
+    echo "You are under {$age} years old." . PHP_EOL;
 }
 
 // Conditionals - switch statement
@@ -72,3 +72,17 @@ $matchResult = match ($number) {
     default => "Other",
 };
 echo "Match result: " . $matchResult . PHP_EOL;
+
+$float_lin = 1_234.567;
+$float_exp = 1.2e3;
+$float_exp_alt = 7E-10;
+$float_lin_exp = 1_23.45e-2_0;
+$somenullby = 0;
+
+declare(ticks=1);
+
+goto a;
+
+a:
+echo 'Bar';
+
