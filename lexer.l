@@ -51,6 +51,7 @@ match		{printf("Found keyword: %s\n", yytext);}
 true        {printf("Found keyword: %s\n", yytext);}
 false       {printf("Found keyword: %s\n", yytext);}
 
+","		    {printf("Found special symbol: %s\n", yytext);}
 "|"		    {printf("Found special symbol: %s\n", yytext);}
 ";"         {printf("Found special symbol: %s\n", yytext);}
 "("		    {printf("Found special symbol: %s\n", yytext);}
