@@ -1,8 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class=".<\?php>">
+        <? echo 'SOMETHING' ?>
+        <!-- <\?php -->
+    </div>
+</body>
+</html>
+
 <?php
 // Example class
 class Person
 {
-    private $name;
+    public $name;
     private static $age;
 
     public function __construct($name, $age)
@@ -13,7 +28,13 @@ class Person
 
     public function greet()
     {
-        echo "Hello, my name is " . $this->name . " and I am " . $this->age . " years old." . PHP_EOL;
+        echo "Hello, my name is " . $this->name . " and I am " . self::$age . " years old." . PHP_EOL;
+        die();
+    }
+
+    public static function statFunc()
+    {
+        echo "Hello, my name is A and I am " . self::$age . " years old." . PHP_EOL;
     }
 }
 
@@ -21,7 +42,13 @@ class Person
 $person1 = new Person("John", 2.5);
 $person2 = new Person("Jane", 30);
 
+Person::statFunc();
+
 $persons = [$person1, $person2];
+
+$int = 1_000; 
+$interpolStr = "String interpol $int";
+$interpolStrOther = "String interpol {$person->name}";
 
 // Loops - for loop
 for ($i = 0; $i < count($persons); $i++) {
@@ -85,4 +112,3 @@ goto a;
 
 a:
 echo 'Bar';
-
