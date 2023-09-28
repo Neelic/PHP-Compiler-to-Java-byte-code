@@ -76,6 +76,10 @@ if ($age > 30) {
 } else {
     echo "You are under {$age} years old." . PHP_EOL;
 }
+/*
+gnjrgvnrvnvrnrvnrin
+vasl*feiii$ddwdw=mrmvir)(){}
+*/
 
 // Conditionals - switch statement
 $day = "Monday";
@@ -112,3 +116,7 @@ goto a;
 
 a:
 echo 'Bar';
+
+$output = `ls -al`;
+
+$rev = &$val;

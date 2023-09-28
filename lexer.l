@@ -5,6 +5,7 @@
 %x DOUBLE_QUOTE_STRING
 %x MULTILINE_COMMENT
 %x NOT_IN_PHP_CODE
+%x EXECUTION_OPERATOR
 
 NUMBER [0-9]
 INTEGER {NUMBER}+(_{NUMBER}+)*
@@ -29,14 +30,11 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
     char str[1000];
     int nestingCount = 0;
 %}
-
-<INITIAL>. {
     if (!inCode) {
         BEGIN(NOT_IN_PHP_CODE);
     } else {
 
     }
-}
 
 array\(\)   	    {printf("Found keyword: %s\n", yytext);}
 const		        {printf("Found keyword: %s\n", yytext);}
@@ -145,16 +143,33 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "%="                {printf("Found arithmetic operation: %s\n", yytext);}
 "**="               {printf("Found arithmetic operation: %s\n", yytext);}
 
+"&"                 {printf("Found operation: %s\n", yytext);}
+
+"|"                 {printf("Found bitwise operation: %s\n", yytext);}
+"^"                 {printf("Found bitwise operation: %s\n", yytext);}
+"~"                 {printf("Found bitwise operation: %s\n", yytext);}
+
+"!"                 {printf("Found operation: %s\n", yytext);}
 "=="                {printf("Found operation: %s\n", yytext);}
 "!="                {printf("Found operation: %s\n", yytext);}
 ">"                 {printf("Found operation: %s\n", yytext);}
 "<"                 {printf("Found operation: %s\n", yytext);}
+"<>"                {printf("Found operation: %s\n", yytext);}
 ">="                {printf("Found operation: %s\n", yytext);}
 "<="                {printf("Found operation: %s\n", yytext);}
 "==="               {printf("Found operation: %s\n", yytext);}
+"!=="               {printf("Found operation: %s\n", yytext);}
+"<=>"               {printf("Found operation: %s\n", yytext);}
 "&&"                {printf("Found operation: %s\n", yytext);}
 "||"                {printf("Found operation: %s\n", yytext);}
-"!"                 {printf("Found operation: %s\n", yytext);}
+
+">>"                {printf("Found bitwise operation: %s\n", yytext);}
+"<<"                {printf("Found bitwise operation: %s\n", yytext);}
+"&="                {printf("Found bitwise operation: %s\n", yytext);}
+"|="                {printf("Found bitwise operation: %s\n", yytext);}
+"^="                {printf("Found bitwise operation: %s\n", yytext);}
+"<<="               {printf("Found bitwise operation: %s\n", yytext);}
+">>="               {printf("Found bitwise operation: %s\n", yytext);}
 
 "->"		        {printf("Found operation: %s\n", yytext);}
 "=>"		        {printf("Found operation: %s\n", yytext);}
@@ -162,6 +177,9 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "$" 		        {printf("Found operation: %s\n", yytext);}
 "::"                {printf("Found operation: %s\n", yytext);}
 "."		            {printf("Found operation: %s\n", yytext);}
+".="                {printf("Found operation: %s\n", yytext);}
+"??="               {printf("Found operation: %s\n", yytext);}
+"@"                 {printf("Found operation: %s\n", yytext);}
 
 \\n                 {lineCount += 1;}
 "<?"                {printf("Found start php code section: %s\n", yytext);}
@@ -189,12 +207,23 @@ goto                {printf("Found keyword: %s\n", yytext);}
     BEGIN(DOUBLE_QUOTE_STRING);
 }
 
+"`" {
+    str[0] = '\0';
+    BEGIN(EXECUTION_OPERATOR);
+}
+
 <NOT_IN_PHP_CODE>"<?"    {inCode = true; BEGIN(INITIAL); printf("Found start php code section: %s\n", yytext);}
 <NOT_IN_PHP_CODE>"<?php" {inCode = true; BEGIN(INITIAL); printf("Found start php code section: %s\n", yytext);}
 <NOT_IN_PHP_CODE>.       {}
 
 <MULTILINE_COMMENT>.|\n  {printf("%s", yytext);}
 <MULTILINE_COMMENT>"*/"  {BEGIN(INITIAL);}
+
+<EXECUTION_OPERATOR>[^`]    {strcat(str, yytext);}
+<EXECUTION_OPERATOR>"`"  {
+                            printf("Found shell command: %s\n", str);
+                            BEGIN(INITIAL);
+                        }
 
 <SINGLE_QUOTE_STRING>[^\'\\\n]+ {strcat(str, yytext);} 
 <SINGLE_QUOTE_STRING>\' { 
