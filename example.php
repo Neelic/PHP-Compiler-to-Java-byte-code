@@ -47,6 +47,10 @@ Person::statFunc();
 $persons = [$person1, $person2];
 
 $int = 1_000; 
+$hexdec = 0x1A;
+$octal = 0123;
+$octal_other = 0o123;
+$binary = 0b11111111;
 $interpolStr = "String interpol $int";
 $interpolStrOther = "String interpol {$person->name}";
 

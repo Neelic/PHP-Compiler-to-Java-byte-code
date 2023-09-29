@@ -8,7 +8,10 @@
 %x EXECUTION_OPERATOR
 
 NUMBER [0-9]
-INTEGER {NUMBER}+(_{NUMBER}+)*
+INTEGER [1-9][0-9]*(_[0-9]+)*|0
+INT_HEXIDECIMAL 0[xX][0-9a-fA-F]+(_[0-9a-fA-F]+)*
+INT_OCTAL 0[oO]?[0-7]+(_[0-7]+)*
+INT_BINARY 0[bB][01]+(_[01]+)*
 FLOAT ({NUMBER}*(_{NUMBER}+)*[\.]{INTEGER})|({INTEGER}[\.]{NUMBER}*(_{NUMBER}+)*)
 EXPONENT_FLOAT (({INTEGER}|{FLOAT})[eE][+-]?{INTEGER})
 IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
@@ -171,6 +174,9 @@ goto                {printf("Found keyword: %s\n", yytext);}
 #.*                 {printf("Found single-line comment: %s\n", yytext + 1);}
 \/\/.*              {printf("Found single-line comment: %s\n", yytext + 2);}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
+{INT_HEXIDECIMAL}   {squeeze(yytext, '_'); printf("Found integer hexidecimal number: %s\n", yytext);}
+{INT_OCTAL}         {squeeze(yytext, '_'); printf("Found integer octal number: %s\n", yytext);}
+{INT_BINARY}        {squeeze(yytext, '_'); printf("Found integer binary number: %s\n", yytext);}
 {FLOAT}             {squeeze(yytext, '_'); printf("Found float number: %s\n", yytext);}
 {EXPONENT_FLOAT}    {squeeze(yytext, '_'); printf("Found exponent number: %s\n", yytext);}
 
