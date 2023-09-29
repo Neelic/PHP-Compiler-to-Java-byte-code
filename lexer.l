@@ -32,8 +32,6 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 %}
     if (!inCode) {
         BEGIN(NOT_IN_PHP_CODE);
-    } else {
-
     }
 
 array\(\)   	    {printf("Found keyword: %s\n", yytext);}
