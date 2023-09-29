@@ -7,7 +7,7 @@
 </head>
 <body>
     <div class=".<\?php>">
-        <? echo 'SOMETHING' ?>
+        <? echo "SOMETHING" ?>
         <!-- <\?php -->
     </div>
 </body>
