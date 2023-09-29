@@ -139,22 +139,12 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "!="                {printf("Found operator: %s\n", yytext);}
 ">"                 {printf("Found operator: %s\n", yytext);}
 "<"                 {printf("Found operator: %s\n", yytext);}
-"<>"                {printf("Found operator: %s\n", yytext);}
-">="                {printf("Found operator: %s\n", yytext);}
-"<="                {printf("Found operator: %s\n", yytext);}
 "==="               {printf("Found operator: %s\n", yytext);}
-"!=="               {printf("Found operator: %s\n", yytext);}
-"<=>"               {printf("Found operator: %s\n", yytext);}
 "&&"                {printf("Found operator: %s\n", yytext);}
 "||"                {printf("Found operator: %s\n", yytext);}
 
 ">>"                {printf("Found bitwise operator: %s\n", yytext);}
 "<<"                {printf("Found bitwise operator: %s\n", yytext);}
-"&="                {printf("Found bitwise operator: %s\n", yytext);}
-"|="                {printf("Found bitwise operator: %s\n", yytext);}
-"^="                {printf("Found bitwise operator: %s\n", yytext);}
-"<<="               {printf("Found bitwise operator: %s\n", yytext);}
-">>="               {printf("Found bitwise operator: %s\n", yytext);}
 
 "->"		        {printf("Found operator: %s\n", yytext);}
 "=>"		        {printf("Found operator: %s\n", yytext);}
@@ -162,8 +152,6 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "$" 		        {printf("Found operator: %s\n", yytext);}
 "::"                {printf("Found operator: %s\n", yytext);}
 "."		            {printf("Found operator: %s\n", yytext);}
-".="                {printf("Found operator: %s\n", yytext);}
-"??="               {printf("Found operator: %s\n", yytext);}
 "@"                 {printf("Found operator: %s\n", yytext);}
 
 \n                  {lineCount += 1;}
