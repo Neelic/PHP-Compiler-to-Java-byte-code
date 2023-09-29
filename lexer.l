@@ -30,12 +30,9 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 %{
     char str[1000];
     int nestingCount = 0;
+    BEGIN(NOT_IN_PHP_CODE);
 %}
-    if (!inCode) {
-        BEGIN(NOT_IN_PHP_CODE);
-    }
 
-array\(\)   	    {printf("Found keyword: %s\n", yytext);}
 const		        {printf("Found keyword: %s\n", yytext);}
 global		        {printf("Found keyword: %s\n", yytext);}
 use		            {printf("Found keyword: %s\n", yytext);}
@@ -46,9 +43,7 @@ catch		        {printf("Found keyword: %s\n", yytext);}
 clone		        {printf("Found keyword: %s\n", yytext);}
 continue	        {printf("Found keyword: %s\n", yytext);}
 echo		        {printf("Found keyword: %s\n", yytext);}
-empty\(\)        	{printf("Found keyword: %s\n", yytext);}
 enddeclare   	    {printf("Found keyword: %s\n", yytext);}
-array\(\)   	    {printf("Found keyword: %s\n", yytext);}
 die\(\)		        {printf("Found keyword: %s\n", yytext);}
 new		            {printf("Found keyword: %s\n", yytext);}
 class		        {printf("Found keyword: %s\n", yytext);}
@@ -57,8 +52,6 @@ private		        {printf("Found keyword: %s\n", yytext);}
 public		        {printf("Found keyword: %s\n", yytext);}
 protected	        {printf("Found keyword: %s\n", yytext);}
 static		        {printf("Found keyword: %s\n", yytext);}
-eval\(\)         	{printf("Found keyword: %s\n", yytext);}
-exit\(\)         	{printf("Found keyword: %s\n", yytext);}
 extends         	{printf("Found keyword: %s\n", yytext);}
 final         	    {printf("Found keyword: %s\n", yytext);}
 finally         	{printf("Found keyword: %s\n", yytext);}
@@ -67,8 +60,6 @@ implements         	{printf("Found keyword: %s\n", yytext);}
 instanceof         	{printf("Found keyword: %s\n", yytext);}
 insteadof         	{printf("Found keyword: %s\n", yytext);}
 interface         	{printf("Found keyword: %s\n", yytext);}
-isset\(\)         	{printf("Found keyword: %s\n", yytext);}
-list\(\)         	{printf("Found keyword: %s\n", yytext);}
 namespace         	{printf("Found keyword: %s\n", yytext);}
 or              	{printf("Found keyword: %s\n", yytext);}
 print         	    {printf("Found keyword: %s\n", yytext);}
@@ -76,7 +67,6 @@ readonly         	{printf("Found keyword: %s\n", yytext);}
 return           	{printf("Found keyword: %s\n", yytext);}
 throw           	{printf("Found keyword: %s\n", yytext);}
 trait         	    {printf("Found keyword: %s\n", yytext);}
-unset\(\)         	{printf("Found keyword: %s\n", yytext);}
 var              	{printf("Found keyword: %s\n", yytext);}
 xor              	{printf("Found keyword: %s\n", yytext);}
 "yield from"        {printf("Found keyword: %s\n", yytext);}
@@ -104,17 +94,16 @@ require             {printf("Found keyword: %s\n", yytext);}
 include             {printf("Found keyword: %s\n", yytext);}
 require_once        {printf("Found keyword: %s\n", yytext);}
 include_once        {printf("Found keyword: %s\n", yytext);}
-__halt_compiler	    {printf("Found keyword: %s\n", yytext);}
 goto                {printf("Found keyword: %s\n", yytext);}
 
-","		            {printf("Found special symbol: %s\n", yytext);}
-"|"		            {printf("Found special symbol: %s\n", yytext);}
-";"                 {printf("Found special symbol: %s\n", yytext);}
-"("		            {printf("Found special symbol: %s\n", yytext);}
-")"		            {printf("Found special symbol: %s\n", yytext);}
-"["		            {printf("Found special symbol: %s\n", yytext);}
-"]"		            {printf("Found special symbol: %s\n", yytext);}
-"{"		            {printf("Found special symbol: %s\n", yytext);}
+","		            {printf("Found special character: %s\n", yytext);}
+"|"		            {printf("Found special character: %s\n", yytext);}
+";"                 {printf("Found special character: %s\n", yytext);}
+"("		            {printf("Found special character: %s\n", yytext);}
+")"		            {printf("Found special character: %s\n", yytext);}
+"["		            {printf("Found special character: %s\n", yytext);}
+"]"		            {printf("Found special character: %s\n", yytext);}
+"{"		            {printf("Found special character: %s\n", yytext);}
 "}"		            {
                         if(nestingCount == 0) {
                             printf("Found bracket: %s\n", yytext);
@@ -126,88 +115,82 @@ goto                {printf("Found keyword: %s\n", yytext);}
                         }
                     }
 
-"+"                 {printf("Found arithmetic operation: %s\n", yytext);}
-"++"                {printf("Found arithmetic operation: %s\n", yytext);}    
-"-"                 {printf("Found arithmetic operation: %s\n", yytext);}
-"--"                {printf("Found arithmetic operation: %s\n", yytext);}
-"*"                 {printf("Found arithmetic operation: %s\n", yytext);}
-"**"                {printf("Found arithmetic operation: %s\n", yytext);}
-"/"                 {printf("Found arithmetic operation: %s\n", yytext);}
-"%"                 {printf("Found arithmetic operation: %s\n", yytext);}
-"="                 {printf("Found arithmetic operation: %s\n", yytext);}
-"+="                {printf("Found arithmetic operation: %s\n", yytext);}
-"-="                {printf("Found arithmetic operation: %s\n", yytext);}
-"*="                {printf("Found arithmetic operation: %s\n", yytext);}
-"/="                {printf("Found arithmetic operation: %s\n", yytext);}
-"%="                {printf("Found arithmetic operation: %s\n", yytext);}
-"**="               {printf("Found arithmetic operation: %s\n", yytext);}
+"+"                 {printf("Found arithmetic operator: %s\n", yytext);}
+"++"                {printf("Found arithmetic operator: %s\n", yytext);}    
+"-"                 {printf("Found arithmetic operator: %s\n", yytext);}
+"--"                {printf("Found arithmetic operator: %s\n", yytext);}
+"*"                 {printf("Found arithmetic operator: %s\n", yytext);}
+"**"                {printf("Found arithmetic operator: %s\n", yytext);}
+"/"                 {printf("Found arithmetic operator: %s\n", yytext);}
+"%"                 {printf("Found arithmetic operator: %s\n", yytext);}
+"="                 {printf("Found arithmetic operator: %s\n", yytext);}
 
-"&"                 {printf("Found operation: %s\n", yytext);}
+"&"                 {printf("Found operator: %s\n", yytext);}
 
-"|"                 {printf("Found bitwise operation: %s\n", yytext);}
-"^"                 {printf("Found bitwise operation: %s\n", yytext);}
-"~"                 {printf("Found bitwise operation: %s\n", yytext);}
+"|"                 {printf("Found bitwise operator: %s\n", yytext);}
+"^"                 {printf("Found bitwise operator: %s\n", yytext);}
+"~"                 {printf("Found bitwise operator: %s\n", yytext);}
 
-"!"                 {printf("Found operation: %s\n", yytext);}
-"=="                {printf("Found operation: %s\n", yytext);}
-"!="                {printf("Found operation: %s\n", yytext);}
-">"                 {printf("Found operation: %s\n", yytext);}
-"<"                 {printf("Found operation: %s\n", yytext);}
-"<>"                {printf("Found operation: %s\n", yytext);}
-">="                {printf("Found operation: %s\n", yytext);}
-"<="                {printf("Found operation: %s\n", yytext);}
-"==="               {printf("Found operation: %s\n", yytext);}
-"!=="               {printf("Found operation: %s\n", yytext);}
-"<=>"               {printf("Found operation: %s\n", yytext);}
-"&&"                {printf("Found operation: %s\n", yytext);}
-"||"                {printf("Found operation: %s\n", yytext);}
+"!"                 {printf("Found operator: %s\n", yytext);}
+"=="                {printf("Found operator: %s\n", yytext);}
+"!="                {printf("Found operator: %s\n", yytext);}
+">"                 {printf("Found operator: %s\n", yytext);}
+"<"                 {printf("Found operator: %s\n", yytext);}
+"<>"                {printf("Found operator: %s\n", yytext);}
+">="                {printf("Found operator: %s\n", yytext);}
+"<="                {printf("Found operator: %s\n", yytext);}
+"==="               {printf("Found operator: %s\n", yytext);}
+"!=="               {printf("Found operator: %s\n", yytext);}
+"<=>"               {printf("Found operator: %s\n", yytext);}
+"&&"                {printf("Found operator: %s\n", yytext);}
+"||"                {printf("Found operator: %s\n", yytext);}
 
-">>"                {printf("Found bitwise operation: %s\n", yytext);}
-"<<"                {printf("Found bitwise operation: %s\n", yytext);}
-"&="                {printf("Found bitwise operation: %s\n", yytext);}
-"|="                {printf("Found bitwise operation: %s\n", yytext);}
-"^="                {printf("Found bitwise operation: %s\n", yytext);}
-"<<="               {printf("Found bitwise operation: %s\n", yytext);}
-">>="               {printf("Found bitwise operation: %s\n", yytext);}
+">>"                {printf("Found bitwise operator: %s\n", yytext);}
+"<<"                {printf("Found bitwise operator: %s\n", yytext);}
+"&="                {printf("Found bitwise operator: %s\n", yytext);}
+"|="                {printf("Found bitwise operator: %s\n", yytext);}
+"^="                {printf("Found bitwise operator: %s\n", yytext);}
+"<<="               {printf("Found bitwise operator: %s\n", yytext);}
+">>="               {printf("Found bitwise operator: %s\n", yytext);}
 
-"->"		        {printf("Found operation: %s\n", yytext);}
-"=>"		        {printf("Found operation: %s\n", yytext);}
-"..."               {printf("Found operation: %s\n", yytext);}
-"$" 		        {printf("Found operation: %s\n", yytext);}
-"::"                {printf("Found operation: %s\n", yytext);}
-"."		            {printf("Found operation: %s\n", yytext);}
-".="                {printf("Found operation: %s\n", yytext);}
-"??="               {printf("Found operation: %s\n", yytext);}
-"@"                 {printf("Found operation: %s\n", yytext);}
+"->"		        {printf("Found operator: %s\n", yytext);}
+"=>"		        {printf("Found operator: %s\n", yytext);}
+"..."               {printf("Found operator: %s\n", yytext);}
+"$" 		        {printf("Found operator: %s\n", yytext);}
+"::"                {printf("Found operator: %s\n", yytext);}
+"."		            {printf("Found operator: %s\n", yytext);}
+".="                {printf("Found operator: %s\n", yytext);}
+"??="               {printf("Found operator: %s\n", yytext);}
+"@"                 {printf("Found operator: %s\n", yytext);}
 
-\\n                 {lineCount += 1;}
+\n                  {lineCount += 1;}
 "<?"                {printf("Found start php code section: %s\n", yytext);}
 "<?php"             {printf("Found start php code section: %s\n", yytext);}
 "?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; BEGIN(NOT_IN_PHP_CODE);}
-{IDENTIFIER}        {squeeze(yytext, '_'); printf("Found identifier: %s\n", yytext);}
+{IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
 #.*                 {printf("Found single-line comment: %s\n", yytext + 1);}
 \/\/.*              {printf("Found single-line comment: %s\n", yytext + 2);}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
 {FLOAT}             {squeeze(yytext, '_'); printf("Found float number: %s\n", yytext);}
 {EXPONENT_FLOAT}    {squeeze(yytext, '_'); printf("Found exponent number: %s\n", yytext);}
 
-<INITIAL>"/*" {
+"/*" {
     BEGIN(MULTILINE_COMMENT);
     printf("Found multiline comment:\n");
 }
 
 \' {
-    str[0] = '\0';
+    str[0] = 0;
     BEGIN(SINGLE_QUOTE_STRING);
 }
 
 \" {
-    str[0] = '\0';
+    str[0] = 0;
     BEGIN(DOUBLE_QUOTE_STRING);
 }
 
 "`" {
-    str[0] = '\0';
+    str[0] = 0;
     BEGIN(EXECUTION_OPERATOR);
 }
 
@@ -232,10 +215,10 @@ goto                {printf("Found keyword: %s\n", yytext);}
 
 
 <DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+                      {strcat(str, yytext);}
-<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\n           {strcat(str, "\n");}
+<DOUBLE_QUOTE_STRING>\\n           {strcat(str, "\n");}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
-<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\\"          {strcat(str, "\"");}
-<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\n            {yyerror("Line break inside literal", lineCount);}
+<DOUBLE_QUOTE_STRING>\\\"          {strcat(str, "\"");}
+<DOUBLE_QUOTE_STRING>\n            {yyerror("Line break inside literal", lineCount);}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\<\<EOF\>\>   {yyerror("Unclosed string", lineCount);}
 <DOUBLE_QUOTE_STRING>"{" {
     printf("Found string %s\n", str);
@@ -283,5 +266,5 @@ void squeeze (char s[], int c) {
         if (s[i] != c)
             s[j++] = s[i];
     
-    s[j] = '\0';
+    s[j] = 0;
 }

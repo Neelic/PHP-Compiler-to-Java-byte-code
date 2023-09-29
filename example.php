@@ -17,6 +17,7 @@
 // Example class
 class Person
 {
+    private $a = 1_1; 
     public $name;
     private static $age;
 
