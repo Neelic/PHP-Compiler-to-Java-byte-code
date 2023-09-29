@@ -24,8 +24,6 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 
     int yyerror(char* errormsg, int lineCount);
     void squeeze (char s[], int c);
-    int lineCount = 1;
-    bool inCode = false;
 %}
 
 %%
@@ -33,6 +31,8 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 %{
     char str[1000];
     int nestingCount = 0;
+    int static lineCount = 1;
+    bool static inCode = false;
     BEGIN(NOT_IN_PHP_CODE);
 %}
 
