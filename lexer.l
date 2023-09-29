@@ -224,7 +224,6 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\\f           {strcat(str, "\f");}
 <DOUBLE_QUOTE_STRING>\\\"          {strcat(str, "\"");}
 <DOUBLE_QUOTE_STRING>\\\$          {strcat(str, "$");}
-<DOUBLE_QUOTE_STRING>\n            {yyerror("Line break inside literal", lineCount);}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>"<<EOF>>"     {yyerror("Unclosed string", lineCount);}
 <DOUBLE_QUOTE_STRING>"{" {
