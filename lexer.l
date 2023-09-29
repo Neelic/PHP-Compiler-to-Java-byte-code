@@ -20,6 +20,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
     #include <stdbool.h>
 
     int yyerror(char* errormsg, int lineCount);
+    void squeeze (char s[], int c);
     int lineCount = 1;
     bool inCode = false;
 %}
@@ -183,12 +184,12 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "<?"                {printf("Found start php code section: %s\n", yytext);}
 "<?php"             {printf("Found start php code section: %s\n", yytext);}
 "?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; BEGIN(NOT_IN_PHP_CODE);}
-{IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
+{IDENTIFIER}        {squeeze(yytext, '_'); printf("Found identifier: %s\n", yytext);}
 #.*                 {printf("Found single-line comment: %s\n", yytext + 1);}
 \/\/.*              {printf("Found single-line comment: %s\n", yytext + 2);}
-{INTEGER}           {printf("Found integer number: %s\n", yytext);}
-{FLOAT}             {printf("Found float number: %s\n", yytext);}
-{EXPONENT_FLOAT}    {printf("Found exponent number: %s\n", yytext);}
+{INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
+{FLOAT}             {squeeze(yytext, '_'); printf("Found float number: %s\n", yytext);}
+{EXPONENT_FLOAT}    {squeeze(yytext, '_'); printf("Found exponent number: %s\n", yytext);}
 
 <INITIAL>"/*" {
     BEGIN(MULTILINE_COMMENT);
@@ -217,7 +218,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <MULTILINE_COMMENT>.|\n  {printf("%s", yytext);}
 <MULTILINE_COMMENT>"*/"  {BEGIN(INITIAL);}
 
-<EXECUTION_OPERATOR>[^`]    {strcat(str, yytext);}
+<EXECUTION_OPERATOR>[^`] {strcat(str, yytext);}
 <EXECUTION_OPERATOR>"`"  {
                             printf("Found shell command: %s\n", str);
                             BEGIN(INITIAL);
@@ -273,4 +274,14 @@ int main(void) {
 int yyerror(char* errormsg, int lineCount) {
     printf("ERROR! %s on line %d\n", errormsg, lineCount);
     exit(1);
+}
+
+void squeeze (char s[], int c) {
+    int i, j;
+
+    for (i = j = 0; s[i] != '\0'; i++)
+        if (s[i] != c)
+            s[j++] = s[i];
+    
+    s[j] = '\0';
 }
