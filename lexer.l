@@ -111,7 +111,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             nestingCount--;
                             BEGIN(DOUBLE_QUOTE_STRING);
                             str[0] = 0;
-                            printf("Found interpolation: +\n");
+                            printf("Found concatenation: .\n");
                         }
                     }
 
@@ -222,13 +222,15 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\<\<EOF\>\>   {yyerror("Unclosed string", lineCount);}
 <DOUBLE_QUOTE_STRING>"{" {
     printf("Found string %s\n", str);
-    printf("Found interpolation: +\n");
+    printf("Found concatenation: .\n");
     nestingCount++;
     BEGIN(INITIAL);
 }
 <DOUBLE_QUOTE_STRING>\${IDENTIFIER} {
     printf("Found string %s\n", str);
-    printf("Found interpolation: + %s +\n", yytext+1);
+    printf("Found concatenation: . \n");
+    printf("Found indentifier: %s\n", yytext+1);
+    printf("Found concatenation: . \n");
     str[0] = 0;
 }
 <DOUBLE_QUOTE_STRING>\" { 
