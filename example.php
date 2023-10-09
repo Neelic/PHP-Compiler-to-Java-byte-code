@@ -34,13 +34,14 @@ class Person
 
     public static function statFunc()
     {
-        echo "Hello, my name is A and I am " . self::$age . " years old." . PHP_EOL;
+        echo "Hello, my name is A and I am " . self::$age . " years \t old." . PHP_EOL;
     }
 }
 
 // Creating instances of the Person class
 $person1 = new Person("John", 2.5);
 $person2 = new Person("Jane", 30);
+$str = '\s';
 
 Person::statFunc();
 

@@ -213,7 +213,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             BEGIN(INITIAL);
                         }
 
-<SINGLE_QUOTE_STRING>[^\'\\\n]+ {strcat(str, yytext);} 
+<SINGLE_QUOTE_STRING>[^\'\\]+   {strcat(str, yytext);} 
 <SINGLE_QUOTE_STRING>\\\'       {strcat(str, "\'");}
 <SINGLE_QUOTE_STRING>\' { 
     printf("found string literal: %s\n", str);
@@ -221,15 +221,15 @@ goto                {printf("Found keyword: %s\n", yytext);}
 }
 
 
-<DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+ {strcat(str, yytext);}
-<DOUBLE_QUOTE_STRING>\\n           {strcat(str, "\n");}
-<DOUBLE_QUOTE_STRING>\\r           {strcat(str, "\r");}
-<DOUBLE_QUOTE_STRING>\\t           {strcat(str, "\t");}
-<DOUBLE_QUOTE_STRING>\\v           {strcat(str, "\v");}
-<DOUBLE_QUOTE_STRING>\\e           {strcat(str, "\e");}
-<DOUBLE_QUOTE_STRING>\\f           {strcat(str, "\f");}
-<DOUBLE_QUOTE_STRING>\\\"          {strcat(str, "\"");}
-<DOUBLE_QUOTE_STRING>\\\$          {strcat(str, "$");}
+<DOUBLE_QUOTE_STRING>[^\"\\\n\r\t\v\e\f{}$]+ {strcat(str, yytext);}
+<DOUBLE_QUOTE_STRING>\\n                     {strcat(str, "\n");}
+<DOUBLE_QUOTE_STRING>\\r                     {strcat(str, "\r");}
+<DOUBLE_QUOTE_STRING>\\t                     {strcat(str, "\t");}
+<DOUBLE_QUOTE_STRING>\\v                     {strcat(str, "\v");}
+<DOUBLE_QUOTE_STRING>\\e                     {strcat(str, "\e");}
+<DOUBLE_QUOTE_STRING>\\f                     {strcat(str, "\f");}
+<DOUBLE_QUOTE_STRING>\\\"                    {strcat(str, "\"");}
+<DOUBLE_QUOTE_STRING>\\\$                    {strcat(str, "$");}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>"<<EOF>>"     {yyerror("Unclosed string", lineCount);}
 <DOUBLE_QUOTE_STRING>"{" {
