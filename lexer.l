@@ -30,6 +30,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 
 %{
     char str[1000];
+    str[0] = 0;
     int nestingCount = 0;
     int static lineCount = 1;
     bool static inCode = false;
@@ -157,7 +158,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 \n                  {lineCount += 1;}
 "<?"                {printf("Found start php code section: %s\n", yytext);}
 "<?php"             {printf("Found start php code section: %s\n", yytext);}
-"?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; BEGIN(NOT_IN_PHP_CODE);}
+"?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; str[0] = 0; BEGIN(NOT_IN_PHP_CODE);}
 {IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
 #.*                 {printf("Found single-line comment: %s\n", yytext + 1);}
 \/\/.*              {printf("Found single-line comment: %s\n", yytext + 2);}
@@ -188,9 +189,20 @@ goto                {printf("Found keyword: %s\n", yytext);}
     BEGIN(EXECUTION_OPERATOR);
 }
 
-<NOT_IN_PHP_CODE>"<?"    {inCode = true; BEGIN(INITIAL); printf("Found start php code section: %s\n", yytext);}
-<NOT_IN_PHP_CODE>"<?php" {inCode = true; BEGIN(INITIAL); printf("Found start php code section: %s\n", yytext);}
-<NOT_IN_PHP_CODE>.       {}
+<NOT_IN_PHP_CODE>"<?"    {
+                            inCode = true; 
+                            BEGIN(INITIAL); 
+                            printf("Found html code section: %s\n", str); 
+                            printf("Found start php code section: %s\n", yytext);
+                         }
+<NOT_IN_PHP_CODE>"<?php" {
+                            inCode = true; 
+                            BEGIN(INITIAL); 
+                            printf("Found html code section: %s\n", str);
+                            printf("Found start php code section: %s\n", yytext);
+                         }
+<NOT_IN_PHP_CODE>.       {strcat(str, yytext);}
+<NOT_IN_PHP_CODE>\n      {strcat(str, yytext);}
 
 <MULTILINE_COMMENT>.|\n  {printf("%s", yytext);}
 <MULTILINE_COMMENT>"*/"  {BEGIN(INITIAL);}
