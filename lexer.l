@@ -3,6 +3,7 @@
 
 %x SINGLE_QUOTE_STRING
 %x DOUBLE_QUOTE_STRING
+%x SINGLE_LINE_COMMENT
 %x MULTILINE_COMMENT
 %x NOT_IN_PHP_CODE
 %x EXECUTION_OPERATOR
@@ -160,8 +161,6 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "<?php"             {printf("Found start php code section: %s\n", yytext);}
 "?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; str[0] = 0; BEGIN(NOT_IN_PHP_CODE);}
 {IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
-#.*                 {printf("Found single-line comment: %s\n", yytext + 1);}
-\/\/.*              {printf("Found single-line comment: %s\n", yytext + 2);}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
 {INT_HEXIDECIMAL}   {squeeze(yytext, '_'); printf("Found integer hexidecimal number: %s\n", yytext);}
 {INT_OCTAL}         {squeeze(yytext, '_'); printf("Found integer octal number: %s\n", yytext);}
@@ -169,22 +168,26 @@ goto                {printf("Found keyword: %s\n", yytext);}
 {FLOAT}             {squeeze(yytext, '_'); printf("Found float number: %s\n", yytext);}
 {EXPONENT_FLOAT}    {squeeze(yytext, '_'); printf("Found exponent number: %s\n", yytext);}
 
-"/*" {
+#|\/\/  {
+    str[0] = 0;
+    BEGIN(SINGLE_LINE_COMMENT);}
+
+"/*"    {
     BEGIN(MULTILINE_COMMENT);
     printf("Found multiline comment:\n");
 }
 
-\' {
+\'      {
     str[0] = 0;
     BEGIN(SINGLE_QUOTE_STRING);
 }
 
-\" {
+\"      {
     str[0] = 0;
     BEGIN(DOUBLE_QUOTE_STRING);
 }
 
-"`" {
+"`"     {
     str[0] = 0;
     BEGIN(EXECUTION_OPERATOR);
 }
@@ -201,8 +204,20 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             printf("Found html code section: %s\n", str);
                             printf("Found start php code section: %s\n", yytext);
                          }
-<NOT_IN_PHP_CODE>.       {strcat(str, yytext);}
-<NOT_IN_PHP_CODE>\n      {strcat(str, yytext);}
+<NOT_IN_PHP_CODE>.|\n    {strcat(str, yytext);}
+
+<SINGLE_LINE_COMMENT>.   {strcat(str, yytext);}
+<SINGLE_LINE_COMMENT>"?>" {
+                           printf("Found single-line comment: %s\n", str);
+                           printf("Found end php code section: %s\n", yytext); 
+                           inCode = false; 
+                           str[0] = 0; 
+                           BEGIN(NOT_IN_PHP_CODE);
+                          }
+<SINGLE_LINE_COMMENT>\n  {
+                          printf("Found single-line comment: %s\n", str);
+                          BEGIN(INITIAL);
+                         }
 
 <MULTILINE_COMMENT>.|\n  {printf("%s", yytext);}
 <MULTILINE_COMMENT>"*/"  {BEGIN(INITIAL);}
