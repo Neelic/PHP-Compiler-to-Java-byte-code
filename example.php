@@ -44,6 +44,7 @@ class Person
 $person1 = new Person("John", 2.5);
 $person2 = new Person("Jane", 30);
 $str = '\n \\ \'';
+$nul = (int) 1;
 
 Person::statFunc();
 
@@ -102,7 +103,7 @@ switch ($day) {
         break;
 }
 
-// Conditionals - match (added in PHP 8.0) ?>
+// Conditionals - match (added in PHP 8.0)
 $number = 2;
 $matchResult = match ($number) {
     1 => "One",

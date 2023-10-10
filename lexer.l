@@ -141,7 +141,10 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "!="                {printf("Found operator: %s\n", yytext);}
 ">"                 {printf("Found operator: %s\n", yytext);}
 "<"                 {printf("Found operator: %s\n", yytext);}
+">="                {printf("Found operator: %s\n", yytext);}
+"<="                {printf("Found operator: %s\n", yytext);}
 "==="               {printf("Found operator: %s\n", yytext);}
+"!=="               {printf("Found operator: %s\n", yytext);}
 "&&"                {printf("Found operator: %s\n", yytext);}
 "||"                {printf("Found operator: %s\n", yytext);}
 
