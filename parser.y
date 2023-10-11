@@ -10,7 +10,7 @@
 %right '='
 %left '-' '+' '/' '*'
 %left '.' '['']'
-%left '>' '<' "==" ">=" "<=" "!=" "===" "!=="
+%left '>' '<'
 %right U_MINUS
 %nonassoc '('')' 
 
