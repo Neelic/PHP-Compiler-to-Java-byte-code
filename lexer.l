@@ -1,6 +1,17 @@
 %option noyywrap
 %option never-interactive
 
+%{
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <stdbool.h>
+    #include "parser_tab.h"
+
+    int error_print(char* errormsg, int lineCount);
+    void squeeze (char s[], int c);
+%}
+
 %x SINGLE_QUOTE_STRING
 %x DOUBLE_QUOTE_STRING
 %x SINGLE_LINE_COMMENT
@@ -16,17 +27,6 @@ INT_BINARY 0[bB][01]+(_[01]+)*
 FLOAT ({NUMBER}*(_{NUMBER}+)*[\.]{INTEGER})|({INTEGER}[\.]{NUMBER}*(_{NUMBER}+)*)
 EXPONENT_FLOAT (({INTEGER}|{FLOAT})[eE][+-]?{INTEGER})
 IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
-
-%{
-    #include <stdio.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include <stdbool.h>
-    #include "parser_tab.h"
-
-    int error_print(char* errormsg, int lineCount);
-    void squeeze (char s[], int c);
-%}
 
 %%
 
@@ -173,47 +173,31 @@ goto                {printf("Found keyword: %s\n", yytext);}
 {FLOAT}             {squeeze(yytext, '_'); printf("Found float number: %s\n", yytext);}
 {EXPONENT_FLOAT}    {squeeze(yytext, '_'); printf("Found exponent number: %s\n", yytext);}
 
-#|\/\/  {
-    str[0] = 0;
-    BEGIN(SINGLE_LINE_COMMENT);}
+#|\/\/  {str[0] = 0; BEGIN(SINGLE_LINE_COMMENT);}
+"/*"    {BEGIN(MULTILINE_COMMENT); printf("Found multiline comment:\n");}
 
-"/*"    {
-    BEGIN(MULTILINE_COMMENT);
-    printf("Found multiline comment:\n");
-}
+\'      {str[0] = 0; BEGIN(SINGLE_QUOTE_STRING);}
+\"      {str[0] = 0; BEGIN(DOUBLE_QUOTE_STRING);}
 
-\'      {
-    str[0] = 0;
-    BEGIN(SINGLE_QUOTE_STRING);
-}
+"`"     {str[0] = 0; BEGIN(EXECUTION_OPERATOR);}
 
-\"      {
-    str[0] = 0;
-    BEGIN(DOUBLE_QUOTE_STRING);
-}
-
-"`"     {
-    str[0] = 0;
-    BEGIN(EXECUTION_OPERATOR);
-}
-
-<NOT_IN_PHP_CODE>"<?"    {
+<NOT_IN_PHP_CODE>"<?"     {
                             inCode = true; 
                             BEGIN(INITIAL); 
                             printf("Found html code section: %s\n", str); 
                             printf("Found start php code section: %s\n", yytext);
-                         }
-<NOT_IN_PHP_CODE>"<?php" {
+                          }
+<NOT_IN_PHP_CODE>"<?php"  {
                             inCode = true; 
                             BEGIN(INITIAL); 
                             printf("Found html code section: %s\n", str);
                             printf("Found start php code section: %s\n", yytext);
-                         }
-<NOT_IN_PHP_CODE>.       {strcat(str, yytext);}
-<NOT_IN_PHP_CODE>\n      {lineCount++; strcat(str, yytext);}
-<NOT_IN_PHP_CODE><<EOF>> {printf("Found html code section: %s\n", str); BEGIN(INITIAL);}
+                          }
+<NOT_IN_PHP_CODE>.        {strcat(str, yytext);}
+<NOT_IN_PHP_CODE>\n       {lineCount++; strcat(str, yytext);}
+<NOT_IN_PHP_CODE><<EOF>>  {printf("Found html code section: %s\n", str); BEGIN(INITIAL);}
 
-<SINGLE_LINE_COMMENT>.   {strcat(str, yytext);}
+<SINGLE_LINE_COMMENT>.    {strcat(str, yytext);}
 <SINGLE_LINE_COMMENT>"?>" {
                             inCode = false; 
                             printf("Found single-line comment: %s\n", str);
@@ -221,24 +205,18 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             str[0] = 0; 
                             BEGIN(NOT_IN_PHP_CODE);
                           }
-<SINGLE_LINE_COMMENT>\n  {printf("Found single-line comment: %s\n", str); BEGIN(INITIAL);}
+<SINGLE_LINE_COMMENT>\n   {printf("Found single-line comment: %s\n", str); BEGIN(INITIAL);}
 
-<MULTILINE_COMMENT>.|\n  {printf("%s", yytext);}
-<MULTILINE_COMMENT>"*/"  {BEGIN(INITIAL);}
+<MULTILINE_COMMENT>.|\n   {printf("%s", yytext);}
+<MULTILINE_COMMENT>"*/"   {BEGIN(INITIAL);}
 
-<EXECUTION_OPERATOR>[^`] {strcat(str, yytext);}
-<EXECUTION_OPERATOR>"`"  {
-                            printf("Found shell command: %s\n", str);
-                            BEGIN(INITIAL);
-                        }
+<EXECUTION_OPERATOR>[^`]  {strcat(str, yytext);}
+<EXECUTION_OPERATOR>"`"   {printf("Found shell command: %s\n", str); BEGIN(INITIAL);}
 
 <SINGLE_QUOTE_STRING>[^\'\\]+   {strcat(str, yytext);}
 <SINGLE_QUOTE_STRING>\\\'       {strcat(str, "\'");}
 <SINGLE_QUOTE_STRING>\\         {strcat(str, "\\");}
-<SINGLE_QUOTE_STRING>\' { 
-    printf("Found string literal: %s\n", str);
-    BEGIN(INITIAL);
-}
+<SINGLE_QUOTE_STRING>\'         {printf("Found string literal: %s\n", str); BEGIN(INITIAL);}
 
 
 <DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+           {strcat(str, yytext);}
@@ -261,7 +239,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\${IDENTIFIER} {
     printf("Found string %s\n", str);
     printf("Found concatenation: . \n");
-    printf("Found indentifier: %s\n", yytext+1);
+    printf("Found indentifier: %s\n", yytext + 1);
     printf("Found concatenation: . \n");
     str[0] = 0;
 }
