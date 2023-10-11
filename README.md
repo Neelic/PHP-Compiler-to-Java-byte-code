@@ -1,5 +1,23 @@
 # PHP-Compiler-into-Java-byte-code
 
-## How to use:
-<p>step 1: .\bison.exe -d parser.y | .\flex.exe lexer.l | gcc -o result parser_tab.c lex.yy.c <br>
-step 2:  .\result.exe > result.txt</p> 
+## How to use on Windows:
+
+Step 1:
+``` bash
+.\bison.exe -d parser.y
+```
+
+Step 2:
+``` bash
+.\flex.exe lexer.l
+```
+
+Step 3: compile
+``` bash
+gcc -o result parser_tab.c lex.yy.c
+```
+
+Step 4:
+``` bash
+.\result.exe > result.txt
+```
