@@ -1,4 +1,5 @@
-%{  
+%{
+#include <stdio.h>
 %}
 
 %token NUMBER STRING BOOL_OP
@@ -58,10 +59,10 @@ expr: NUMBER
         | ID'('expr_list')'
         | expr'.'ID
 
-expr_list: expr
+expr_list_not_e: expr
 	| expr_list','expr
 
-expr_list_e: expr_list
+expr_list: expr_list_not_e
 	   | /* empty */
 
 stmt_list: stmt
@@ -74,12 +75,14 @@ class_def: CLASS ID
 id_list: ID
         | id_list ',' ID
 
-function_def: FUNCTION ID '(' function_arg_list ')'
-
-function_arg_list:
+function_def: FUNCTION ID '(' expr_list ')'
 
 %%
 
-int main() {
+/* int main(int argc, char** argv) {
         return yyparse();
+} */
+
+void yyerror(char* str) {
+        fprintf(stderr, "ERROR: %s\n", str);
 }

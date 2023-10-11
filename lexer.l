@@ -22,8 +22,9 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
     #include <stdlib.h>
     #include <string.h>
     #include <stdbool.h>
+    #include "parser_tab.h"
 
-    int yyerror(char* errormsg, int lineCount);
+    int error_print(char* errormsg, int lineCount);
     void squeeze (char s[], int c);
 %}
 
@@ -155,6 +156,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "=>"		        {printf("Found operator: %s\n", yytext);}
 "..."               {printf("Found operator: %s\n", yytext);}
 "$" 		        {printf("Found operator: %s\n", yytext);}
+":"                 {printf("Found operator: %s\n", yytext);}
 "::"                {printf("Found operator: %s\n", yytext);}
 "."		            {printf("Found operator: %s\n", yytext);}
 "@"                 {printf("Found operator: %s\n", yytext);}
@@ -239,7 +241,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 }
 
 
-<DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+ {strcat(str, yytext);}
+<DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+           {strcat(str, yytext);}
 <DOUBLE_QUOTE_STRING>\\n                     {strcat(str, "\n");}
 <DOUBLE_QUOTE_STRING>\\r                     {strcat(str, "\r");}
 <DOUBLE_QUOTE_STRING>\\t                     {strcat(str, "\t");}
@@ -249,7 +251,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\\\"                    {strcat(str, "\"");}
 <DOUBLE_QUOTE_STRING>\\\$                    {strcat(str, "$");}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
-<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>"<<EOF>>"     {yyerror("Unclosed string", lineCount);}
+<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>"<<EOF>>"     {error_print("Unclosed string", lineCount);}
 <DOUBLE_QUOTE_STRING>"{" {
     printf("Found string %s\n", str);
     printf("Found concatenation: .\n");
@@ -286,7 +288,7 @@ int main(void) {
     return 0;
 }
 
-int yyerror(char* errormsg, int lineCount) {
+int error_print(char* errormsg, int lineCount) {
     printf("ERROR! %s on line %d\n", errormsg, lineCount);
     exit(0);
 }

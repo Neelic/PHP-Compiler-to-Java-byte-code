@@ -1,3 +1,5 @@
 lex.yy.c
 result.exe
 result.txt
+parser_tab.c
+parser_tab.h
