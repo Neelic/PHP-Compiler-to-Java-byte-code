@@ -2,7 +2,7 @@
 #include <stdio.h>
 %}
 
-%token NUMBER STRING BOOL_OP
+%token NUMBER STRING
 %token CLASS EXTENDS IMPLEMENTS
 %token ID FUNCTION
 %token FOR WHILE DO IF
@@ -10,10 +10,14 @@
 %right '='
 %left '-' '+' '/' '*'
 %left '.' '['']'
+%left '>' '<' "==" ">=" "<=" "!=" "===" "!=="
 %right U_MINUS
 %nonassoc '('')' 
 
 %%
+
+bool_op: '>' /* TODO Доделать как-то логические операции */
+        | '<'
 
 get_value: '$'
         | get_value '$'
@@ -23,10 +27,16 @@ decl_var: get_value ID '=' NUMBER
         | get_value ID '=' ID
         | get_value ID '=' get_value ID
 
-bool_stmt: get_value ID BOOL_OP get_value ID
-        | '(' get_value ID BOOL_OP get_value ID ')'
-        | bool_stmt BOOL_OP get_value ID
-        | bool_stmt BOOL_OP bool_stmt
+bool_stmt: get_value ID bool_op get_value ID
+        | '!' get_value ID
+        | '!' ID
+        | '!' bool_stmt
+        | bool_stmt bool_op get_value ID
+        | bool_stmt bool_op bool_stmt
+        | get_value ID '|' '|' get_value ID
+        | get_value ID '&' '&' get_value ID
+        | bool_stmt '|' '|' bool_stmt
+        | bool_stmt '&' '&' bool_stmt
 
 if_stmt: IF '(' bool_stmt ')' stmt
         | IF '(' get_value ID ')' stmt
@@ -48,6 +58,7 @@ stmt: expr';'
         | '{'stmt_list'}'
         | ';'
         | while_stmt
+        | do_while_stmt
 
 expr: NUMBER
         | ID
@@ -63,7 +74,7 @@ expr_list_not_e: expr
 	| expr_list','expr
 
 expr_list: expr_list_not_e
-	   | /* empty */
+	| /* empty */
 
 stmt_list: stmt
 	| stmt_list stmt
@@ -75,7 +86,17 @@ class_def: CLASS ID
 id_list: ID
         | id_list ',' ID
 
-function_def: FUNCTION ID '(' expr_list ')'
+param_list: param_list_not_e
+        | /* empty */
+
+param_list_not_e: get_value ID
+                | decl_var
+                | param_list_not_e ',' get_value ID
+                | param_list_not_e ',' decl_var
+
+function_def: FUNCTION ID '(' param_list ')'
+
+function_stmt: function_def '{' stmt_list '}'
 
 %%
 

@@ -50,7 +50,7 @@ clone		        {printf("Found keyword: %s\n", yytext);}
 continue	        {printf("Found keyword: %s\n", yytext);}
 echo		        {printf("Found keyword: %s\n", yytext);}
 enddeclare   	    {printf("Found keyword: %s\n", yytext);}
-die\(\)		        {printf("Found keyword: %s\n", yytext);}
+die	    	        {printf("Found keyword: %s\n", yytext);}
 new		            {printf("Found keyword: %s\n", yytext);}
 class		        {printf("Found keyword: %s\n", yytext);}
 abstract	        {printf("Found keyword: %s\n", yytext);}
