@@ -45,7 +45,7 @@ stmt: expr';'
         | do_while_stmt
 
 expr: NUMBER
-        | STRING
+        | string_expr
         | get_value ID
         | expr'='expr
         | expr'['expr']'
@@ -56,6 +56,14 @@ expr: NUMBER
         | expr'%'expr
         | '-'expr %prec U_MINUS
         | '+'expr %prec U_PLUS
+        | expr '=' ID
+        | expr '-' ID
+        | expr '+' ID
+        | expr '*' ID
+        | expr '/' ID
+        | expr '%' ID
+        | '-' ID %prec U_MINUS
+        | '+' ID %prec U_PLUS
         | ID'('expr_list')'
         | expr '-' '>' get_value ID %prec R_ARROW
         | expr bool_op expr /* TODO исправить конфликт с круглыми скобками */
@@ -68,7 +76,12 @@ expr_list_not_e: expr
 	| expr_list','expr
 
 expr_list: expr_list_not_e
-	| /* empty */
+	| /* empty */ 
+
+string_expr: STRING
+        | string_expr '.' STRING
+        | string_expr '.' ID
+        | ID '.' string_expr
 
 stmt_list: stmt
 	| stmt_list stmt
@@ -77,18 +90,17 @@ class_def: CLASS ID
         | CLASS ID EXTENDS ID
         | CLASS ID IMPLEMENTS id_list
 
-class_stmt: class_def
+class_stmt: class_def '{' class_stmt_list '}'
+
+class_stmt_list: class_stmt_list_not_e
+                | /* empty */
+
+class_stmt_list_not_e:
 
 id_list: ID
         | id_list ',' ID
 
-param_list: param_list_not_e
-        | /* empty */
-
-param_list_not_e: get_value ID
-                | param_list_not_e ',' get_value ID
-
-function_def: FUNCTION ID '(' param_list ')'
+function_def: FUNCTION ID '(' expr_list ')'
 
 function_stmt: function_def '{' stmt_list '}'
 

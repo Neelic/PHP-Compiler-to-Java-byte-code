@@ -65,6 +65,7 @@ for ($i = 0; $i < count($persons); $i++) {
 
 foreach ($persons as $key => $a) {
     # code...
+    PHP_EOL;
 }
 
 // Loops - while loop
