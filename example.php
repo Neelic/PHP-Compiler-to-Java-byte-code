@@ -63,6 +63,10 @@ for ($i = 0; $i < count($persons); $i++) {
     $persons[$i]->greet();
 }
 
+foreach ($persons as $key => $a) {
+    # code...
+}
+
 // Loops - while loop
 $j = 0;
 while ($j < count($persons)) {

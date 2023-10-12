@@ -5,11 +5,11 @@
 %token NUMBER STRING
 %token CLASS EXTENDS IMPLEMENTS
 %token ID FUNCTION
-%token FOR WHILE DO IF ELSE
+%token FOR WHILE DO IF ELSE FOREACH AS
 
 %right '='
-%left '-' '+' '/' '*'
-%left '/' '*'
+%left '-' '+'
+%left '/' '*' '%'
 %right U_MINUS U_PLUS
 %right '!'
 %left '.' '['']' R_ARROW
@@ -29,11 +29,12 @@ if_stmt: IF '(' expr ')' stmt
 
 for_stmt: FOR '(' expr ';' expr ';' expr ')' stmt
 
+foreach_stmt: FOREACH '(' expr AS expr ')' stmt
+        | FOREACH '(' expr AS expr '=' '>' expr ')' stmt
+
 while_stmt: WHILE '(' expr ')' stmt
-        | WHILE '(' ID ')' stmt
 
 do_while_stmt: DO stmt WHILE '(' expr ')' ';'
-                | DO stmt WHILE '(' ID ')' ';'
 
 stmt: expr';' 
         | if_stmt
@@ -74,7 +75,6 @@ stmt_list: stmt
 
 class_def: CLASS ID 
         | CLASS ID EXTENDS ID
-        | CLASS ID IMPLEMENTS ID
         | CLASS ID IMPLEMENTS id_list /* TODO конфликт с expr */
 
 class_stmt: class_def

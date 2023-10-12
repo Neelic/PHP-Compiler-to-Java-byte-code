@@ -79,6 +79,7 @@ xor              	{printf("Found keyword: %s\n", yytext);}
 yield            	{printf("Found keyword: %s\n", yytext);}
 function	        {printf("Found keyword: %s\n", yytext);}
 for                 {printf("Found keyword: %s\n", yytext);}
+foreach             {printf("Found keyword: %s\n", yytext);}
 endfor         	    {printf("Found keyword: %s\n", yytext);}
 endforeach        	{printf("Found keyword: %s\n", yytext);}
 do			        {printf("Found keyword: %s\n", yytext);}
