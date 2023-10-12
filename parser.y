@@ -36,7 +36,8 @@ while_stmt: WHILE '(' expr ')' stmt
 
 do_while_stmt: DO stmt WHILE '(' expr ')' ';'
 
-stmt: expr';' 
+stmt: expr';'
+        | ID ';'
         | if_stmt
         | '{'stmt_list'}'
         | ';'
@@ -45,7 +46,6 @@ stmt: expr';'
 
 expr: NUMBER
         | STRING
-        | ID
         | get_value ID
         | expr'='expr
         | expr'['expr']'
@@ -75,7 +75,7 @@ stmt_list: stmt
 
 class_def: CLASS ID 
         | CLASS ID EXTENDS ID
-        | CLASS ID IMPLEMENTS id_list /* TODO конфликт с expr */
+        | CLASS ID IMPLEMENTS id_list
 
 class_stmt: class_def
 
