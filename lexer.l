@@ -8,7 +8,7 @@
     #include <stdbool.h>
     #include "parser_tab.h"
 
-    int error_print(char* errormsg, int lineCount);
+    int error_print(char* errormsg, int lineCount, bool isWarning);
     void squeeze (char s[], int c);
 %}
 
@@ -75,7 +75,7 @@ throw           	{printf("Found keyword: %s\n", yytext);}
 trait         	    {printf("Found keyword: %s\n", yytext);}
 var              	{printf("Found keyword: %s\n", yytext);}
 xor              	{printf("Found keyword: %s\n", yytext);}
-"yield from"        {printf("Found keyword: %s\n", yytext);}
+from                {printf("Found keyword: %s\n", yytext);}
 yield            	{printf("Found keyword: %s\n", yytext);}
 function	        {printf("Found keyword: %s\n", yytext);}
 for                 {printf("Found keyword: %s\n", yytext);}
@@ -163,8 +163,6 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "@"                 {printf("Found operator: %s\n", yytext);}
 
 \n                  {lineCount += 1;}
-"<?"                {printf("Found start php code section: %s\n", yytext);}
-"<?php"             {printf("Found start php code section: %s\n", yytext);}
 "?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; str[0] = 0; BEGIN(NOT_IN_PHP_CODE);}
 {IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
@@ -230,19 +228,17 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\\\"                    {strcat(str, "\"");}
 <DOUBLE_QUOTE_STRING>\\\$                    {strcat(str, "$");}
 <DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
-<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>"<<EOF>>"     {error_print("Unclosed string", lineCount);}
-<DOUBLE_QUOTE_STRING>"{" {
+<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>"<<EOF>>"     {error_print("Unclosed string", lineCount, false);}
+<DOUBLE_QUOTE_STRING>\{\$ {
     printf("Found string %s\n", str);
     printf("Found concatenation: .\n");
     nestingCount++;
     BEGIN(INITIAL);
 }
 <DOUBLE_QUOTE_STRING>\${IDENTIFIER} {
-    printf("Found string %s\n", str);
-    printf("Found concatenation: . \n");
-    printf("Found indentifier: %s\n", yytext + 1);
-    printf("Found concatenation: . \n");
-    str[0] = 0;
+    error_print("Non supported interpolition", lineCount, true);
+    strcat(str, yytext);
+    /* str[0] = 0; */
 }
 <DOUBLE_QUOTE_STRING>\" { 
     printf("Found string literal: %s\n", str);
@@ -267,9 +263,13 @@ int main(void) {
     return 0;
 }
 
-int error_print(char* errormsg, int lineCount) {
-    printf("ERROR! %s on line %d\n", errormsg, lineCount);
-    exit(0);
+int error_print(char* errormsg, int lineCount, bool isWarning) {
+    if (!isWarning) {
+        printf("ERROR: %s on line %d\n", errormsg, lineCount);
+        exit(0);
+    } else {
+        printf("WARNING: %s on linde %d\n", errormsg, lineCount);
+    }
 }
 
 void squeeze (char s[], int c) {
