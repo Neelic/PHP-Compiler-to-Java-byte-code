@@ -175,7 +175,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 {EXPONENT_FLOAT}    {squeeze(yytext, '_'); printf("Found exponent number: %s\n", yytext);}
 
 #|\/\/  {str[0] = 0; BEGIN(SINGLE_LINE_COMMENT);}
-"/*"    {BEGIN(MULTILINE_COMMENT); printf("Found multiline comment:\n");}
+"/*"    {str[0] = 0; BEGIN(MULTILINE_COMMENT);}
 
 \'      {str[0] = 0; BEGIN(SINGLE_QUOTE_STRING);}
 \"      {str[0] = 0; BEGIN(DOUBLE_QUOTE_STRING);}
@@ -194,11 +194,12 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             printf("Found html code section: %s\n", str);
                             printf("Found start php code section: %s\n", yytext);
                           }
-<NOT_IN_PHP_CODE>.        {strcat(str, yytext);}
-<NOT_IN_PHP_CODE>\n       {lineCount++; strcat(str, yytext);}
+<NOT_IN_PHP_CODE>[^<]+    {strcat(str, yytext);}
+<NOT_IN_PHP_CODE>\<[^?]   {strcat(str, yytext);}
 <NOT_IN_PHP_CODE><<EOF>>  {printf("Found html code section: %s\n", str); BEGIN(INITIAL);}
 
-<SINGLE_LINE_COMMENT>.    {strcat(str, yytext);}
+<SINGLE_LINE_COMMENT>[^?\n]+  {strcat(str, yytext);}
+<SINGLE_LINE_COMMENT>\?[^>]   {strcat(str, yytext);}
 <SINGLE_LINE_COMMENT>"?>" {
                             inCode = false; 
                             printf("Found single-line comment: %s\n", str);
@@ -208,8 +209,9 @@ goto                {printf("Found keyword: %s\n", yytext);}
                           }
 <SINGLE_LINE_COMMENT>\n   {printf("Found single-line comment: %s\n", str); BEGIN(INITIAL);}
 
-<MULTILINE_COMMENT>.|\n   {printf("%s", yytext);}
-<MULTILINE_COMMENT>"*/"   {BEGIN(INITIAL);}
+<MULTILINE_COMMENT>[^*]+  {strcat(str, yytext);}
+<MULTILINE_COMMENT>\*[^/]  {strcat(str, yytext);}
+<MULTILINE_COMMENT>"*/"   {printf("Found multiline comment: %s\n", str); BEGIN(INITIAL);}
 
 <EXECUTION_OPERATOR>[^`]  {strcat(str, yytext);}
 <EXECUTION_OPERATOR>"`"   {printf("Found shell command: %s\n", str); BEGIN(INITIAL);}
