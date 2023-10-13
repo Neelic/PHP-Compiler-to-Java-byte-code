@@ -31,7 +31,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 %%
 
 %{
-    char str[10000];
+    std::string str[10000];
     str[0] = 0;
     int nestingCount = 0;
     int static lineCount = 1;
@@ -104,7 +104,6 @@ include_once        {printf("Found keyword: %s\n", yytext);}
 goto                {printf("Found keyword: %s\n", yytext);}
 
 ","		            {printf("Found special character: %s\n", yytext);}
-"|"		            {printf("Found special character: %s\n", yytext);}
 ";"                 {printf("Found special character: %s\n", yytext);}
 "("		            {printf("Found special character: %s\n", yytext);}
 ")"		            {printf("Found special character: %s\n", yytext);}
@@ -162,7 +161,8 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "."		            {printf("Found operator: %s\n", yytext);}
 "@"                 {printf("Found operator: %s\n", yytext);}
 
-\n                  {lineCount += 1;}
+\n+                 {lineCount += yyleng;}
+[\t\r\t\f\v ]+      {}
 "?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; str[0] = 0; BEGIN(NOT_IN_PHP_CODE);}
 {IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
@@ -180,6 +180,8 @@ goto                {printf("Found keyword: %s\n", yytext);}
 
 "`"     {str[0] = 0; BEGIN(EXECUTION_OPERATOR);}
 
+.       {printf("Unknown character: %s\n", yytext);}
+
 <NOT_IN_PHP_CODE>"<?"     {
                             inCode = true; 
                             BEGIN(INITIAL); 
@@ -193,7 +195,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             printf("Found start php code section: %s\n", yytext);
                           }
 <NOT_IN_PHP_CODE>[^<]+    {strcat(str, yytext);}
-<NOT_IN_PHP_CODE>\<[^?]   {strcat(str, yytext);}
+<NOT_IN_PHP_CODE>\<+[^?]  {strcat(str, yytext);}
 <NOT_IN_PHP_CODE><<EOF>>  {printf("Found html code section: %s\n", str); BEGIN(INITIAL);}
 
 <SINGLE_LINE_COMMENT>[^?\n]+  {strcat(str, yytext);}
@@ -208,10 +210,10 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <SINGLE_LINE_COMMENT>\n   {printf("Found single-line comment: %s\n", str); BEGIN(INITIAL);}
 
 <MULTILINE_COMMENT>[^*]+  {strcat(str, yytext);}
-<MULTILINE_COMMENT>\*[^/]  {strcat(str, yytext);}
+<MULTILINE_COMMENT>\*[^/] {strcat(str, yytext);}
 <MULTILINE_COMMENT>"*/"   {printf("Found multiline comment: %s\n", str); BEGIN(INITIAL);}
 
-<EXECUTION_OPERATOR>[^`]  {strcat(str, yytext);}
+<EXECUTION_OPERATOR>[^`]+ {strcat(str, yytext);}
 <EXECUTION_OPERATOR>"`"   {printf("Found shell command: %s\n", str); BEGIN(INITIAL);}
 
 <SINGLE_QUOTE_STRING>[^\'\\]+   {strcat(str, yytext);}
@@ -229,16 +231,17 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\\f                     {strcat(str, "\f");}
 <DOUBLE_QUOTE_STRING>\\\"                    {strcat(str, "\"");}
 <DOUBLE_QUOTE_STRING>\\\$                    {strcat(str, "$");}
-<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
-<DOUBLE_QUOTE_STRING><SINGLE_QUOTE_STRING>"<<EOF>>"     {error_print("Unclosed string", lineCount, false);}
+<DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
+<DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING><<EOF>>     {error_print("Unclosed string", lineCount, false);}
 <DOUBLE_QUOTE_STRING>\{\$ {
     printf("Found string %s\n", str);
     printf("Found concatenation: .\n");
+    printf("Found operation: $\n");
     nestingCount++;
     BEGIN(INITIAL);
 }
 <DOUBLE_QUOTE_STRING>\${IDENTIFIER} {
-    error_print("Non supported interpolition", lineCount, true);
+    error_print("Non supported interpolation", lineCount, true);
     strcat(str, yytext);
     /* str[0] = 0; */
 }

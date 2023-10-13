@@ -19,13 +19,13 @@
 
 class Person
 {
-    public $name;
+    public $name = 100;
     private static $age;
 
     public function __construct($name, $age)
     {
         $this->name = $name;
-        $this->age = $age;
+        $this->age = $age | $age;
     }
 
     public function greet()
