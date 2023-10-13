@@ -34,9 +34,10 @@ class Person
         die();
     }
 
-    public static function statFunc()
+    public static function statFunc($name)
     {
-        echo "Hello, my name is A and I am " . self::$age . " years old." . PHP_EOL;
+        echo "Hello, my $name is A and I am " . self::$age . " years old." . PHP_EOL;
+        yield from "as";
     }
 }
 
@@ -46,7 +47,7 @@ $person2 = new Person("Jane", 30);
 $str = '\n \\ \'';
 $nul = (int) 1;
 
-Person::statFunc();
+Person::statFunc('a');
 
 $persons = [$person1, $person2];
 
