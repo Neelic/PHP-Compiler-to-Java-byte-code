@@ -19,8 +19,10 @@
 
 class Person
 {
-    public $name = 100;
+    static public $name = 100;
     private static $age;
+
+    private static $a = static function() use ($name) {};
 
     public function __construct($name, $age)
     {
@@ -37,9 +39,18 @@ class Person
     public static function statFunc($name)
     {
         echo "Hello, my $name is A and I am " . self::$age . " years old." . PHP_EOL;
+        
         yield from "as";
     }
 }
+
+abstract class Example {
+    abstract public $c = 1;
+    public abstract static function a();
+    abstract private $b = function() {};
+}
+
+$a = static function() {};
 
 // Creating instances of the Person class 
 $person1 = new Person("John", 2.5);
