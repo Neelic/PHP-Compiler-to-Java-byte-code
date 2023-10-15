@@ -79,7 +79,8 @@ $binary = 0b11111111;
 $interpolStr = "String interpol $int";
 $interpolStrOther = "String interpol {$person->name}";
 
-person - 1;
+define('person', 1);
+$tmp = person - 1;
 
 // Loops - for loop
 for ($i = 0; $i < count($persons); $i++) {
