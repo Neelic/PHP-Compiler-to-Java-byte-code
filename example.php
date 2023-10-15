@@ -52,13 +52,22 @@ abstract class Example {
 
 $a = static function() {};
 
+function b () {}
+
+b()::a;
+
+static fn($x) => $x + $a;
+
 // Creating instances of the Person class 
 $person1 = new Person("John", 2.5);
 $person2 = new Person("Jane", 30);
+echo $person1::$name[0];
 $str = '\n \\ \'';
 $nul = (int) 1;
 
 Person::statFunc('a');
+
+('a' . 's')[0];
 
 $persons = [$person1, $person2];
 
@@ -70,12 +79,14 @@ $binary = 0b11111111;
 $interpolStr = "String interpol $int";
 $interpolStrOther = "String interpol {$person->name}";
 
+person - 1;
+
 // Loops - for loop
 for ($i = 0; $i < count($persons); $i++) {
     $persons[$i]->greet();
 }
 
-foreach ($persons as $key => $a) {
+foreach ($persons as $ke => &$a) {
     # code...
     PHP_EOL;
 }

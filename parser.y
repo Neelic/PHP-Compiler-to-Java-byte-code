@@ -3,6 +3,8 @@
 %}
 
 %token R_ARROW
+%token R_ARROW_O
+%token QUARTER_DOT
 
 %token ID
 %token NUMBER
@@ -18,6 +20,7 @@
 %token ELSE
 
 %token FUNCTION
+%token FN
 %token USE
 
 %token CLASS
@@ -30,35 +33,39 @@
 %token STATIC
 
 %right '='
-%left '-' '+'
+%left '-' '+' '.'
 %left '/' '*' '%'
 %right U_MINUS U_PLUS
-%right '!'
-%left '.' '['']' R_ARROW
 %left '>' '<'
+%right '!'
+%left '['']' R_ARROW R_ARROW_O QUARTER_DOT
 %nonassoc '('')'
 
 %%
 
 start: top_stmt_list
 
-top_stmt_list: top_stmt_list_ex
-
-top_stmt_list_ex: top_stmt_list_ex top_stmt
+top_stmt_list: top_stmt_list_not_e
                 | /* empty */
+
+top_stmt_list_not_e: top_stmt
+                |    top_stmt_list_not_e top_stmt
 
 top_stmt: stmt
 
 get_value: '$'
         |  get_value '$'
 
+get_value_func:   '&' '$' ID
+                | '$' ID
+
 if_stmt:  IF '(' expr ')' stmt
         | IF '(' expr ')' stmt ELSE stmt
 
-for_stmt: FOR '(' expr ';' expr ';' expr ')' stmt
+for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt
 
-foreach_stmt: FOREACH '(' expr AS expr ')' stmt
-        |     FOREACH '(' expr AS expr '=' '>' expr ')' stmt
+foreach_stmt: FOREACH '(' var_expr AS var_expr ')' stmt
+        |     FOREACH '(' var_expr AS var_expr R_ARROW_O get_value_func ID ')' stmt
 
 while_stmt: WHILE '(' expr ')' stmt
 
@@ -76,26 +83,52 @@ stmt:     expr';'
         | function_stmt_decl
         | class_stmt_decl
 
+
+stmt_list: stmt
+	|  stmt_list stmt
+
 expr:     NUMBER
-        | string_expr
-        | get_value ID
+        | var_expr
         | expr '=' expr
-        | expr '[' expr ']'
         | expr '-' expr
         | expr '+' expr
         | expr '*' expr
         | expr '/' expr
         | expr '%' expr
-        | '-'expr %prec U_MINUS
-        | '+'expr %prec U_PLUS
+        | expr '>' expr
+        | expr '<' expr
         | expr '=' ID
         | expr '-' ID
         | expr '+' ID
         | expr '*' ID
         | expr '/' ID
         | expr '%' ID
-        | ID'('expr_list')'
-        | expr R_ARROW get_value ID %prec R_ARROW
+        | expr '>' ID
+        | expr '<' ID
+        | ID '-' expr
+        | ID '+' expr
+        | ID '*' expr
+        | ID '/' expr
+        | ID '%' expr
+        | ID '>' expr
+        | ID '<' expr
+        | '-' expr %prec U_MINUS
+        | '+' expr %prec U_PLUS
+        | '-' ID %prec U_MINUS
+        | '+' ID %prec U_MINUS
+
+expr_may_empty: expr
+                | /* empty */
+
+var_expr: get_value ID
+        | '(' expr ')'
+        | string_expr
+        | var_expr '[' expr ']'
+        | function_call_expr
+        | var_expr R_ARROW ID
+        | var_expr R_ARROW var_expr
+        | var_expr QUARTER_DOT ID
+        | var_expr QUARTER_DOT var_expr
 
 string_expr: STRING
         |    string_expr '.' STRING
@@ -106,7 +139,7 @@ id_list:  ID ',' ID
         | id_list ',' ID
 
 expr_list_not_e:  expr
-	        | expr_list','expr
+	        | expr_list_not_e ',' expr
 
 expr_list: expr_list_not_e
 	| /* empty */ 
@@ -144,6 +177,7 @@ class_stmt: class_expr ';'
 
 class_expr: class_expr_visibility get_value ID '=' expr
         |   class_expr_visibility get_value ID '=' ID
+        |   class_expr_visibility get_value ID
 
 abstract_class_def: ABSTRACT class_expr_def
 
@@ -164,22 +198,47 @@ abstract_class_expr_visibility:   class_expr_visibility ABSTRACT
                                 | STATIC ABSTRACT PROTECTED
                                 | ABSTRACT class_expr_visibility
 
+abstract_class_expr: abstract_class_expr_visibility get_value ID '=' expr
+                |    abstract_class_expr_visibility get_value ID '=' ID
+                |    abstract_class_expr_visibility get_value ID
+
 abstract_class_stmt: abstract_class_expr_visibility function_def ';'
                 |    abstract_class_expr_visibility anon_function_stmt_decl
+                |    abstract_class_expr ';'
 
-stmt_list: stmt
-	|  stmt_list stmt
+function_call_expr: ID '(' expr_list ')'
+                |   get_value ID branches
 
-function_def: FUNCTION ID '(' expr_list ')'
+branches: '(' expr_list ')'
+        | branches '(' expr_list ')'
+
+function_def: FUNCTION ID '(' expr_func_list ')'
 
 function_stmt_decl: function_def '{' stmt_list '}'
+                |   anon_function_stmt_decl
+                |   anon_function_short_stmt_decl
 
-anon_function_def: get_value ID '=' FUNCTION '(' expr_list ')'
-                |  get_value ID '=' FUNCTION '(' expr_list ')' USE '(' get_value ID ')'
-                |  get_value ID '=' STATIC FUNCTION '(' expr_list ')'
-                |  get_value ID '=' STATIC FUNCTION '(' expr_list ')' USE '(' get_value ID ')'
+expr_func_list:   expr_func_list_not_e
+                | /* empty */
+
+expr_func_list_not_e: get_value_func ID
+                |     get_value_func ID '=' ID
+                |     get_value_func ID '=' expr
+                |     expr_func_list_not_e ',' get_value_func ID
+                |     expr_func_list_not_e ',' get_value_func ID '=' ID
+                |     expr_func_list_not_e ',' get_value_func ID '=' expr
+
+anon_function_def: FUNCTION '(' expr_func_list ')'
+                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func ID ')'
+                |  STATIC FUNCTION '(' expr_func_list ')'
+                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func ID ')'
 
 anon_function_stmt_decl: anon_function_def '{' stmt_list '}' ';'
+
+anon_function_short_def:  FN '(' expr_func_list ')'
+                        | STATIC FN '(' expr_func_list ')'
+
+anon_function_short_stmt_decl: anon_function_short_def R_ARROW_O stmt
 
 %%
 
