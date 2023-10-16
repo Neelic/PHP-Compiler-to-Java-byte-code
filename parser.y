@@ -22,6 +22,8 @@
 %token FUNCTION
 %token FN
 %token USE
+%token STATIC
+%token GLOBAL
 
 %token CLASS
 %token ABSTRACT
@@ -30,7 +32,6 @@
 %token PUBLIC
 %token PRIVATE
 %token PROTECTED
-%token STATIC
 
 %right '='
 %left '-' '+' '.'
@@ -71,11 +72,12 @@ while_stmt: WHILE '(' expr ')' stmt
 
 do_while_stmt: DO stmt WHILE '(' expr ')' ';'
 
-stmt:     expr';'
-        | ID ';'
+stmt:     simple_stmt
         | if_stmt
         | '{'stmt_list'}'
         | ';'
+        | STATIC static_var_list ';'
+        | GLOBAL global_var_list ';'
         | while_stmt
         | do_while_stmt
         | for_stmt
@@ -83,6 +85,16 @@ stmt:     expr';'
         | function_stmt_decl
         | class_stmt_decl
 
+static_var_list:  '$' ID
+                | '$' ID '=' expr
+                | static_var_list ',' '$' ID
+                | static_var_list ',' '$' ID '=' expr
+
+global_var_list:  get_value ID
+                | global_var_list ',' get_value ID
+
+simple_stmt: expr ';'
+        |    ID ';'
 
 stmt_list: stmt
 	|  stmt_list stmt
@@ -120,15 +132,18 @@ expr:     NUMBER
 expr_may_empty: expr
                 | /* empty */
 
-var_expr: get_value ID
+var_expr: callable_var
         | '(' expr ')'
         | string_expr
-        | var_expr '[' expr ']'
-        | function_call_expr
         | var_expr R_ARROW ID
         | var_expr R_ARROW var_expr
         | var_expr QUARTER_DOT ID
         | var_expr QUARTER_DOT var_expr
+
+callable_var:     get_value ID
+                | get_value '{' expr '}'
+                | var_expr '[' expr ']'
+                | function_call_expr
 
 string_expr: STRING
         |    string_expr '.' STRING
@@ -217,6 +232,8 @@ function_def: FUNCTION ID '(' expr_func_list ')'
 function_stmt_decl: function_def '{' stmt_list '}'
                 |   anon_function_stmt_decl
                 |   anon_function_short_stmt_decl
+                |   var_expr '=' anon_function_stmt_decl
+                |   var_expr '=' anon_function_short_stmt_decl
 
 expr_func_list:   expr_func_list_not_e
                 | /* empty */
@@ -238,7 +255,7 @@ anon_function_stmt_decl: anon_function_def '{' stmt_list '}' ';'
 anon_function_short_def:  FN '(' expr_func_list ')'
                         | STATIC FN '(' expr_func_list ')'
 
-anon_function_short_stmt_decl: anon_function_short_def R_ARROW_O stmt
+anon_function_short_stmt_decl: anon_function_short_def R_ARROW_O simple_stmt
 
 %%
 

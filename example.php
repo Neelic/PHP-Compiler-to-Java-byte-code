@@ -52,9 +52,14 @@ abstract class Example {
 
 $a = static function() {};
 
+static $a = null, $b;
+global $a, $$b;
+
 function b () {}
 
 b()::a;
+
+${1 + 2}->cal_info();
 
 static fn($x) => $x + $a;
 
@@ -71,7 +76,7 @@ Person::statFunc('a');
 
 $persons = [$person1, $person2];
 
-$int = 1_000; 
+static $int = 1_000; 
 $hexdec = 0x1A;
 $octal = 0123;
 $octal_other = 0o123;
