@@ -2,6 +2,9 @@
 #include <stdio.h>
 %}
 
+%token START_CODE_PHP_TAG
+%token END_CODE_PHP_TAG
+
 %token R_ARROW
 %token R_ARROW_O
 %token QUARTER_DOT
@@ -52,7 +55,7 @@ top_stmt_list: top_stmt_list_not_e
 top_stmt_list_not_e: top_stmt
                 |    top_stmt_list_not_e top_stmt
 
-top_stmt: stmt
+top_stmt: START_CODE_PHP_TAG stmt_list END_CODE_PHP_TAG
 
 get_value: '$'
         |  get_value '$'
