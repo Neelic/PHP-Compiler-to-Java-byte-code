@@ -104,7 +104,7 @@ stmt_list: stmt
 
 expr:     NUMBER
         | var_expr
-        | expr '=' expr
+        | var_expr '=' expr
         | expr '-' expr
         | expr '+' expr
         | expr '*' expr
@@ -112,7 +112,7 @@ expr:     NUMBER
         | expr '%' expr
         | expr '>' expr
         | expr '<' expr
-        | expr '=' ID
+        | var_expr '=' ID
         | expr '-' ID
         | expr '+' ID
         | expr '*' ID
