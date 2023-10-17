@@ -226,7 +226,7 @@ abstract_class_expr: abstract_class_expr_visibility get_value ID '=' expr
                 |    abstract_class_expr_visibility get_value ID
 
 abstract_class_stmt: abstract_class_expr_visibility function_def ';'
-                |    abstract_class_expr_visibility anon_function_stmt_decl
+                |    abstract_class_expr_visibility anon_function_expr ';'
                 |    abstract_class_expr ';'
 
 function_call_expr: ID '(' expr_list ')'
