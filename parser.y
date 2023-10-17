@@ -131,6 +131,7 @@ expr:     NUMBER
         | '+' expr %prec U_PLUS
         | '-' ID %prec U_MINUS
         | '+' ID %prec U_MINUS
+        | anon_function_expr
 
 expr_may_empty: expr
                 | /* empty */
@@ -233,10 +234,10 @@ branches: '(' expr_list ')'
 function_def: FUNCTION ID '(' expr_func_list ')'
 
 function_stmt_decl: function_def '{' stmt_list '}'
-                |   anon_function_stmt_decl
+                |   anon_function_expr ';'
+
+anon_function_expr: anon_function_stmt_decl
                 |   anon_function_short_stmt_decl
-                |   var_expr '=' anon_function_stmt_decl
-                |   var_expr '=' anon_function_short_stmt_decl
 
 expr_func_list:   expr_func_list_not_e
                 | /* empty */
@@ -253,12 +254,12 @@ anon_function_def: FUNCTION '(' expr_func_list ')'
                 |  STATIC FUNCTION '(' expr_func_list ')'
                 |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func ID ')'
 
-anon_function_stmt_decl: anon_function_def '{' stmt_list '}' ';'
+anon_function_stmt_decl: anon_function_def '{' stmt_list '}'
 
 anon_function_short_def:  FN '(' expr_func_list ')'
                         | STATIC FN '(' expr_func_list ')'
 
-anon_function_short_stmt_decl: anon_function_short_def R_ARROW_O simple_stmt
+anon_function_short_stmt_decl: anon_function_short_def R_ARROW_O expr
 
 %%
 

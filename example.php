@@ -52,7 +52,7 @@ abstract class Example {
 
 $a = static function() {};
 
-static $a = null, $b;
+static $a = null, $b = function() use ($_COOKIE) {}, $c = fn() => 1 + 2, $d;
 global $a, $$b;
 
 function b () {}
