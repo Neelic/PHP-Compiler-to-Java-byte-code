@@ -63,6 +63,9 @@ get_value: '$'
 get_value_func:   '&' '$' ID
                 | '$' ID
 
+get_value_func_list_not_e: get_value_func
+                        |  get_value_func_list_not_e ',' get_value_func
+
 if_stmt:  IF '(' expr ')' stmt
         | IF '(' expr ')' stmt ELSE stmt
 
@@ -192,6 +195,7 @@ class_stmt_list_not_e:    class_stmt
 class_stmt: class_expr ';'
         |   class_expr_visibility function_stmt_decl
         |   USE ID ';'
+        |   USE id_list ';'
         |   class_stmt_decl
 
 class_expr: class_expr_visibility get_value ID '=' expr
@@ -242,17 +246,17 @@ anon_function_expr: anon_function_stmt_decl
 expr_func_list:   expr_func_list_not_e
                 | /* empty */
 
-expr_func_list_not_e: get_value_func ID
+expr_func_list_not_e: get_value_func_list_not_e
                 |     get_value_func ID '=' ID
                 |     get_value_func ID '=' expr
-                |     expr_func_list_not_e ',' get_value_func ID
+                |     expr_func_list_not_e ',' get_value_func_list_not_e
                 |     expr_func_list_not_e ',' get_value_func ID '=' ID
                 |     expr_func_list_not_e ',' get_value_func ID '=' expr
 
 anon_function_def: FUNCTION '(' expr_func_list ')'
-                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func ID ')'
+                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'
                 |  STATIC FUNCTION '(' expr_func_list ')'
-                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func ID ')'
+                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'
 
 anon_function_stmt_decl: anon_function_def '{' stmt_list '}'
 

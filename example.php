@@ -45,6 +45,7 @@ class Person
 }
 
 abstract class Example {
+    use property, ai;
     abstract public $c = 1;
     public abstract static function a();
     abstract private $b = function() {};
@@ -52,7 +53,7 @@ abstract class Example {
 
 $a = static function() {};
 
-static $a = null, $b = function() use ($_COOKIE) {}, $c = fn() => 1 + 2, $d;
+static $a = null, $b = function() use ($_COOKIE, $_ENV) {}, $c = fn() => 1 + 2, $d;
 global $a, $$b;
 
 function b () {}
