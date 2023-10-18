@@ -8,8 +8,20 @@
 </head>
 <body>
     <div class=".<\?php>">
+        <?php if (true): $a = 1; $b = 2?>
+        <?php elseif(true):?>
         <? echo "SOMETHING \$" ?>
         <!-- <\?php -->
+        <?php endif;?>
+        <?php for ($i = 0; $i <= 1; $i++):?>
+        <?php endfor;?>
+        <?php while (1): ?>
+            <?php break; endwhile;?>
+        <?php switch(true):
+                case 1: ?>
+            <?php case 2: ?>
+            <?php default:?>
+        <?php endswitch;?>
     </div>
 </body>
 </html>

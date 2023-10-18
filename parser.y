@@ -4,6 +4,7 @@
 
 %token START_CODE_PHP_TAG
 %token END_CODE_PHP_TAG
+%token HTML
 
 %token R_ARROW
 %token R_ARROW_O
@@ -14,13 +15,22 @@
 %token STRING
 
 %token FOR
+%token END_FOR
 %token WHILE
+%token END_WHILE
 %token DO
 %token FOREACH
 %token AS
+%token END_FOREACH
 
 %token IF
 %token ELSE
+%token END_IF
+%token SWITCH
+%token CASE
+%token BREAK
+%token DEFAULT
+%token END_SWITCH
 
 %token FUNCTION
 %token FN
@@ -40,7 +50,7 @@
 %left '-' '+' '.'
 %left '/' '*' '%'
 %right U_MINUS U_PLUS
-%left '>' '<'
+%left '>' '<' EQU_MORE EQU_LESS EQUAL EQUAL_STRICT
 %right '!'
 %left '['']' R_ARROW R_ARROW_O QUARTER_DOT
 %nonassoc '('')'
@@ -55,7 +65,7 @@ top_stmt_list: top_stmt_list_not_e
 top_stmt_list_not_e: top_stmt
                 |    top_stmt_list_not_e top_stmt
 
-top_stmt: START_CODE_PHP_TAG stmt_list END_CODE_PHP_TAG
+top_stmt: stmt
 
 get_value: '$'
         |  get_value '$'
@@ -66,20 +76,50 @@ get_value_func:   '&' '$' ID
 get_value_func_list_not_e: get_value_func
                         |  get_value_func_list_not_e ',' get_value_func
 
-if_stmt:  IF '(' expr ')' stmt
-        | IF '(' expr ')' stmt ELSE stmt
+if_stmt:  IF '(' expr_or_const ')' stmt
+        | IF '(' expr_or_const ')' stmt ELSE stmt
+        | IF '(' expr_or_const ')' ':' stmt_list_may_empty END_IF ';'
+        | IF '(' expr_or_const ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG END_IF ';'
+        | IF '(' expr_or_const ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty ELSE ':' stmt_list_may_empty END_IF ';'
+        | IF '(' expr_or_const ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty ELSE ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_IF ';'
+
+switch_stmt: SWITCH '(' expr_or_const ')' '{' '}'
+        |    SWITCH '(' expr_or_const ')' '{' case_stmt_list '}'
+        |    SWITCH '(' expr_or_const ')' ':' case_stmt END_SWITCH ';'
+        |    SWITCH '(' expr_or_const ')' ':' case_stmt END_CODE_PHP_TAG START_CODE_PHP_TAG case_stmt END_SWITCH ';'
+        |    SWITCH '(' expr_or_const ')' ':' case_stmt END_CODE_PHP_TAG case_html_stmt_list START_CODE_PHP_TAG case_stmt END_SWITCH ';'
+
+case_stmt_list:   case_stmt
+                | case_stmt_list case_stmt
+
+case_stmt: CASE expr_or_const ':' stmt_list_may_empty
+        |  CASE expr_or_const ':' stmt_list_may_empty BREAK ';'
+
+case_html_stmt_list: START_CODE_PHP_TAG case_stmt_list END_CODE_PHP_TAG
+                |    HTML
+                |    case_html_stmt_list START_CODE_PHP_TAG case_stmt_list END_CODE_PHP_TAG
+                |    case_html_stmt_list HTML
 
 for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt
+        | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'
+        | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOR ';'
 
 foreach_stmt: FOREACH '(' var_expr AS var_expr ')' stmt
         |     FOREACH '(' var_expr AS var_expr R_ARROW_O get_value_func ID ')' stmt
+        |     FOREACH '(' var_expr AS var_expr ')' ':' stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' var_expr AS var_expr R_ARROW_O get_value_func ID ')' ':' stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' var_expr AS var_expr ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' var_expr AS var_expr R_ARROW_O get_value_func ID ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
 
-while_stmt: WHILE '(' expr ')' stmt
+while_stmt: WHILE '(' expr_or_const ')' stmt
+        |   WHILE '(' expr_or_const ')' ':' stmt_list_may_empty END_WHILE ';'
+        |   WHILE '(' expr_or_const ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_WHILE ';'
 
-do_while_stmt: DO stmt WHILE '(' expr ')' ';'
+do_while_stmt: DO stmt WHILE '(' expr_or_const ')' ';'
 
 stmt:     simple_stmt
         | if_stmt
+        | switch_stmt
         | '{'stmt_list'}'
         | ';'
         | STATIC static_var_list ';'
@@ -105,36 +145,40 @@ simple_stmt: expr ';'
 stmt_list: stmt
 	|  stmt_list stmt
 
+stmt_list_may_empty: stmt_list
+                |    /* empty */
+
+php_code_section: START_CODE_PHP_TAG stmt_list_may_empty END_CODE_PHP_TAG   
+
+html_php_stmt_list_not_e: HTML
+                        | php_code_section
+                        | html_php_stmt_list_not_e HTML
+                        | html_php_stmt_list_not_e php_code_section
+
+html_php_stmt_list: html_php_stmt_list_not_e
+                |   /* empty */
+
 expr:     NUMBER
         | var_expr
-        | var_expr '=' expr
-        | expr '-' expr
-        | expr '+' expr
-        | expr '*' expr
-        | expr '/' expr
-        | expr '%' expr
-        | expr '>' expr
-        | expr '<' expr
-        | var_expr '=' ID
-        | expr '-' ID
-        | expr '+' ID
-        | expr '*' ID
-        | expr '/' ID
-        | expr '%' ID
-        | expr '>' ID
-        | expr '<' ID
-        | ID '-' expr
-        | ID '+' expr
-        | ID '*' expr
-        | ID '/' expr
-        | ID '%' expr
-        | ID '>' expr
-        | ID '<' expr
-        | '-' expr %prec U_MINUS
-        | '+' expr %prec U_PLUS
-        | '-' ID %prec U_MINUS
-        | '+' ID %prec U_MINUS
+        | var_expr '=' expr_or_const
+        | expr_or_const '-' expr_or_const
+        | expr_or_const '+' expr_or_const
+        | expr_or_const '*' expr_or_const
+        | expr_or_const '/' expr_or_const
+        | expr_or_const '%' expr_or_const
+        | expr_or_const '>' expr_or_const
+        | expr_or_const '<' expr_or_const
+        | expr_or_const EQUAL expr_or_const 
+        | expr_or_const EQUAL_STRICT expr_or_const
+        | expr_or_const EQU_MORE expr_or_const
+        | expr_or_const EQU_LESS expr_or_const
+        | '-' expr_or_const %prec U_MINUS
+        | '+' expr_or_const %prec U_PLUS
+        | '!' expr_or_const
         | anon_function_expr
+
+expr_or_const: expr
+        |   ID
 
 expr_may_empty: expr
                 | /* empty */
@@ -157,20 +201,18 @@ string_expr: STRING
         |    string_expr '.' ID
         |    ID '.' string_expr
 
-id_list:  ID ',' ID
+id_list:  ID
         | id_list ',' ID
 
 expr_list_not_e:  expr
-	        | expr_list_not_e ',' expr
+                | expr_list_not_e ',' expr
 
 expr_list: expr_list_not_e
 	| /* empty */ 
 
 class_expr_def:   CLASS ID 
                 | CLASS ID EXTENDS ID
-                | CLASS ID IMPLEMENTS ID
                 | CLASS ID IMPLEMENTS id_list
-                | CLASS ID EXTENDS ID IMPLEMENTS ID
                 | CLASS ID EXTENDS ID IMPLEMENTS id_list
 
 class_stmt_decl:  class_expr_def '{' class_stmt_list '}'
@@ -194,12 +236,10 @@ class_stmt_list_not_e:    class_stmt
 
 class_stmt: class_expr ';'
         |   class_expr_visibility function_stmt_decl
-        |   USE ID ';'
         |   USE id_list ';'
         |   class_stmt_decl
 
-class_expr: class_expr_visibility get_value ID '=' expr
-        |   class_expr_visibility get_value ID '=' ID
+class_expr: class_expr_visibility get_value ID '=' expr_or_const
         |   class_expr_visibility get_value ID
 
 abstract_class_def: ABSTRACT class_expr_def
@@ -247,11 +287,9 @@ expr_func_list:   expr_func_list_not_e
                 | /* empty */
 
 expr_func_list_not_e: get_value_func_list_not_e
-                |     get_value_func ID '=' ID
-                |     get_value_func ID '=' expr
+                |     get_value_func ID '=' expr_or_const
                 |     expr_func_list_not_e ',' get_value_func_list_not_e
-                |     expr_func_list_not_e ',' get_value_func ID '=' ID
-                |     expr_func_list_not_e ',' get_value_func ID '=' expr
+                |     expr_func_list_not_e ',' get_value_func ID '=' expr_or_const
 
 anon_function_def: FUNCTION '(' expr_func_list ')'
                 |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'
@@ -263,7 +301,7 @@ anon_function_stmt_decl: anon_function_def '{' stmt_list '}'
 anon_function_short_def:  FN '(' expr_func_list ')'
                         | STATIC FN '(' expr_func_list ')'
 
-anon_function_short_stmt_decl: anon_function_short_def R_ARROW_O expr
+anon_function_short_stmt_decl: anon_function_short_def R_ARROW_O expr_or_const
 
 %%
 
