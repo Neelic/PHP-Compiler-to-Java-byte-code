@@ -166,7 +166,7 @@ switch ($day) {
         break;
 }
 
-// Conditionals - match?> (added in PHP 8.0)
+// Conditionals - match (added in PHP 8.0)
 $number = 2;
 $matchResult = match ($number) {
     1 => "One",
@@ -186,8 +186,8 @@ declare(ticks=1);
 goto a;
 
 a:
-echo 'Bar';
+echo 'Bar' . "";
 
-$output = `ls -al`;
+$output = `ls -al` . '';
 
 $rev = &$val;

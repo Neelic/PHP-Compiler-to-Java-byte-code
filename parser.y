@@ -6,13 +6,10 @@
 %token END_CODE_PHP_TAG
 %token HTML
 
-%token R_ARROW
-%token R_DOUBLE_ARROW
-%token QUARTER_DOT
-
 %token ID
 %token NUMBER
 %token STRING
+%token COM_STRING
 
 %token TRY
 %token CATCH
@@ -182,6 +179,8 @@ html_php_stmt_list: html_php_stmt_list_not_e
                 |   /* empty */
 
 expr:     NUMBER
+        | STRING
+        | COM_STRING
         | var_expr
         | var_expr '=' expr_or_const
         | expr_or_const '-' expr_or_const
@@ -216,7 +215,6 @@ expr_may_empty: expr
 
 var_expr: callable_var
         | '(' expr ')'
-        | string_expr
         | var_expr R_ARROW ID
         | var_expr R_ARROW var_expr
         | var_expr QUARTER_DOT ID
@@ -226,11 +224,6 @@ callable_var:     get_value ID
                 | get_value '{' expr '}'
                 | var_expr '[' expr ']'
                 | function_call_expr
-
-string_expr: STRING
-        |    string_expr '.' STRING
-        |    string_expr '.' ID
-        |    ID '.' string_expr
 
 id_list:  ID
         | id_list ',' ID
