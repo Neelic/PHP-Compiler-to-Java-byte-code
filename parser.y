@@ -7,7 +7,7 @@
 %token HTML
 
 %token R_ARROW
-%token R_ARROW_O
+%token R_DOUBLE_ARROW
 %token QUARTER_DOT
 
 %token ID
@@ -35,26 +35,27 @@
 %token FUNCTION
 %token FN
 %token USE
-%token STATIC
 %token GLOBAL
 
 %token CLASS
 %token ABSTRACT
 %token EXTENDS
 %token IMPLEMENTS
-%token PUBLIC
-%token PRIVATE
-%token PROTECTED
+%right PUBLIC PRIVATE PROTECTED READ_ONLY FINAL STATIC
 %token INTERFACE
 %token TRAIT
 
+%right THROW
+%left BOOLEAN_OR
+%left BOOLEAN_AND
+%nonassoc EQUAL EQUAL_STRICT
+%nonassoc '>' '<' EQU_MORE EQU_LESS
 %right '='
 %left '-' '+' '.'
 %left '/' '*' '%'
 %right U_MINUS U_PLUS
-%left '>' '<' EQU_MORE EQU_LESS EQUAL EQUAL_STRICT
 %right '!'
-%left '['']' R_ARROW R_ARROW_O QUARTER_DOT
+%left '['']' R_ARROW R_DOUBLE_ARROW QUARTER_DOT
 %nonassoc '('')'
 
 %%
@@ -109,11 +110,11 @@ for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt
         | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOR ';'
 
 foreach_stmt: FOREACH '(' var_expr AS var_expr ')' stmt
-        |     FOREACH '(' var_expr AS var_expr R_ARROW_O get_value_func ID ')' stmt
+        |     FOREACH '(' var_expr AS var_expr R_DOUBLE_ARROW get_value_func ID ')' stmt
         |     FOREACH '(' var_expr AS var_expr ')' ':' stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' var_expr AS var_expr R_ARROW_O get_value_func ID ')' ':' stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' var_expr AS var_expr R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_FOREACH ';'
         |     FOREACH '(' var_expr AS var_expr ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' var_expr AS var_expr R_ARROW_O get_value_func ID ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' var_expr AS var_expr R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
 
 while_stmt: WHILE '(' expr_or_const ')' stmt
         |   WHILE '(' expr_or_const ')' ':' stmt_list_may_empty END_WHILE ';'
@@ -174,6 +175,8 @@ expr:     NUMBER
         | expr_or_const '%' expr_or_const
         | expr_or_const '>' expr_or_const
         | expr_or_const '<' expr_or_const
+        | expr_or_const BOOLEAN_OR expr_or_const
+        | expr_or_const BOOLEAN_AND expr_or_const
         | expr_or_const EQUAL expr_or_const 
         | expr_or_const EQUAL_STRICT expr_or_const
         | expr_or_const EQU_MORE expr_or_const
@@ -227,15 +230,21 @@ class_stmt_decl:  class_expr_def '{' class_stmt_list '}'
 class_stmt_list: class_stmt_list_not_e
                 | /* empty */
 
-class_expr_visibility:    PUBLIC
-                        | PRIVATE
-                        | PROTECTED
-                        | PUBLIC STATIC
-                        | PRIVATE STATIC
-                        | PROTECTED STATIC
-                        | STATIC PUBLIC
-                        | STATIC PRIVATE
-                        | STATIC PROTECTED
+class_access_mod: PUBLIC
+                | PROTECTED
+                | PRIVATE
+
+class_expr_visibility:    class_access_mod
+                        | class_access_mod STATIC
+                        | STATIC class_access_mod
+                        | FINAL class_access_mod 
+                        | class_access_mod FINAL
+                        | STATIC class_access_mod FINAL
+                        | STATIC FINAL class_access_mod 
+                        | FINAL STATIC class_access_mod
+                        | FINAL class_access_mod STATIC
+                        | class_access_mod STATIC FINAL
+                        | class_access_mod FINAL STATIC
 
 class_stmt_list_not_e:    class_stmt
                         | class_stmt_list_not_e class_stmt
@@ -259,12 +268,14 @@ abstract_class_stmt_list_not_e:   class_stmt
                                 | abstract_class_stmt_list_not_e abstract_class_stmt
 
 abstract_class_expr_visibility:   class_expr_visibility ABSTRACT
-                                | PUBLIC ABSTRACT STATIC
-                                | PRIVATE ABSTRACT STATIC
-                                | PROTECTED ABSTRACT STATIC
-                                | STATIC ABSTRACT PUBLIC
-                                | STATIC ABSTRACT PRIVATE
-                                | STATIC ABSTRACT PROTECTED
+                                | class_access_mod ABSTRACT STATIC
+                                | class_access_mod ABSTRACT STATIC FINAL
+                                | class_access_mod ABSTRACT FINAL STATIC
+                                | STATIC ABSTRACT class_access_mod
+                                | STATIC ABSTRACT FINAL class_access_mod
+                                | FINAL ABSTRACT STATIC class_access_mod
+                                | STATIC FINAL ABSTRACT class_access_mod
+                                | FINAL STATIC ABSTRACT class_access_mod
                                 | ABSTRACT class_expr_visibility
 
 abstract_class_expr: abstract_class_expr_visibility get_value ID '=' expr
@@ -324,7 +335,7 @@ anon_function_stmt_decl: anon_function_def '{' stmt_list '}'
 anon_function_short_def:  FN '(' expr_func_list ')'
                         | STATIC FN '(' expr_func_list ')'
 
-anon_function_short_stmt_decl: anon_function_short_def R_ARROW_O expr_or_const
+anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr_or_const
 
 %%
 
