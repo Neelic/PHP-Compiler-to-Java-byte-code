@@ -63,6 +63,18 @@ abstract class Example {
     abstract private $b = function() {};
 }
 
+interface objectO {}
+
+interface interfaceO extends objectO, id, a {
+    public function a($a = 1);
+}
+
+trait TraitName {
+    public abstract static $a = 1;
+    protected abstract function r();
+}
+
+
 $a = static function() {};
 
 static $a = null, $b = function() use ($_COOKIE, $_ENV) {}, $c = fn() => 1 + 2, $d;

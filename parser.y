@@ -45,6 +45,8 @@
 %token PUBLIC
 %token PRIVATE
 %token PROTECTED
+%token INTERFACE
+%token TRAIT
 
 %right '='
 %left '-' '+' '.'
@@ -132,6 +134,8 @@ stmt:     simple_stmt
         | foreach_stmt
         | function_stmt_decl
         | class_stmt_decl
+        | interface_stmt_decl
+        | trait_stmt_decl
 
 static_var_list:  '$' ID
                 | '$' ID '=' expr
@@ -270,6 +274,23 @@ abstract_class_expr: abstract_class_expr_visibility get_value ID '=' expr
 abstract_class_stmt: abstract_class_expr_visibility function_def ';'
                 |    abstract_class_expr_visibility anon_function_expr ';'
                 |    abstract_class_expr ';'
+
+interface_expr_def: INTERFACE ID 
+                |   INTERFACE ID EXTENDS id_list
+
+interface_stmt_decl: interface_expr_def '{' interface_stmt_list '}'
+
+interface_stmt_list: interface_stmt_list_not_e
+                |    /* empty */
+
+interface_stmt_list_not_e: interface_stmt
+                        |  interface_stmt_list_not_e interface_stmt
+
+interface_stmt: class_expr_visibility function_def ';'
+
+trait_expr_def: TRAIT ID 
+
+trait_stmt_decl: trait_expr_def '{' abstract_class_stmt_list '}'
 
 function_call_expr: ID '(' expr_list ')'
                 |   get_value ID branches
