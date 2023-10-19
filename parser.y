@@ -84,20 +84,22 @@ if_stmt:  IF '(' expr_or_const ')' stmt
         | IF '(' expr_or_const ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty ELSE ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_IF ';'
 
 switch_stmt: SWITCH '(' expr_or_const ')' '{' '}'
-        |    SWITCH '(' expr_or_const ')' '{' case_stmt_list '}'
-        |    SWITCH '(' expr_or_const ')' ':' case_stmt END_SWITCH ';'
-        |    SWITCH '(' expr_or_const ')' ':' case_stmt END_CODE_PHP_TAG START_CODE_PHP_TAG case_stmt END_SWITCH ';'
-        |    SWITCH '(' expr_or_const ')' ':' case_stmt END_CODE_PHP_TAG case_html_stmt_list START_CODE_PHP_TAG case_stmt END_SWITCH ';'
+        |    SWITCH '(' expr_or_const ')' '{' case_default_stmt_list '}'
+        |    SWITCH '(' expr_or_const ')' ':' case_default_stmt END_SWITCH ';'
+        |    SWITCH '(' expr_or_const ')' ':' case_default_stmt END_CODE_PHP_TAG START_CODE_PHP_TAG case_default_stmt END_SWITCH ';'
+        |    SWITCH '(' expr_or_const ')' ':' case_default_stmt END_CODE_PHP_TAG case_html_stmt_list START_CODE_PHP_TAG case_default_stmt END_SWITCH ';'
 
-case_stmt_list:   case_stmt
-                | case_stmt_list case_stmt
+case_default_stmt_list:   case_default_stmt
+                | case_default_stmt_list case_default_stmt
 
-case_stmt: CASE expr_or_const ':' stmt_list_may_empty
+case_default_stmt: CASE expr_or_const ':' stmt_list_may_empty
         |  CASE expr_or_const ':' stmt_list_may_empty BREAK ';'
+        |  DEFAULT ':' stmt_list_may_empty
+        |  DEFAULT ':' stmt_list_may_empty BREAK ';'
 
-case_html_stmt_list: START_CODE_PHP_TAG case_stmt_list END_CODE_PHP_TAG
+case_html_stmt_list: START_CODE_PHP_TAG case_default_stmt_list END_CODE_PHP_TAG
                 |    HTML
-                |    case_html_stmt_list START_CODE_PHP_TAG case_stmt_list END_CODE_PHP_TAG
+                |    case_html_stmt_list START_CODE_PHP_TAG case_default_stmt_list END_CODE_PHP_TAG
                 |    case_html_stmt_list HTML
 
 for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt
