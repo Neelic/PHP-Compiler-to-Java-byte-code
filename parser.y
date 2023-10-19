@@ -53,11 +53,16 @@
 %left BOOLEAN_AND
 %nonassoc EQUAL EQUAL_STRICT
 %nonassoc '>' '<' EQU_MORE EQU_LESS
+%left '|'
+%left '&'
+%left '^'
 %right '='
+%left SHIFT_L SHIFT_R
 %left '-' '+' '.'
 %left '/' '*' '%'
 %right U_MINUS U_PLUS
 %right '!'
+%right '~'
 %left '['']' R_ARROW R_DOUBLE_ARROW QUARTER_DOT
 %nonassoc '('')'
 
@@ -192,9 +197,15 @@ expr:     NUMBER
         | expr_or_const EQUAL_STRICT expr_or_const
         | expr_or_const EQU_MORE expr_or_const
         | expr_or_const EQU_LESS expr_or_const
+        | expr_or_const SHIFT_L expr_or_const
+        | expr_or_const SHIFT_R expr_or_const
+        | expr_or_const '^' expr_or_const
+        | expr_or_const '|' expr_or_const
+        | expr_or_const '&' expr_or_const
         | '-' expr_or_const %prec U_MINUS
         | '+' expr_or_const %prec U_PLUS
         | '!' expr_or_const
+        | '~' expr_or_const
         | anon_function_expr
 
 expr_or_const: expr
