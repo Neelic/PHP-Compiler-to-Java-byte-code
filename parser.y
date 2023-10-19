@@ -14,6 +14,9 @@
 %token NUMBER
 %token STRING
 
+%token TRY
+%token CATCH
+
 %token FOR
 %token END_FOR
 %token WHILE
@@ -41,7 +44,7 @@
 %token ABSTRACT
 %token EXTENDS
 %token IMPLEMENTS
-%right PUBLIC PRIVATE PROTECTED READ_ONLY FINAL STATIC
+%right PUBLIC PRIVATE PROTECTED FINAL STATIC
 %token INTERFACE
 %token TRAIT
 
@@ -122,6 +125,12 @@ while_stmt: WHILE '(' expr_or_const ')' stmt
 
 do_while_stmt: DO stmt WHILE '(' expr_or_const ')' ';'
 
+try_stmt: TRY '{' stmt_list_may_empty '}'
+
+try_catch_stmt:   try_stmt CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
+                | try_stmt CATCH'(' ID ')' '{' stmt_list_may_empty '}'
+                | try_stmt
+
 stmt:     simple_stmt
         | if_stmt
         | switch_stmt
@@ -137,6 +146,8 @@ stmt:     simple_stmt
         | class_stmt_decl
         | interface_stmt_decl
         | trait_stmt_decl
+        | THROW expr ';'
+        | try_catch_stmt
 
 static_var_list:  '$' ID
                 | '$' ID '=' expr

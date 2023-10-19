@@ -77,8 +77,12 @@ trait TraitName {
 
 $a = static function() {};
 
-static $a = null, $b = function() use ($_COOKIE, $_ENV) {}, $c = fn() => 1 + 2, $d;
-global $a, $$b;
+try {
+    static $a = null, $b = function() use ($_COOKIE, $_ENV) {}, $c = fn() => 1 + 2, $d;
+    global $a, $$b;
+} catch (a $a) {
+    
+}
 
 function b () {}
 
@@ -86,7 +90,7 @@ b()::a;
 
 ${1 + 2}->cal_info();
 
-static fn($x) => $x + $a;
+static fn($x) => throw $x + $a;
 
 // Creating instances of the Person class 
 $person1 = new Person("John", 2.5);
