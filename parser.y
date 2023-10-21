@@ -17,6 +17,8 @@
 %token CATCH
 %token FINALLY
 
+%token MATCH
+
 %token FOR
 %token END_FOR
 %token WHILE
@@ -137,6 +139,18 @@ while_stmt: WHILE '(' expr_or_const ')' stmt
 
 do_while_stmt: DO stmt WHILE '(' expr_or_const ')' ';'
 
+match_stmt: MATCH '(' expr_or_const ')' '{' match_stmt_list '}' ';'
+
+match_stmt_list:  match_stmt_list_not_e
+                | /* empty */
+
+match_stmt_list_not_e:    match_arm 
+                        | match_stmt_list_not_e ',' match_arm
+
+match_arm: expr_or_const_list_not_e R_DOUBLE_ARROW expr_or_const
+        |  DEFAULT R_DOUBLE_ARROW expr_or_const
+        |  DEFAULT ',' R_DOUBLE_ARROW expr_or_const
+
 try_stmt: TRY '{' stmt_list_may_empty '}'
 
 try_catch_stmt:   try_stmt CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
@@ -163,6 +177,7 @@ stmt:     simple_stmt
         | trait_stmt_decl
         | THROW expr ';'
         | try_catch_stmt
+        | match_stmt
         | CONST const_decl_list_not_e ';'
         | return_stmt
 
@@ -237,6 +252,9 @@ expr:     NUMBER
 
 expr_or_const:    expr
                 | ID
+
+expr_or_const_list_not_e: expr_or_const
+                        | expr_or_const_list_not_e ',' expr_or_const
 
 expr_may_empty: expr
                 | /* empty */
