@@ -10,9 +10,12 @@
 %token NUMBER
 %token STRING
 %token COM_STRING
+%token CONST
+%token RETURN
 
 %token TRY
 %token CATCH
+%token FINALLY
 
 %token FOR
 %token END_FOR
@@ -46,9 +49,13 @@
 %token TRAIT
 
 %right THROW
+%left LOGIC_OR
+%left LOGIC_XOR
+%left LOGIC_AND
 %left BOOLEAN_OR
 %left BOOLEAN_AND
 %nonassoc EQUAL EQUAL_STRICT
+%left '?' ':'
 %nonassoc '>' '<' EQU_MORE EQU_LESS
 %left '|'
 %left '&'
@@ -62,6 +69,8 @@
 %right '~'
 %left '['']' R_ARROW R_DOUBLE_ARROW QUARTER_DOT
 %nonassoc '('')'
+
+%nonassoc NEW CLONE
 
 %%
 
@@ -104,6 +113,7 @@ case_default_stmt: CASE expr_or_const ':' stmt_list_may_empty
         |  CASE expr_or_const ':' stmt_list_may_empty BREAK ';'
         |  DEFAULT ':' stmt_list_may_empty
         |  DEFAULT ':' stmt_list_may_empty BREAK ';'
+        |  FINALLY '{' stmt_list_may_empty '}' 
 
 case_html_stmt_list: START_CODE_PHP_TAG case_default_stmt_list END_CODE_PHP_TAG
                 |    HTML
@@ -114,12 +124,12 @@ for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt
         | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'
         | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOR ';'
 
-foreach_stmt: FOREACH '(' var_expr AS var_expr ')' stmt
-        |     FOREACH '(' var_expr AS var_expr R_DOUBLE_ARROW get_value_func ID ')' stmt
-        |     FOREACH '(' var_expr AS var_expr ')' ':' stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' var_expr AS var_expr R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' var_expr AS var_expr ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' var_expr AS var_expr R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
+foreach_stmt: FOREACH '(' var_expr AS callable_var ')' stmt
+        |     FOREACH '(' var_expr AS callable_var R_DOUBLE_ARROW get_value_func ID ')' stmt
+        |     FOREACH '(' var_expr AS callable_var ')' ':' stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' var_expr AS callable_var R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' var_expr AS callable_var ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' var_expr AS callable_var R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
 
 while_stmt: WHILE '(' expr_or_const ')' stmt
         |   WHILE '(' expr_or_const ')' ':' stmt_list_may_empty END_WHILE ';'
@@ -132,6 +142,9 @@ try_stmt: TRY '{' stmt_list_may_empty '}'
 try_catch_stmt:   try_stmt CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
                 | try_stmt CATCH'(' ID ')' '{' stmt_list_may_empty '}'
                 | try_stmt
+
+return_stmt: RETURN expr_or_const ';'
+        |    RETURN ';'
 
 stmt:     simple_stmt
         | if_stmt
@@ -150,17 +163,18 @@ stmt:     simple_stmt
         | trait_stmt_decl
         | THROW expr ';'
         | try_catch_stmt
+        | CONST const_decl_list_not_e ';'
+        | return_stmt
 
 static_var_list:  '$' ID
-                | '$' ID '=' expr
+                | '$' ID '=' expr_or_const
                 | static_var_list ',' '$' ID
-                | static_var_list ',' '$' ID '=' expr
+                | static_var_list ',' '$' ID '=' expr_or_const
 
 global_var_list:  get_value ID
                 | global_var_list ',' get_value ID
 
-simple_stmt: expr ';'
-        |    ID ';'
+simple_stmt: expr_or_const ';'
 
 stmt_list: stmt
 	|  stmt_list stmt
@@ -183,15 +197,25 @@ expr:     NUMBER
         | COM_STRING
         | var_expr
         | var_expr '=' expr_or_const
+        | var_expr '=' '&' var_expr
+        | '(' expr ')'
+        | '(' expr ')' R_ARROW ID
+        | '(' expr ')' R_ARROW var_expr
+        | '(' expr ')' QUARTER_DOT ID
+        | '(' expr ')' QUARTER_DOT var_expr
         | expr_or_const '-' expr_or_const
         | expr_or_const '+' expr_or_const
         | expr_or_const '*' expr_or_const
         | expr_or_const '/' expr_or_const
         | expr_or_const '%' expr_or_const
+        | expr_or_const '.' expr_or_const
         | expr_or_const '>' expr_or_const
         | expr_or_const '<' expr_or_const
         | expr_or_const BOOLEAN_OR expr_or_const
         | expr_or_const BOOLEAN_AND expr_or_const
+        | expr_or_const LOGIC_OR expr_or_const
+        | expr_or_const LOGIC_XOR expr_or_const
+        | expr_or_const LOGIC_AND expr_or_const
         | expr_or_const EQUAL expr_or_const 
         | expr_or_const EQUAL_STRICT expr_or_const
         | expr_or_const EQU_MORE expr_or_const
@@ -206,15 +230,18 @@ expr:     NUMBER
         | '!' expr_or_const
         | '~' expr_or_const
         | anon_function_expr
+        | CLONE expr_or_const
+        | expr_or_const '?' expr_or_const ':' expr_or_const
+        | expr '?' ':' expr_or_const
+        | new_expr
 
-expr_or_const: expr
-        |   ID
+expr_or_const:    expr
+                | ID
 
 expr_may_empty: expr
                 | /* empty */
 
 var_expr: callable_var
-        | '(' expr ')'
         | var_expr R_ARROW ID
         | var_expr R_ARROW var_expr
         | var_expr QUARTER_DOT ID
@@ -233,6 +260,17 @@ expr_list_not_e:  expr
 
 expr_list: expr_list_not_e
 	| /* empty */ 
+
+const_decl_expr: ID '=' expr 
+
+const_decl_list_not_e:    const_decl_expr
+                        | const_decl_list_not_e ',' const_decl_expr
+
+new_expr: NEW ID '(' expr_list ')'
+        | NEW ID
+        | NEW get_value ID
+        | NEW get_value ID '(' expr_list ')'
+        | NEW '(' expr ')'
 
 class_expr_def:   CLASS ID 
                 | CLASS ID EXTENDS ID
@@ -271,6 +309,7 @@ class_stmt: class_expr ';'
 
 class_expr: class_expr_visibility get_value ID '=' expr_or_const
         |   class_expr_visibility get_value ID
+        |   class_expr_visibility CONST const_decl_list_not_e ';'
 
 abstract_class_def: ABSTRACT class_expr_def
 
@@ -296,6 +335,7 @@ abstract_class_expr_visibility:   class_expr_visibility ABSTRACT
 abstract_class_expr: abstract_class_expr_visibility get_value ID '=' expr
                 |    abstract_class_expr_visibility get_value ID '=' ID
                 |    abstract_class_expr_visibility get_value ID
+                |    abstract_class_expr_visibility CONST const_decl_list_not_e ';'
 
 abstract_class_stmt: abstract_class_expr_visibility function_def ';'
                 |    abstract_class_expr_visibility anon_function_expr ';'

@@ -59,13 +59,14 @@ class Person
 abstract class Example {
     use property, ai;
     abstract public $c = 1;
+    const NAME = 1, abc = '123';
     public abstract static function a();
     abstract private $b = function() {};
 }
 
 interface objectO {}
 
-interface interfaceO extends objectO, id, a {
+interface interfaceO extends objectO {
     public function a($a = 1);
 }
 
@@ -80,8 +81,10 @@ $a = static function() {};
 try {
     static $a = null, $b = function() use ($_COOKIE, $_ENV) {}, $c = fn() => 1 + 2, $d;
     global $a, $$b;
-} catch (a $a) {
+} catch (Error $a) {
     
+} finally {
+
 }
 
 function b () {}
@@ -90,7 +93,7 @@ b()::a;
 
 ${1 + 2}->cal_info();
 
-static fn($x) => throw $x + $a;
+static fn($x) => throw $a;
 
 // Creating instances of the Person class 
 $person1 = new Person("John", 2.5);
@@ -121,7 +124,7 @@ for ($i = 0; $i < count($persons); $i++) {
     $persons[$i]->greet();
 }
 
-foreach ($persons as $ke => &$a) {
+foreach (($persons) as $ke => &$a) {
     # code...
     PHP_EOL;
 }
