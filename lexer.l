@@ -4,9 +4,8 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include <string.h>
-    #include <stdbool.h>
-    #include "parser_tab.h"
+    #include <string>
+    #include <iostream>
 
     int error_print(char* errormsg, int lineCount, bool isWarning);
     void squeeze (char s[], int c);
@@ -31,7 +30,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 %%
 
 %{
-    std::string str[10000];
+    char str[10000];
     str[0] = 0;
     int nestingCount = 0;
     int static lineCount = 1;
@@ -253,6 +252,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 %%
 
 int main(void) {
+    std::cout << "Hello";
     FILE *file = fopen("example.php", "r");
     if (file == NULL) {
         printf("File opening error");
@@ -273,7 +273,7 @@ int error_print(char* errormsg, int lineCount, bool isWarning) {
         printf("ERROR: %s on line %d\n", errormsg, lineCount);
         exit(0);
     } else {
-        printf("WARNING: %s on linde %d\n", errormsg, lineCount);
+        printf("WARNING: %s on line %d\n", errormsg, lineCount);
     }
 }
 
