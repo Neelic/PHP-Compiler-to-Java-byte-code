@@ -223,6 +223,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 
 
 <DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+           {strcat(str, yytext);}
+<DOUBLE_QUOTE_STRING>\n                      {strcat(str, yytext);}
 <DOUBLE_QUOTE_STRING>\\n                     {strcat(str, "\n");}
 <DOUBLE_QUOTE_STRING>\\r                     {strcat(str, "\r");}
 <DOUBLE_QUOTE_STRING>\\t                     {strcat(str, "\t");}
@@ -231,6 +232,8 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\\f                     {strcat(str, "\f");}
 <DOUBLE_QUOTE_STRING>\\\"                    {strcat(str, "\"");}
 <DOUBLE_QUOTE_STRING>\\\$                    {strcat(str, "$");}
+<DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {strcat(str, yytext+2)}
+<DOUBLE_QUOTE_STRING>\\u\{[0-9A-Fa-f]+\}     {strcat(str, yytext+2)}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING><<EOF>>     {error_print("Unclosed string", lineCount, false);}
 <DOUBLE_QUOTE_STRING>\{\$ {
@@ -246,6 +249,9 @@ goto                {printf("Found keyword: %s\n", yytext);}
     /* str[0] = 0; */
 }
 <DOUBLE_QUOTE_STRING>\" { 
+    if (nestingCount > 0){
+        error_print("Unclosed interpolation", lineCount, false);
+    }
     printf("Found string literal: %s\n", str);
     BEGIN(INITIAL);
 }
