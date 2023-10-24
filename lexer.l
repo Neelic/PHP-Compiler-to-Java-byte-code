@@ -7,6 +7,7 @@
     #include <string>
     #include <iostream>
 
+    extern int yyparse(void);
     int error_print(char* errormsg, int lineCount, bool isWarning);
     void squeeze (char s[], int c);
 %}
@@ -252,7 +253,6 @@ goto                {printf("Found keyword: %s\n", yytext);}
 %%
 
 int main(void) {
-    std::cout << "Hello";
     FILE *file = fopen("example.php", "r");
     if (file == NULL) {
         printf("File opening error");
@@ -261,7 +261,8 @@ int main(void) {
 
     yyin = file;
 
-    while (yylex() != 0);
+    /* while (yylex() != 0); */
+    yyparse();
 
     fclose(file);
 

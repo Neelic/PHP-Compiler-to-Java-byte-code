@@ -1,5 +1,7 @@
 %{
 #include <stdio.h>
+extern int yylex();
+void yyerror(char* str);
 %}
 
 %token START_CODE_PHP_TAG
@@ -411,10 +413,6 @@ anon_function_short_def:  FN '(' expr_func_list ')'
 anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr_or_const
 
 %%
-
-int main(int argc, char** argv) {
-        return yyparse();
-}
 
 void yyerror(char* str) {
         fprintf(stderr, "ERROR: %s\n", str);
