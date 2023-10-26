@@ -10,7 +10,9 @@
     <div class=".<\?php>">
         <?php if (true): $a = 1; $b = 2?>
         <?php elseif(true):?>
-        <? echo "SOMETHING \$" ?>
+        <? echo "SOMETHING \$";?>
+        <?php echo "abc
+                    cbd";?>
         <!-- <\?php -->
         <?php endif;?>
         <?php for ($i = 0; $i <= 1; $i++):?>

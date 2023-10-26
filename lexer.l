@@ -4,11 +4,10 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include <string>
     #include <iostream>
 
     extern int yyparse(void);
-    int error_print(char* errormsg, int lineCount, bool isWarning);
+    void error_print(char* errormsg, int lineCount, bool isWarning);
     void squeeze (char s[], int c);
 %}
 
@@ -31,8 +30,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 %%
 
 %{
-    char str[10000];
-    str[0] = 0;
+    std::string str = "";
     int nestingCount = 0;
     int static lineCount = 1;
     bool static inCode = false;
@@ -116,7 +114,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
                         } else {
                             nestingCount--;
                             BEGIN(DOUBLE_QUOTE_STRING);
-                            str[0] = 0;
+                            str = "";
                             printf("Found concatenation: .\n");
                         }
                     }
@@ -163,7 +161,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 
 \n+                 {lineCount += yyleng;}
 [\t\r\t\f\v ]+      {}
-"?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; str[0] = 0; BEGIN(NOT_IN_PHP_CODE);}
+"?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; str = ""; BEGIN(NOT_IN_PHP_CODE);}
 {IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
 {INT_HEXIDECIMAL}   {squeeze(yytext, '_'); printf("Found integer hexidecimal number: %s\n", yytext);}
@@ -172,72 +170,72 @@ goto                {printf("Found keyword: %s\n", yytext);}
 {FLOAT}             {squeeze(yytext, '_'); printf("Found float number: %s\n", yytext);}
 {EXPONENT_FLOAT}    {squeeze(yytext, '_'); printf("Found exponent number: %s\n", yytext);}
 
-#|\/\/  {str[0] = 0; BEGIN(SINGLE_LINE_COMMENT);}
-"/*"    {str[0] = 0; BEGIN(MULTILINE_COMMENT);}
+#|\/\/  {str = ""; BEGIN(SINGLE_LINE_COMMENT);}
+"/*"    {str = ""; BEGIN(MULTILINE_COMMENT);}
 
-\'      {str[0] = 0; BEGIN(SINGLE_QUOTE_STRING);}
-\"      {str[0] = 0; BEGIN(DOUBLE_QUOTE_STRING);}
+\'      {str = ""; BEGIN(SINGLE_QUOTE_STRING);}
+\"      {str = ""; BEGIN(DOUBLE_QUOTE_STRING);}
 
-"`"     {str[0] = 0; BEGIN(EXECUTION_OPERATOR);}
+"`"     {str = ""; BEGIN(EXECUTION_OPERATOR);}
 
 .       {printf("Unknown character: %s\n", yytext);}
 
 <NOT_IN_PHP_CODE>"<?"     {
                             inCode = true; 
                             BEGIN(INITIAL); 
-                            printf("Found html code section: %s\n", str); 
+                            printf("Found html code section: %s\n", str.c_str()); 
                             printf("Found start php code section: %s\n", yytext);
                           }
 <NOT_IN_PHP_CODE>"<?php"  {
                             inCode = true; 
                             BEGIN(INITIAL); 
-                            printf("Found html code section: %s\n", str);
+                            printf("Found html code section: %s\n", str.c_str());
                             printf("Found start php code section: %s\n", yytext);
                           }
-<NOT_IN_PHP_CODE>[^<]+    {strcat(str, yytext);}
-<NOT_IN_PHP_CODE>\<+[^?]  {strcat(str, yytext);}
-<NOT_IN_PHP_CODE><<EOF>>  {printf("Found html code section: %s\n", str); BEGIN(INITIAL);}
+<NOT_IN_PHP_CODE>[^<]+    {str += yytext;}
+<NOT_IN_PHP_CODE>\<+[^?]  {str += yytext;}
+<NOT_IN_PHP_CODE><<EOF>>  {printf("Found html code section: %s\n", str.c_str()); BEGIN(INITIAL);}
 
-<SINGLE_LINE_COMMENT>[^?\n]+  {strcat(str, yytext);}
-<SINGLE_LINE_COMMENT>\?[^>]   {strcat(str, yytext);}
+<SINGLE_LINE_COMMENT>[^?\n]+  {str += yytext;}
+<SINGLE_LINE_COMMENT>\?[^>]   {str += yytext;}
 <SINGLE_LINE_COMMENT>"?>" {
                             inCode = false; 
-                            printf("Found single-line comment: %s\n", str);
+                            printf("Found single-line comment: %s\n", str.c_str());
                             printf("Found end php code section: %s\n", yytext); 
                             str[0] = 0; 
                             BEGIN(NOT_IN_PHP_CODE);
                           }
-<SINGLE_LINE_COMMENT>\n   {printf("Found single-line comment: %s\n", str); BEGIN(INITIAL);}
+<SINGLE_LINE_COMMENT>\n   {printf("Found single-line comment: %s\n", str.c_str()); BEGIN(INITIAL);}
 
-<MULTILINE_COMMENT>[^*]+  {strcat(str, yytext);}
-<MULTILINE_COMMENT>\*[^/] {strcat(str, yytext);}
-<MULTILINE_COMMENT>"*/"   {printf("Found multiline comment: %s\n", str); BEGIN(INITIAL);}
+<MULTILINE_COMMENT>[^*]+  {str += yytext;}
+<MULTILINE_COMMENT>\*[^/] {str += yytext;}
+<MULTILINE_COMMENT>"*/"   {printf("Found multiline comment: %s\n", str.c_str()); BEGIN(INITIAL);}
 
-<EXECUTION_OPERATOR>[^`]+ {strcat(str, yytext);}
-<EXECUTION_OPERATOR>"`"   {printf("Found shell command: %s\n", str); BEGIN(INITIAL);}
+<EXECUTION_OPERATOR>[^`]+ {str += yytext;}
+<EXECUTION_OPERATOR>"`"   {printf("Found shell command: %s\n", str.c_str()); BEGIN(INITIAL);}
 
-<SINGLE_QUOTE_STRING>[^\'\\]+   {strcat(str, yytext);}
-<SINGLE_QUOTE_STRING>\\\'       {strcat(str, "\'");}
-<SINGLE_QUOTE_STRING>\\         {strcat(str, "\\");}
-<SINGLE_QUOTE_STRING>\'         {printf("Found string literal: %s\n", str); BEGIN(INITIAL);}
+<SINGLE_QUOTE_STRING>[^\'\\]+   {str += yytext;}
+<SINGLE_QUOTE_STRING>\\\'       {str += "\'";}
+<SINGLE_QUOTE_STRING>\\         {str += "\\";}
+<SINGLE_QUOTE_STRING>\'         {printf("Found string literal: %s\n", str.c_str()); BEGIN(INITIAL);}
 
 
-<DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+           {strcat(str, yytext);}
-<DOUBLE_QUOTE_STRING>\n                      {strcat(str, yytext);}
-<DOUBLE_QUOTE_STRING>\\n                     {strcat(str, "\n");}
-<DOUBLE_QUOTE_STRING>\\r                     {strcat(str, "\r");}
-<DOUBLE_QUOTE_STRING>\\t                     {strcat(str, "\t");}
-<DOUBLE_QUOTE_STRING>\\v                     {strcat(str, "\v");}
-<DOUBLE_QUOTE_STRING>\\e                     {strcat(str, "\e");}
-<DOUBLE_QUOTE_STRING>\\f                     {strcat(str, "\f");}
-<DOUBLE_QUOTE_STRING>\\\"                    {strcat(str, "\"");}
-<DOUBLE_QUOTE_STRING>\\\$                    {strcat(str, "$");}
-<DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {strcat(str, yytext+2)}
-<DOUBLE_QUOTE_STRING>\\u\{[0-9A-Fa-f]+\}     {strcat(str, yytext+2)}
-<DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING>\\\\          {strcat(str, "\\");}
+<DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+           {str += yytext;}
+<DOUBLE_QUOTE_STRING>\n                      {str += yytext;}
+<DOUBLE_QUOTE_STRING>\\n                     {str += "\n";}
+<DOUBLE_QUOTE_STRING>\\r                     {str += "\r";}
+<DOUBLE_QUOTE_STRING>\\t                     {str += "\t";}
+<DOUBLE_QUOTE_STRING>\\v                     {str += "\v";}
+<DOUBLE_QUOTE_STRING>\\e                     {str += "\e";}
+<DOUBLE_QUOTE_STRING>\\f                     {str += "\f";}
+<DOUBLE_QUOTE_STRING>\\\"                    {str += "\"";}
+<DOUBLE_QUOTE_STRING>\\\$                    {str += "$";}
+<DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {str += yytext + 2;}
+<DOUBLE_QUOTE_STRING>\\u\{[0-9A-Fa-f]+\}     {str += yytext + 2;}
+<DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING>\\\\          {str += "\\";}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING><<EOF>>     {error_print("Unclosed string", lineCount, false);}
 <DOUBLE_QUOTE_STRING>\{\$ {
-    printf("Found string %s\n", str);
+    printf("Found string %s\n", str.c_str());
     printf("Found concatenation: .\n");
     printf("Found operation: $\n");
     nestingCount++;
@@ -245,21 +243,24 @@ goto                {printf("Found keyword: %s\n", yytext);}
 }
 <DOUBLE_QUOTE_STRING>\${IDENTIFIER} {
     error_print("Non supported interpolation", lineCount, true);
-    strcat(str, yytext);
-    /* str[0] = 0; */
+    str += yytext;
 }
 <DOUBLE_QUOTE_STRING>\" { 
     if (nestingCount > 0){
         error_print("Unclosed interpolation", lineCount, false);
     }
-    printf("Found string literal: %s\n", str);
+    printf("Found string literal: %s\n", str.c_str());
     BEGIN(INITIAL);
 }
 
 %%
 
-int main(void) {
-    FILE *file = fopen("example.php", "r");
+int main(int argc, char *argv[]) {
+    FILE *file = NULL;
+    if (argc > 1) {
+        file = fopen("example.php", "r");
+    }
+
     if (file == NULL) {
         printf("File opening error");
         return 1;
@@ -267,15 +268,15 @@ int main(void) {
 
     yyin = file;
 
-    /* while (yylex() != 0); */
-    yyparse();
+    while (yylex() != 0);
+    /* yyparse(); */
 
     fclose(file);
 
     return 0;
 }
 
-int error_print(char* errormsg, int lineCount, bool isWarning) {
+void error_print(char* errormsg, int lineCount, bool isWarning) {
     if (!isWarning) {
         printf("ERROR: %s on line %d\n", errormsg, lineCount);
         exit(0);

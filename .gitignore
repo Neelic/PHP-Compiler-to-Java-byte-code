@@ -1,9 +1,9 @@
 lex.yy.c
 result.exe
 result.txt
-parser_tab.c
-parser_tab.h
 parser.output
 parser.tab.cc
 parser.tab.hh
 stack.hh
+parser.tab.h
+parser.tab.c
