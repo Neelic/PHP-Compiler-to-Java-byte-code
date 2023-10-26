@@ -14,10 +14,10 @@ Step 2:
 
 Step 3: compile
 ``` bash
-gcc -o result parser_tab.c lex.yy.c
+gcc -o result parser.tab.c lex.yy.c
 ```
 
 Step 4:
 ``` bash
-.\result.exe > result.txt
+.\result.exe .\example.php > result.txt
 ```
