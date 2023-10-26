@@ -14,6 +14,7 @@ void yyerror(char* str);
 %token COM_STRING
 %token CONST
 %token RETURN
+%token YIELD
 
 %token TRY
 %token CATCH
@@ -93,6 +94,8 @@ get_value: '$'
 
 get_value_func:   '&' '$' ID
                 | '$' ID
+                | ID '&' '$' ID
+                | ID '$' ID
 
 get_value_func_list_not_e: get_value_func
                         |  get_value_func_list_not_e ',' get_value_func
@@ -162,6 +165,9 @@ try_catch_stmt:   try_stmt CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
 return_stmt: RETURN expr_or_const ';'
         |    RETURN ';'
 
+yield_stmt: YIELD expr_or_const ';'
+        |   YIELD ';'
+
 stmt:     simple_stmt
         | if_stmt
         | switch_stmt
@@ -182,6 +188,7 @@ stmt:     simple_stmt
         | match_stmt
         | CONST const_decl_list_not_e ';'
         | return_stmt
+        | yield_stmt
 
 static_var_list:  '$' ID
                 | '$' ID '=' expr_or_const
@@ -215,6 +222,8 @@ expr:     NUMBER
         | var_expr
         | var_expr '=' expr_or_const
         | var_expr '=' '&' var_expr
+        | '(' ID ')' var_expr
+        | '(' ID ')' '(' expr ')'
         | '(' expr ')'
         | '(' expr ')' R_ARROW ID
         | '(' expr ')' R_ARROW var_expr
@@ -385,6 +394,7 @@ branches: '(' expr_list ')'
         | branches '(' expr_list ')'
 
 function_def: FUNCTION ID '(' expr_func_list ')'
+        |     FUNCTION ID '(' expr_func_list ')' ':' ID
 
 function_stmt_decl: function_def '{' stmt_list '}'
                 |   anon_function_expr ';'
@@ -404,11 +414,17 @@ anon_function_def: FUNCTION '(' expr_func_list ')'
                 |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'
                 |  STATIC FUNCTION '(' expr_func_list ')'
                 |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'
+                |  FUNCTION '(' expr_func_list ')' ':' ID
+                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID
+                |  STATIC FUNCTION '(' expr_func_list ')' ':' ID
+                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID
 
 anon_function_stmt_decl: anon_function_def '{' stmt_list '}'
 
 anon_function_short_def:  FN '(' expr_func_list ')'
+                        | FN '(' expr_func_list ')' ':' ID
                         | STATIC FN '(' expr_func_list ')'
+                        | STATIC FN '(' expr_func_list ')' ':' ID
 
 anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr_or_const
 

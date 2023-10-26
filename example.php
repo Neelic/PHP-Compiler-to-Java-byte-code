@@ -36,7 +36,7 @@ class Person
     static public $name = 100;
     private static $age;
 
-    private static $a = static function() use ($name) {};
+    private static $a = static function() use ($name):void {};
 
     public function __construct($name, $age)
     {
@@ -54,7 +54,7 @@ class Person
     {
         echo "Hello, my $name is A and I am " . self::$age . " years old." . PHP_EOL;
         
-        yield from "as";
+        yield;
     }
 }
 
@@ -95,7 +95,7 @@ b()::a;
 
 ${1 + 2}->cal_info();
 
-static fn($x) => throw $a;
+static fn(int $x) => throw $a;
 
 // Creating instances of the Person class 
 $person1 = new Person("John", 2.5);
