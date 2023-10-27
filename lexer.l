@@ -5,6 +5,8 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <iostream>
+    #include <iomanip>
+    #include <sstream>
 
     extern int yyparse(void);
     void error_print(char* errormsg, int lineCount, bool isWarning);
@@ -31,6 +33,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 
 %{
     std::string str = "";
+    int tmp;
     int nestingCount = 0;
     int static lineCount = 1;
     bool static inCode = false;
@@ -230,8 +233,17 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\\f                     {str += "\f";}
 <DOUBLE_QUOTE_STRING>\\\"                    {str += "\"";}
 <DOUBLE_QUOTE_STRING>\\\$                    {str += "$";}
-<DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {str += yytext + 2;}
-<DOUBLE_QUOTE_STRING>\\u\{[0-9A-Fa-f]+\}     {str += yytext + 2;}
+<DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {std::stringstream stream;
+                                              stream << std::__cxx11::stoi(yytext + 2);
+                                              stream >> std::hex >> tmp;
+                                              str += (char) tmp;}
+<DOUBLE_QUOTE_STRING>\\u\{[0-9A-Fa-f]+\}     {std::string temp = ""; 
+                                              temp += yytext+3; 
+                                              temp.erase(temp.find('}'), 1);
+                                              std::stringstream stream;
+                                              stream << std::__cxx11::stoi(temp);
+                                              stream >> std::hex >> tmp;
+                                              str += (char) tmp;}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING>\\\\          {str += "\\";}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING><<EOF>>     {error_print("Unclosed string", lineCount, false);}
 <DOUBLE_QUOTE_STRING>\{\$ {
