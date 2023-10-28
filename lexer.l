@@ -258,7 +258,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 int main(int argc, char *argv[]) {
     FILE *file = NULL;
     if (argc > 1) {
-        file = fopen("example.php", "r");
+        file = fopen(argv[1], "r");
     }
 
     if (file == NULL) {
