@@ -46,7 +46,7 @@ class Person
 
     public function greet()
     {
-        echo "Hello, my name is " . $this->name . " and I am " . self::$age . " years old." . PHP_EOL;
+        echo "Hello, \u{41} my \x41 name is " . $this->name . " and I am " . self::$age . " years old." . PHP_EOL;
         die();
     }
 
