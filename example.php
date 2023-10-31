@@ -77,8 +77,8 @@ trait TraitName {
     protected abstract function r();
 }
 
-
 $a = static function() {};
+$b = (float) 100;
 
 try {
     static $a = null, $b = function() use ($_COOKIE, $_ENV) {}, $c = fn() => 1 + 2, $d;
