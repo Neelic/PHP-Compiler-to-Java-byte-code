@@ -226,7 +226,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <SINGLE_QUOTE_STRING>\'         {printf("Found string literal: %s\n", str.c_str()); BEGIN(INITIAL);}
 
 
-<DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+           {str += yytext;}
+<DOUBLE_QUOTE_STRING>[^\"\\\n{$]+           {str += yytext;}
 <DOUBLE_QUOTE_STRING>\n                      {str += yytext; lineCount += yyleng;}
 <DOUBLE_QUOTE_STRING>\\n                     {str += "\n";}
 <DOUBLE_QUOTE_STRING>\\r                     {str += "\r";}
@@ -253,6 +253,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\\u\{[^}]*              {str += yytext;}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING>\\\\          {str += "\\";}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING><<EOF>>     {error_print("Unclosed string", lineCount, false);}
+<DOUBLE_QUOTE_STRING>\{[^$]                          {str += yytext;}
 <DOUBLE_QUOTE_STRING>\{\$ {
     printf("Found string %s\n", str.c_str());
     printf("Found concatenation: .\n");
