@@ -25,8 +25,8 @@ INTEGER [1-9][0-9]*(_[0-9]+)*|0
 INT_HEXIDECIMAL 0[xX][0-9a-fA-F]+(_[0-9a-fA-F]+)*
 INT_OCTAL 0[oO]?[0-7]+(_[0-7]+)*
 INT_BINARY 0[bB][01]+(_[01]+)*
-FLOAT ({NUMBER}*(_{NUMBER}+)*[\.]{INTEGER})|({INTEGER}[\.]{NUMBER}*(_{NUMBER}+)*)
-EXPONENT_FLOAT (({INTEGER}|{FLOAT})[eE][+-]?{INTEGER})
+FLOAT ({NUMBER}*(_{NUMBER}+)*[\.]{NUMBER}+)|({INTEGER}[\.]{NUMBER}*(_{NUMBER}+)*)
+EXPONENT_FLOAT (({INTEGER}|{FLOAT})[eE][+-]{NUMBER}+)
 IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 
 %%
@@ -34,6 +34,7 @@ IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 %{
     std::string str = "";
     int tmp;
+    float test = .0;
     int nestingCount = 0;
     int static lineCount = 1;
     bool static inCode = false;
@@ -195,7 +196,8 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             printf("Found html code section: %s\n", str.c_str());
                             printf("Found start php code section: %s\n", yytext);
                           }
-<NOT_IN_PHP_CODE>[^<]+    {str += yytext;}
+<NOT_IN_PHP_CODE>[^<\n]+  {str += yytext;}
+<NOT_IN_PHP_CODE>\n       {str += yytext; lineCount += yyleng;}
 <NOT_IN_PHP_CODE>\<+[^?]  {str += yytext;}
 <NOT_IN_PHP_CODE><<EOF>>  {printf("Found html code section: %s\n", str.c_str()); BEGIN(INITIAL);}
 
@@ -208,11 +210,12 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             str[0] = 0; 
                             BEGIN(NOT_IN_PHP_CODE);
                           }
-<SINGLE_LINE_COMMENT>\n   {printf("Found single-line comment: %s\n", str.c_str()); BEGIN(INITIAL);}
+<SINGLE_LINE_COMMENT>\n   {lineCount += yyleng; printf("Found single-line comment: %s\n", str.c_str()); BEGIN(INITIAL);}
 
-<MULTILINE_COMMENT>[^*]+  {str += yytext;}
-<MULTILINE_COMMENT>\*[^/] {str += yytext;}
-<MULTILINE_COMMENT>"*/"   {printf("Found multiline comment: %s\n", str.c_str()); BEGIN(INITIAL);}
+<MULTILINE_COMMENT>[^*\n]+ {str += yytext;}
+<MULTILINE_COMMENT>\n      {str += yytext; lineCount += yyleng;}
+<MULTILINE_COMMENT>\*[^/]  {str += yytext;}
+<MULTILINE_COMMENT>"*/"    {printf("Found multiline comment: %s\n", str.c_str()); BEGIN(INITIAL);}
 
 <EXECUTION_OPERATOR>[^`]+ {str += yytext;}
 <EXECUTION_OPERATOR>"`"   {printf("Found shell command: %s\n", str.c_str()); BEGIN(INITIAL);}
@@ -224,7 +227,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 
 
 <DOUBLE_QUOTE_STRING>[^\"\\\n{}$]+           {str += yytext;}
-<DOUBLE_QUOTE_STRING>\n                      {str += yytext;}
+<DOUBLE_QUOTE_STRING>\n                      {str += yytext; lineCount += yyleng;}
 <DOUBLE_QUOTE_STRING>\\n                     {str += "\n";}
 <DOUBLE_QUOTE_STRING>\\r                     {str += "\r";}
 <DOUBLE_QUOTE_STRING>\\t                     {str += "\t";}
@@ -233,6 +236,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <DOUBLE_QUOTE_STRING>\\f                     {str += "\f";}
 <DOUBLE_QUOTE_STRING>\\\"                    {str += "\"";}
 <DOUBLE_QUOTE_STRING>\\\$                    {str += "$";}
+<DOUBLE_QUOTE_STRING>\\[^nrtvefu"$\\]       {str += yytext;}
 <DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {std::stringstream stream;
                                               stream << std::__cxx11::stoi(yytext + 2);
                                               stream >> std::hex >> tmp;
@@ -244,6 +248,9 @@ goto                {printf("Found keyword: %s\n", yytext);}
                                               stream << std::__cxx11::stoi(temp);
                                               stream >> std::hex >> tmp;
                                               str += (char) tmp;}
+<DOUBLE_QUOTE_STRING>\\u\{[^0-9A-Fa-f]\}      {str += yytext;}
+<DOUBLE_QUOTE_STRING>\\u[^{]*                {str += yytext;}
+<DOUBLE_QUOTE_STRING>\\u\{[^}]*              {str += yytext;}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING>\\\\          {str += "\\";}
 <DOUBLE_QUOTE_STRING,SINGLE_QUOTE_STRING><<EOF>>     {error_print("Unclosed string", lineCount, false);}
 <DOUBLE_QUOTE_STRING>\{\$ {
@@ -253,6 +260,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
     nestingCount++;
     BEGIN(INITIAL);
 }
+<DOUBLE_QUOTE_STRING>\$[^a-zA-Z_]?   {str += yytext;}
 <DOUBLE_QUOTE_STRING>\${IDENTIFIER} {
     error_print("Non supported interpolation", lineCount, true);
     str += yytext;

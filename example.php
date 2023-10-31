@@ -52,7 +52,7 @@ class Person
 
     public static function statFunc($name)
     {
-        echo "Hello, my $name is A and I am " . self::$age . " years old." . PHP_EOL;
+        echo "Hello,\ \ \my $name \is A \n \x and I am " . self::$age . " years old." . PHP_EOL;
         
         yield;
     }
