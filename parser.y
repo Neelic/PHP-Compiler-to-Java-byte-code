@@ -80,7 +80,8 @@ void yyerror(char* str);
 
 %%
 
-start: top_stmt_list
+start:    START_CODE_PHP_TAG top_stmt_list
+        | START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG
 
 top_stmt_list: top_stmt_list_not_e
                 | /* empty */
@@ -104,44 +105,31 @@ get_value_func_list_not_e: get_value_func
 if_stmt:  IF '(' expr ')' stmt
         | IF '(' expr ')' stmt ELSE stmt
         | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'
-        | IF '(' expr ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG END_IF ';'
-        | IF '(' expr ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty ELSE ':' stmt_list_may_empty END_IF ';'
-        | IF '(' expr ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty ELSE ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_IF ';'
+        | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';'
 
 switch_stmt: SWITCH '(' expr ')' '{' '}'
         |    SWITCH '(' expr ')' '{' case_default_stmt_list '}'
-        |    SWITCH '(' expr ')' ':' case_default_stmt END_SWITCH ';'
-        |    SWITCH '(' expr ')' ':' case_default_stmt END_CODE_PHP_TAG START_CODE_PHP_TAG case_default_stmt END_SWITCH ';'
-        |    SWITCH '(' expr ')' ':' case_default_stmt END_CODE_PHP_TAG case_html_stmt_list START_CODE_PHP_TAG case_default_stmt END_SWITCH ';'
+        |    SWITCH '(' expr ')' ':' case_default_stmt_list END_SWITCH ';'
 
-case_default_stmt_list:   case_default_stmt
-                | case_default_stmt_list case_default_stmt
+case_default_stmt_list: case_default_stmt
+                |       case_default_stmt_list case_default_stmt
 
 case_default_stmt: CASE expr ':' stmt_list_may_empty
-        |  CASE expr ':' stmt_list_may_empty BREAK ';'
-        |  DEFAULT ':' stmt_list_may_empty
-        |  DEFAULT ':' stmt_list_may_empty BREAK ';'
-        |  FINALLY '{' stmt_list_may_empty '}' 
-
-case_html_stmt_list: START_CODE_PHP_TAG case_default_stmt_list END_CODE_PHP_TAG
-                |    HTML
-                |    case_html_stmt_list START_CODE_PHP_TAG case_default_stmt_list END_CODE_PHP_TAG
-                |    case_html_stmt_list HTML
+                |  CASE expr ':' stmt_list_may_empty BREAK ';'
+                |  DEFAULT ':' stmt_list_may_empty
+                |  DEFAULT ':' stmt_list_may_empty BREAK ';'
+                |  FINALLY '{' stmt_list_may_empty '}' 
 
 for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt
         | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'
-        | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOR ';'
 
 foreach_stmt: FOREACH '(' expr AS expr ')' stmt
         |     FOREACH '(' expr AS expr R_DOUBLE_ARROW get_value_func ID ')' stmt
         |     FOREACH '(' expr AS expr ')' ':' stmt_list_may_empty END_FOREACH ';'
         |     FOREACH '(' expr AS expr R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' expr AS expr ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_FOREACH ';'
 
 while_stmt: WHILE '(' expr ')' stmt
         |   WHILE '(' expr ')' ':' stmt_list_may_empty END_WHILE ';'
-        |   WHILE '(' expr ')' ':' stmt_list_may_empty END_CODE_PHP_TAG html_php_stmt_list START_CODE_PHP_TAG stmt_list_may_empty END_WHILE ';'
 
 do_while_stmt: DO stmt WHILE '(' expr ')' ';'
 
@@ -188,6 +176,7 @@ stmt:     expr_may_empty ';'
         | CONST const_decl_list_not_e ';'
         | return_stmt
         | yield_stmt
+        | html_stmt
 
 static_var_list:  '$' ID
                 | '$' ID '=' expr
@@ -203,15 +192,8 @@ stmt_list: stmt
 stmt_list_may_empty: stmt_list
                 |    /* empty */
 
-php_code_section: START_CODE_PHP_TAG stmt_list_may_empty END_CODE_PHP_TAG   
-
-html_php_stmt_list_not_e: HTML
-                        | php_code_section
-                        | html_php_stmt_list_not_e HTML
-                        | html_php_stmt_list_not_e php_code_section
-
-html_php_stmt_list: html_php_stmt_list_not_e
-                |   /* empty */
+html_stmt: END_CODE_PHP_TAG HTML 
+        |  END_CODE_PHP_TAG HTML START_CODE_PHP_TAG
 
 expr:     NUMBER
         | STRING

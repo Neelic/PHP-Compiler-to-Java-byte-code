@@ -29,7 +29,7 @@ FLOAT ({NUMBER}*(_{NUMBER}+)*[\.]{NUMBER}+)|({INTEGER}[\.]{NUMBER}*(_{NUMBER}+)*
 EXPONENT_FLOAT (({INTEGER}|{FLOAT})[eE][+-]{NUMBER}+)
 IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 
-SPACE [\t\r\t\f\v ]+
+SPACE [\t\r\t\f\v ]
 
 %%
 
@@ -178,8 +178,12 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "@"                 {printf("Found operator: %s\n", yytext);}
 
 \n+                 {lineCount += yyleng;}
-{SPACE}             {}
-"?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; str = ""; BEGIN(NOT_IN_PHP_CODE);}
+{SPACE}+            {}
+"?>"                {
+                        printf("Found special character: ;\n"); 
+                        printf("Found end php code section: %s\n", yytext); 
+                        inCode = false; str = ""; 
+                        BEGIN(NOT_IN_PHP_CODE);}
 {IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
 {INT_HEXIDECIMAL}   {squeeze(yytext, '_'); printf("Found integer hexidecimal number: %s\n", yytext);}
