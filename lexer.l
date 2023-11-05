@@ -29,6 +29,8 @@ FLOAT ({NUMBER}*(_{NUMBER}+)*[\.]{NUMBER}+)|({INTEGER}[\.]{NUMBER}*(_{NUMBER}+)*
 EXPONENT_FLOAT (({INTEGER}|{FLOAT})[eE][+-]{NUMBER}+)
 IDENTIFIER [a-zA-Z_][a-zA-Z0-9_]*
 
+SPACE [\t\r\t\f\v ]+
+
 %%
 
 %{
@@ -105,6 +107,18 @@ require_once        {printf("Found keyword: %s\n", yytext);}
 include_once        {printf("Found keyword: %s\n", yytext);}
 goto                {printf("Found keyword: %s\n", yytext);}
 
+\({SPACE}*[iI][nN][tT]{SPACE}*\)                  {printf("Found int cast: %s\n", yytext);}
+\({SPACE}*[iI][nN][tT][eE][gG][eE][rR]{SPACE}*\)  {printf("Found int cast: %s\n", yytext);}
+\({SPACE}*[bB][oO][oO][lL]{SPACE}*\)              {printf("Found bool cast: %s\n", yytext);}
+\({SPACE}*[bB][oO][oO][lL][eE][aA][nN]{SPACE}*\)  {printf("Found bool cast: %s\n", yytext);}
+\({SPACE}*[fF][lL][oO][aA][tT]{SPACE}*\)          {printf("Found float cast: %s\n", yytext);}
+\({SPACE}*[dD][oO][uU][bB][lL]{SPACE}*\)          {printf("Found float cast: %s\n", yytext);}
+\({SPACE}*[rR][eE][aA][lL]{SPACE}*\)              {printf("Found float cast: %s\n", yytext);}
+\({SPACE}*[sS][tT][rR][iI][nN][gG]{SPACE}*\)      {printf("Found string cast: %s\n", yytext);}
+\({SPACE}*[bB][iI][nN][aA][rR][yY]{SPACE}*\)      {printf("Found string cast: %s\n", yytext);}
+\({SPACE}*[aA][rR][rR][aA][yY]{SPACE}*\)          {printf("Found array cast: %s\n", yytext);}
+\({SPACE}*[oO][bB][jJ][eE][cC][tT]{SPACE}*\)      {printf("Found object cast: %s\n", yytext);}
+
 ","		            {printf("Found special character: %s\n", yytext);}
 ";"                 {printf("Found special character: %s\n", yytext);}
 "("		            {printf("Found special character: %s\n", yytext);}
@@ -164,7 +178,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 "@"                 {printf("Found operator: %s\n", yytext);}
 
 \n+                 {lineCount += yyleng;}
-[\t\r\t\f\v ]+      {}
+{SPACE}             {}
 "?>"                {printf("Found end php code section: %s\n", yytext); inCode = false; str = ""; BEGIN(NOT_IN_PHP_CODE);}
 {IDENTIFIER}        {printf("Found identifier: %s\n", yytext);}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext);}
@@ -226,7 +240,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
 <SINGLE_QUOTE_STRING>\'         {printf("Found string literal: %s\n", str.c_str()); BEGIN(INITIAL);}
 
 
-<DOUBLE_QUOTE_STRING>[^\"\\\n{$]+           {str += yytext;}
+<DOUBLE_QUOTE_STRING>[^\"\\\n\{$]+           {str += yytext;}
 <DOUBLE_QUOTE_STRING>\n                      {str += yytext; lineCount += yyleng;}
 <DOUBLE_QUOTE_STRING>\\n                     {str += "\n";}
 <DOUBLE_QUOTE_STRING>\\r                     {str += "\r";}

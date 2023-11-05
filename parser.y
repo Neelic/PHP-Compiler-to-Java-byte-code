@@ -72,7 +72,7 @@ void yyerror(char* str);
 %right U_MINUS U_PLUS
 %right POW
 %right '!'
-%right '~'
+%right '~' INT_CAST FLOAT_CAST STRING_CAST ARRAY_CAST OBJECT_CAST BOOL_CAST
 %left '['']' R_ARROW R_DOUBLE_ARROW QUARTER_DOT
 %nonassoc '('')'
 
@@ -220,7 +220,12 @@ expr:     NUMBER
         | ID
         | expr '=' expr
         | expr '=' '&' expr
-        | '(' expr ')' expr
+        | INT_CAST expr
+        | FLOAT_CAST expr
+        | STRING_CAST expr
+        | ARRAY_CAST expr
+        | OBJECT_CAST expr
+        | BOOL_CAST expr
         | expr R_ARROW ID
         | expr R_ARROW get_value ID
         | expr R_ARROW get_value '{' expr '}'
