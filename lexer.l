@@ -202,6 +202,8 @@ goto                {printf("Found keyword: %s\n", yytext);}
 
 .       {printf("Unknown character: %s\n", yytext);}
 
+<<EOF>> {printf("Found special character: ;\n");}
+
 <NOT_IN_PHP_CODE>"<?"     {
                             inCode = true; 
                             BEGIN(INITIAL); 
@@ -214,7 +216,7 @@ goto                {printf("Found keyword: %s\n", yytext);}
                             printf("Found html code section: %s\n", str.c_str());
                             printf("Found start php code section: %s\n", yytext);
                           }
-<NOT_IN_PHP_CODE>[^<\n]+  {str += yytext;}
+<NOT_IN_PHP_CODE>[^\<\n]+  {str += yytext;}
 <NOT_IN_PHP_CODE>\n       {str += yytext; lineCount += yyleng;}
 <NOT_IN_PHP_CODE>\<+[^?]  {str += yytext;}
 <NOT_IN_PHP_CODE><<EOF>>  {printf("Found html code section: %s\n", str.c_str()); BEGIN(INITIAL);}

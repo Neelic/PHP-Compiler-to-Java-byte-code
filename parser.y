@@ -57,104 +57,131 @@ void yyerror(char* str);
 %left LOGIC_OR
 %left LOGIC_XOR
 %left LOGIC_AND
+%right '='
 %left BOOLEAN_OR
 %left BOOLEAN_AND
-%nonassoc EQUAL EQUAL_STRICT
 %right '?' ':'
-%nonassoc '>' '<' EQU_MORE EQU_LESS
 %left '|'
-%left '&'
 %left '^'
-%right '='
+%left '&'
+%nonassoc EQUAL EQUAL_STRICT
+%nonassoc '>' '<' EQU_MORE EQU_LESS
 %left SHIFT_L SHIFT_R
-%left '-' '+' '.'
+%left '.'
+%left '-' '+'
 %left '/' '*' '%'
-%right U_MINUS U_PLUS
-%right POW
 %right '!'
-%right '~' INT_CAST FLOAT_CAST STRING_CAST ARRAY_CAST OBJECT_CAST BOOL_CAST
+%right '~' U_MINUS U_PLUS INT_CAST FLOAT_CAST STRING_CAST ARRAY_CAST OBJECT_CAST BOOL_CAST
 %left '['']' R_ARROW R_DOUBLE_ARROW QUARTER_DOT
+%right POW
 %nonassoc '('')'
-
 %nonassoc NEW CLONE
 
 %%
 
 start:    START_CODE_PHP_TAG top_stmt_list
         | START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG
+        | START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG HTML
+        | HTML START_CODE_PHP_TAG top_stmt_list
+        | HTML START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG
+        | HTML START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG HTML
+        ;
 
 top_stmt_list: top_stmt_list_not_e
                 | /* empty */
+                ;
 
 top_stmt_list_not_e: top_stmt
                 |    top_stmt_list_not_e top_stmt
+                ;
 
 top_stmt: stmt
+        | function_stmt_decl
+        | class_stmt_decl
+        | interface_stmt_decl
+        | trait_stmt_decl
+        ;
 
 get_value: '$'
         |  get_value '$'
-
-get_value_func:   '&' '$' ID
-                | '$' ID
-                | ID '&' '$' ID
-                | ID '$' ID
-
-get_value_func_list_not_e: get_value_func
-                        |  get_value_func_list_not_e ',' get_value_func
+        ;
 
 if_stmt:  IF '(' expr ')' stmt
         | IF '(' expr ')' stmt ELSE stmt
         | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'
         | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';'
+        ;
 
 switch_stmt: SWITCH '(' expr ')' '{' '}'
         |    SWITCH '(' expr ')' '{' case_default_stmt_list '}'
         |    SWITCH '(' expr ')' ':' case_default_stmt_list END_SWITCH ';'
+        ;
 
 case_default_stmt_list: case_default_stmt
                 |       case_default_stmt_list case_default_stmt
+                ;
 
 case_default_stmt: CASE expr ':' stmt_list_may_empty
-                |  CASE expr ':' stmt_list_may_empty BREAK ';'
                 |  DEFAULT ':' stmt_list_may_empty
-                |  DEFAULT ':' stmt_list_may_empty BREAK ';'
                 |  FINALLY '{' stmt_list_may_empty '}' 
+                ;
 
 for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt
         | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'
+        ;
 
 foreach_stmt: FOREACH '(' expr AS expr ')' stmt
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW get_value_func ID ')' stmt
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' stmt
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' stmt
         |     FOREACH '(' expr AS expr ')' ':' stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW get_value_func ID ')' ':' stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'
+        ;
 
 while_stmt: WHILE '(' expr ')' stmt
         |   WHILE '(' expr ')' ':' stmt_list_may_empty END_WHILE ';'
+        ;
 
 do_while_stmt: DO stmt WHILE '(' expr ')' ';'
+        ;
 
 match_stmt: MATCH '(' expr ')' '{' match_stmt_list '}' ';'
+        ;
 
 match_stmt_list:  match_stmt_list_not_e
                 | /* empty */
+                ;
 
 match_stmt_list_not_e:    match_arm 
                         | match_stmt_list_not_e ',' match_arm
+                        ;
 
 match_arm: expr_list_not_e R_DOUBLE_ARROW expr
         |  DEFAULT R_DOUBLE_ARROW expr
         |  DEFAULT ',' R_DOUBLE_ARROW expr
+        ;
 
 try_stmt: TRY '{' stmt_list_may_empty '}'
+        ;
 
-try_catch_stmt:   try_stmt CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
-                | try_stmt CATCH'(' ID ')' '{' stmt_list_may_empty '}'
+catch_stmt: CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
+        |   CATCH'(' ID ')' '{' stmt_list_may_empty '}'
+        ;
+
+catch_stmt_list:  catch_stmt
+                | catch_stmt_list catch_stmt
+                ;
+
+try_catch_stmt:   try_stmt catch_stmt_list
                 | try_stmt
+                ;
 
 return_stmt: RETURN expr_may_empty ';'
+        ;
 
 yield_stmt: YIELD expr_may_empty ';'
         |   YIELD expr R_DOUBLE_ARROW expr ';'
+        ;
 
 stmt:     expr_may_empty ';'
         | if_stmt
@@ -166,10 +193,6 @@ stmt:     expr_may_empty ';'
         | do_while_stmt
         | for_stmt
         | foreach_stmt
-        | function_stmt_decl
-        | class_stmt_decl
-        | interface_stmt_decl
-        | trait_stmt_decl
         | THROW expr ';'
         | try_catch_stmt
         | match_stmt
@@ -177,23 +200,29 @@ stmt:     expr_may_empty ';'
         | return_stmt
         | yield_stmt
         | html_stmt
+        | BREAK ';'
+        ;
 
 static_var_list:  '$' ID
                 | '$' ID '=' expr
                 | static_var_list ',' '$' ID
                 | static_var_list ',' '$' ID '=' expr
+                ;
 
 global_var_list:  get_value ID
                 | global_var_list ',' get_value ID
+                ;
 
 stmt_list: stmt
 	|  stmt_list stmt
+        ;
 
 stmt_list_may_empty: stmt_list
                 |    /* empty */
+                ;
 
-html_stmt: END_CODE_PHP_TAG HTML 
-        |  END_CODE_PHP_TAG HTML START_CODE_PHP_TAG
+html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG
+        ;
 
 expr:     NUMBER
         | STRING
@@ -247,6 +276,7 @@ expr:     NUMBER
         | expr '?' ':' expr
         | get_value '{' expr '}'
         | expr '[' expr ']'
+        | expr '[' ']' '=' expr
         | ID '(' expr_list ')'
         | get_value ID branches
         | anon_function_expr
@@ -255,35 +285,45 @@ expr:     NUMBER
         | NEW get_value ID
         | NEW get_value ID '(' expr_list ')'
         | NEW '(' expr ')'
+        ;
 
 expr_may_empty: expr
                 | /* empty */
+                ;
 
 branches: '(' expr_list ')'
         | branches '(' expr_list ')'
+        ;
 
 id_list:  ID
         | id_list ',' ID
+        ;
 
 expr_list_not_e:  expr
                 | expr_list_not_e ',' expr
+                ;
 
 expr_list: expr_list_not_e
 	| /* empty */ 
+        ;
 
 const_decl_list_not_e:    ID '=' expr
                         | const_decl_list_not_e ',' ID '=' expr
+                        ;
 
 class_def: CLASS ID 
         |  CLASS ID EXTENDS ID
         |  CLASS ID IMPLEMENTS id_list
         |  CLASS ID EXTENDS ID IMPLEMENTS id_list
+        ;
 
 class_stmt_decl:  class_def '{' class_stmt_list '}'
                 | class_access_mod class_def '{' class_stmt_list '}'
+                ;
 
 class_stmt_list: class_stmt_list_not_e
                 | /* empty */
+                ;
 
 class_access_mod: PUBLIC
                 | PROTECTED
@@ -292,54 +332,81 @@ class_access_mod: PUBLIC
                 | ABSTRACT
                 | READ_ONLY
                 | STATIC
+                ;
 
 class_access_mod_list:    class_access_mod
                         | class_access_mod_list class_access_mod
+                        ;
 
 class_stmt_list_not_e:    class_stmt
                         | class_stmt_list_not_e class_stmt
+                        ;
 
 class_stmt: class_expr ';'
         |   class_access_mod_list function_stmt_decl
         |   USE id_list ';'
         |   class_stmt_decl
+        ;
 
 class_expr: class_access_mod_list get_value ID '=' expr
         |   class_access_mod_list get_value ID
         |   class_access_mod_list CONST const_decl_list_not_e ';'
+        ;
 
 interface_expr_def: INTERFACE ID 
                 |   INTERFACE ID EXTENDS id_list
+                ;
 
 interface_stmt_decl: interface_expr_def '{' interface_stmt_list '}'
+                ;
 
 interface_stmt_list: interface_stmt_list_not_e
                 |    /* empty */
+                ;
 
 interface_stmt_list_not_e: interface_stmt
                         |  interface_stmt_list_not_e interface_stmt
+                        ;
 
-interface_stmt: class_access_mod_list function_def ';'
+interface_stmt: class_access_mod_list function_def ';' 
+                ;
 
 trait_expr_def: TRAIT ID 
+                ;
 
-trait_stmt_decl: trait_expr_def '{' class_stmt_list '}'
+trait_stmt_decl: trait_expr_def '{' class_stmt_list '}' 
+                ;
 
 function_def: FUNCTION ID '(' expr_func_list ')'
         |     FUNCTION ID '(' expr_func_list ')' ':' ID
+        ;
 
-function_stmt_decl: function_def '{' stmt_list '}'
+function_stmt_decl: function_def '{' stmt_list '}' 
+                ;
 
 anon_function_expr: anon_function_stmt_decl
                 |   anon_function_short_stmt_decl
+                ;
 
 expr_func_list:   expr_func_list_not_e
                 | /* empty */
+                ;
 
-expr_func_list_not_e: get_value_func_list_not_e
-                |     get_value_func ID '=' expr
-                |     expr_func_list_not_e ',' get_value_func_list_not_e
-                |     expr_func_list_not_e ',' get_value_func ID '=' expr
+get_value_func:   '&' '$' ID
+                | '$' ID
+                | ID '&' '$' ID
+                | ID '$' ID
+                ;
+
+get_value_func_list_not_e: get_value_func
+                        |  get_value_func_list_not_e ',' get_value_func
+                        ;
+
+expr_func_list_not_e: get_value_func
+                |     get_value_func '=' expr
+                |     expr_func_list_not_e ',' get_value_func
+                |     expr_func_list_not_e ',' get_value_func '=' expr
+                ;
 
 anon_function_def: FUNCTION '(' expr_func_list ')'
                 |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'
@@ -349,15 +416,19 @@ anon_function_def: FUNCTION '(' expr_func_list ')'
                 |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID
                 |  STATIC FUNCTION '(' expr_func_list ')' ':' ID
                 |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID
+                ;
 
 anon_function_stmt_decl: anon_function_def '{' stmt_list '}'
+                        ;
 
 anon_function_short_def:  FN '(' expr_func_list ')'
                         | FN '(' expr_func_list ')' ':' ID
                         | STATIC FN '(' expr_func_list ')'
                         | STATIC FN '(' expr_func_list ')' ':' ID
+                        ;
 
 anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr
+                        ;
 
 %%
 
