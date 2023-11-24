@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include "parser_classes/all_include.hpp"
 extern int yylex();
 void yyerror(char* str);
 %}
@@ -9,7 +10,8 @@ void yyerror(char* str);
 %token HTML
 
 %token ID
-%token NUMBER
+%token INT_NUMBER
+%token FLOAT_NUMBER
 %token STRING
 %token COM_STRING
 %token CONST
@@ -79,17 +81,16 @@ void yyerror(char* str);
 
 %%
 
-start:    START_CODE_PHP_TAG top_stmt_list
-        | START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG
-        | START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG HTML
-        | HTML START_CODE_PHP_TAG top_stmt_list
-        | HTML START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG
-        | HTML START_CODE_PHP_TAG top_stmt_list END_CODE_PHP_TAG HTML
+start:    START_CODE_PHP_TAG top_stmt_list_not_e
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML
+        | START_CODE_PHP_TAG
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML
         ;
-
-top_stmt_list: top_stmt_list_not_e
-                | /* empty */
-                ;
 
 top_stmt_list_not_e: top_stmt
                 |    top_stmt_list_not_e top_stmt
@@ -224,7 +225,8 @@ stmt_list_may_empty: stmt_list
 html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG
         ;
 
-expr:     NUMBER
+expr:     INT_NUMBER
+        | FLOAT_NUMBER
         | STRING
         | COM_STRING
         | get_value ID
