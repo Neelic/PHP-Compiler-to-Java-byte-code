@@ -1,7 +1,4 @@
 #include "ExprType.cpp"
-#include "GetValueNode.cpp"
-#include <string>
-#include <vector>
 
 class ExprNode
 {
@@ -27,16 +24,3 @@ public:
     static ExprNode* CreateFromGetValueId(GetValueNode* get_value, std::string* id);
     //TODO продолжить список
 };
-
-ExprNode* ExprNode::CreateFromId(std::string* id)
-{
-    ExprNode* tmp = new ExprNode();
-    tmp->id = id;
-    tmp->exprType = constant;
-    return tmp;
-}
-
-ExprNode *ExprNode::CreateFromFunctionCall(std::string* id, std::vector<ExprNode*>* listParams)
-{
-    return nullptr;
-}

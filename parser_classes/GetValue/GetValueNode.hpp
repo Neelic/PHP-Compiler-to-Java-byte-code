@@ -5,8 +5,3 @@ public:
 
     static GetValueNode* Create();
 };
-
-GetValueNode *GetValueNode::Create()
-{
-    return new GetValueNode();
-}
