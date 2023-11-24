@@ -177,13 +177,6 @@ try_catch_stmt:   try_stmt catch_stmt_list
                 | try_stmt
                 ;
 
-return_stmt: RETURN expr_may_empty ';'
-        ;
-
-yield_stmt: YIELD expr_may_empty ';'
-        |   YIELD expr R_DOUBLE_ARROW expr ';'
-        ;
-
 stmt:     expr_may_empty ';'
         | if_stmt
         | switch_stmt
@@ -198,8 +191,9 @@ stmt:     expr_may_empty ';'
         | try_catch_stmt
         | match_stmt
         | CONST const_decl_list_not_e ';'
-        | return_stmt
-        | yield_stmt
+        | RETURN expr_may_empty ';'
+        | YIELD expr_may_empty ';'
+        | YIELD expr R_DOUBLE_ARROW expr ';'
         | html_stmt
         | BREAK ';'
         ;
