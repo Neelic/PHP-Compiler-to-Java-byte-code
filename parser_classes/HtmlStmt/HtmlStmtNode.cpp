@@ -1,16 +1,14 @@
 class HtmlStmtNode
 {
-private:
-    /* data */
 public:
-    HtmlStmtNode(/* args */);
-    ~HtmlStmtNode();
+    std::string* html;
+
+    static HtmlStmtNode* Create(std::string* html);
 };
 
-HtmlStmtNode::HtmlStmtNode(/* args */)
+HtmlStmtNode* HtmlStmtNode::Create(std::string* html)
 {
-}
-
-HtmlStmtNode::~HtmlStmtNode()
-{
-}
+    HtmlStmtNode* tmp = new HtmlStmtNode();
+    tmp->html = html;
+    return tmp;
+};
