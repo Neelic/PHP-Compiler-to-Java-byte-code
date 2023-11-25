@@ -34,6 +34,47 @@ public:
     static ExprNode* CreateFromObjectCast(ExprNode* left);
     static ExprNode* CreateFromBoolCast(ExprNode* left);
     //Right arrow
+    static ExprNode* CreateFromFieldReference(ExprNode* left, std::string* id);
+    static ExprNode* CreateFromGetValueFieldReference(ExprNode* left, GetValueNode* get_value, std::string* id);
+    static ExprNode* CreateFromGetValueWithExprReference(ExprNode* left, GetValueNode* get_value, ExprNode* get_value_expr);
+    //Quarter Dot
+    static ExprNode* CreateFromFieldReferenceDots(ExprNode* left, std::string* id);
+    static ExprNode* CreateFromGetValueFieldReferenceDots(ExprNode* left, GetValueNode* get_value, std::string* id);
+    static ExprNode* CreateFromGetValueWithExprReferenceDots(ExprNode* left, GetValueNode* get_value, ExprNode* get_value_expr);
+    //Brackets
+    static ExprNode* CreateFromExprInBrackets(ExprNode* left);
+    //Math signs
+    static ExprNode* CreateFromSubstraction(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromAddition(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromMultipliction(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromDivision(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromMod(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromPower(ExprNode* left, ExprNode* right);
+    //Concatenation
+    static ExprNode* CreateFromConcatenation(ExprNode* left, ExprNode* right);
+    //Boolean operations
+    static ExprNode* CreateFromBooleanOpMore(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBooleanOpLess(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBooleanOpOr(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBooleanOpAnd(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBooleanOpEqual(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBooleanOpEqualStrict(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBooleanOpEqualMore(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBooleanOpEqualLess(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBooleanOpNot(ExprNode* left);
+    //Logical
+    static ExprNode* CreateFromLogicOpAnd(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromLogicOpOr(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromLogicOpXor(ExprNode* left, ExprNode* right);
+    //Bitwise
+    static ExprNode* CreateFromShiftLeft(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromShiftRight(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBitwiseXor(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBitwiseAnd(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBitwiseOr(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBitwiseNot(ExprNode* left, ExprNode* right);
+    //Uni
+    static ExprNode* CreateFromBitwiseNot(ExprNode* left, ExprNode* right);
 
     //TODO продолжить список
 };
