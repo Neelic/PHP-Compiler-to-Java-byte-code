@@ -426,9 +426,22 @@ ExprNode* ExprNode::CreateFromBitwiseNot(ExprNode* left, ExprNode* right)
     return tmp;
 }
 
-//Uni
+//Unary
+ExprNode* ExprNode::CreateFromUnaryPlus(ExprNode* left)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->exprType = ExprType::u_plus_op;
+    return tmp;
+}
 
-
+ExprNode* ExprNode::CreateFromUnaryMinus(ExprNode* left)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->exprType = ExprType::u_minus_op;
+    return tmp;
+}
 
 
 

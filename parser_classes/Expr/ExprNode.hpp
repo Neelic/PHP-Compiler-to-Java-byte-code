@@ -73,8 +73,9 @@ public:
     static ExprNode* CreateFromBitwiseAnd(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromBitwiseOr(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromBitwiseNot(ExprNode* left, ExprNode* right);
-    //Uni
-    static ExprNode* CreateFromBitwiseNot(ExprNode* left, ExprNode* right);
+    //Unary
+    static ExprNode* CreateFromUnaryPlus(ExprNode* left);
+    static ExprNode* CreateFromUnaryMinus(ExprNode* left);
 
     //TODO продолжить список
 };
