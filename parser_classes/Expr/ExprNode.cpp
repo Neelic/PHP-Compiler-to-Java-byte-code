@@ -13,7 +13,7 @@ ExprNode* ExprNode::CreateFromFunctionCall(std::string* id, std::vector<ExprNode
     ExprNode* tmp = new ExprNode();
     tmp->id = id;
     tmp->listParams = listParams;
-    tmp->exprType = ExprType::ref_op // Не нашел типа для функции, или просто не понял
+    tmp->exprType = ExprType::ref_op; // Не нашел типа для функции, или просто не понял
     return tmp;
 }
 

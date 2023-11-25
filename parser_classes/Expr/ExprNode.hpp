@@ -1,5 +1,4 @@
-#include "../Expr/ExprType.cpp"
-#include "../GetValue/GetValueNode.hpp"
+#include "ExprType.cpp"
 
 class ExprNode
 {
