@@ -13,7 +13,7 @@ ExprNode* ExprNode::CreateFromFunctionCall(std::string* id, std::vector<ExprNode
     ExprNode* tmp = new ExprNode();
     tmp->id = id;
     tmp->listParams = listParams;
-    tmp->exprType = ExprType::ref_op; // Не нашел типа для функции, или просто не понял
+    tmp->exprType = ExprType::call_func;
     return tmp;
 }
 
@@ -443,6 +443,102 @@ ExprNode* ExprNode::CreateFromUnaryMinus(ExprNode* left)
     return tmp;
 }
 
+//Clone
+ExprNode* ExprNode::CreateFromCloneOp(ExprNode* left)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->exprType = ExprType::clone_op;
+    return tmp;
+}
+
+//Ternary
+ExprNode* ExprNode::CreateFromTernaryOp(ExprNode* left, ExprNode* right, ExprNode* central)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->right = right;
+    tmp->central = central;
+    tmp->exprType = ExprType::ternary_op;
+    return tmp;
+}
+
+//Ref op
+ExprNode* ExprNode::CreateFromRefOp(ExprNode* left, ExprNode* right)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->right = right;
+    tmp->exprType = ExprType::ref_op;
+    return tmp;
+}
+
+//Array
+ExprNode* ExprNode::CreateFromGetArrayVal(GetValueNode* get_value, ExprNode* left)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->get_value = get_value;
+    tmp->exprType = ExprType::get_value_array;
+    return tmp;
+}
+
+ExprNode* ExprNode::CreateFromArrayValueById(ExprNode* left, ExprNode* right)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->right = right;
+    tmp->exprType = ExprType::get_array_val;
+    return tmp;
+}
+
+ExprNode* ExprNode::CreateFromAssignArrayValById(ExprNode* left, ExprNode* right)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->right = right;
+    tmp->exprType = ExprType::add_array_val;
+    return tmp;
+}
+
+//Functions
+ExprNode* ExprNode::CreateFromGetValueFunction(GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->get_value = get_value;
+    tmp->id = id;
+    tmp->listParams = listParams;
+    tmp->exprType = ExprType::call_get_value_func;
+    return tmp;
+}
+
+//Declarations
+ExprNode* ExprNode::CreateFromNewDecl(std::string* id, std::vector<ExprNode*>* listParams)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->id = id;
+    tmp->listParams = listParams;
+    tmp->exprType = ExprType::new_decl;
+    return tmp;
+}
+
+ExprNode* ExprNode::CreateFromNewDeclNoId(ExprNode* left)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->exprType = ExprType::new_decl_no_id;
+    return tmp;
+}
+
+ExprNode* ExprNode::CreateFromGetValueDecl(GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->get_value = get_value;
+    tmp->id = id;
+    tmp->listParams = listParams;
+    tmp->exprType = ExprType::new_get_value_decl;
+    return tmp;
+}
 
 
 

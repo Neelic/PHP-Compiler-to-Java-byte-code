@@ -76,6 +76,23 @@ public:
     //Unary
     static ExprNode* CreateFromUnaryPlus(ExprNode* left);
     static ExprNode* CreateFromUnaryMinus(ExprNode* left);
+    //Clone
+    static ExprNode* CreateFromCloneOp(ExprNode* left);
+    //Ternary
+    static ExprNode* CreateFromTernaryOp(ExprNode* left, ExprNode* right, ExprNode* central);
+    //Ref op - уточнить
+    static ExprNode* CreateFromRefOp(ExprNode* left, ExprNode* right);
+    //Array
+    static ExprNode* CreateFromGetArrayVal(GetValueNode* get_value, ExprNode* left);
+    static ExprNode* CreateFromArrayValueById(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromAssignArrayValById(ExprNode* left, ExprNode* right);
+    //Functions
+    static ExprNode* CreateFromGetValueFunction(GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams);
+
+    //Declaration
+    static ExprNode* CreateFromNewDecl(std::string* id, std::vector<ExprNode*>* listParams);
+    static ExprNode* CreateFromNewDeclNoId(ExprNode* left);
+    static ExprNode* CreateFromGetValueDecl(GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams);
 
     //TODO продолжить список
 };

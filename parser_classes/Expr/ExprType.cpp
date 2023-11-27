@@ -50,8 +50,13 @@ enum ExprType
     ternary_op,
     ref_op,
     get_array_val,
+    get_value_array,
     add_array_val,
     call_anon_func,
     decl_anon_func,
+    call_func,
+    call_get_value_func,
     new_decl,
+    new_decl_no_id,
+    new_get_value_decl
 };
