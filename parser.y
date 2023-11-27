@@ -236,6 +236,9 @@ expr:     INT_NUMBER
         | expr R_ARROW ID
         | expr R_ARROW get_value ID
         | expr R_ARROW get_value '{' expr '}'
+        | expr R_ARROW ID '(' expr_list ')'
+        | expr R_ARROW get_value ID '(' expr_list ')'
+        | expr R_ARROW get_value ID '{' expr '}' '(' expr_list ')'
         | expr QUARTER_DOT ID
         | expr QUARTER_DOT get_value ID
         | expr QUARTER_DOT get_value '{' expr '}'
@@ -274,7 +277,7 @@ expr:     INT_NUMBER
         | expr '[' expr ']'
         | expr '[' ']' '=' expr
         | ID '(' expr_list ')'
-        | get_value ID branches
+        | get_value ID brackets
         | anon_function_expr
         | NEW ID '(' expr_list ')'
         | NEW ID
@@ -287,8 +290,8 @@ expr_may_empty: expr
                 | /* empty */
                 ;
 
-branches: '(' expr_list ')'
-        | branches '(' expr_list ')'
+brackets: '(' expr_list ')'
+        | brackets '(' expr_list ')'
         ;
 
 id_list:  ID
