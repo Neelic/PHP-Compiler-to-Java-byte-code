@@ -6,3 +6,4 @@
 #include "Stmt/StmtNode.hpp"
 #include "GetValueFunc/GetValueFuncNode.hpp"
 #include "SwitchCaseStmt/SwitchStmtNode.hpp"
+#include "SwitchCaseStmt/CaseDefaultStmtNode.hpp"
