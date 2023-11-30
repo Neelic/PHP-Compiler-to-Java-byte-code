@@ -1,16 +1,9 @@
-class DoWhileStmtNode
-{
-private:
-    /* data */
-public:
-    DoWhileStmtNode(/* args */);
-    ~DoWhileStmtNode();
-};
+#include "DoWhileStmtNode.hpp"
 
-DoWhileStmtNode::DoWhileStmtNode(/* args */)
+DoWhileStmtNode* DoWhileStmtNode::CreateFromDoWhileStmt(StmtNode* stmt, ExprNode* expr)
 {
-}
-
-DoWhileStmtNode::~DoWhileStmtNode()
-{
+    DoWhileStmtNode* tmp = new DoWhileStmtNode();
+    tmp->stmt = stmt;
+    tmp->expr = expr;
+    return tmp;
 }
