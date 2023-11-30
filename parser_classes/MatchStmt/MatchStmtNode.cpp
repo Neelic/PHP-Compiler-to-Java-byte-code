@@ -1,16 +1,9 @@
-class MatchStmtNode
-{
-private:
-    /* data */
-public:
-    MatchStmtNode(/* args */);
-    ~MatchStmtNode();
-};
+#include "MatchStmtNode.hpp"
 
-MatchStmtNode::MatchStmtNode(/* args */)
+MatchStmtNode* MatchStmtNode::CreateFromMatchStmtNode(ExprNode* expr, std::vector<MatchStmtNode*>* matchList)
 {
-}
-
-MatchStmtNode::~MatchStmtNode()
-{
+    MatchStmtNode* tmp = new MatchStmtNode();
+    tmp->expr = expr;
+    tmp->matchList = matchList;
+    return tmp;
 }
