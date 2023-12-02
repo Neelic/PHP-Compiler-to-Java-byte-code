@@ -80,7 +80,6 @@ trait         	    {printf("Found keyword: %s\n", yytext);}
 var              	{printf("Found keyword: %s\n", yytext);}
 xor              	{printf("Found keyword: %s\n", yytext);}
 from                {printf("Found keyword: %s\n", yytext);}
-yield            	{printf("Found keyword: %s\n", yytext);}
 function	        {printf("Found keyword: %s\n", yytext);}
 for                 {printf("Found keyword: %s\n", yytext);}
 foreach             {printf("Found keyword: %s\n", yytext);}

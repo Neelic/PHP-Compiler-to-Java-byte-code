@@ -16,7 +16,6 @@ void yyerror(char* str);
 %token COM_STRING
 %token CONST
 %token RETURN
-%token YIELD
 
 %token TRY
 %token CATCH
@@ -162,7 +161,7 @@ match_arm: expr_list_not_e R_DOUBLE_ARROW expr
         |  DEFAULT ',' R_DOUBLE_ARROW expr
         ;
 
-try_stmt: TRY '{' stmt_list_may_empty '}'
+try_stmt: TRY '{' stmt_list_may_empty '}' /* not supported */
         ;
 
 catch_stmt: CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
@@ -173,7 +172,7 @@ catch_stmt_list:  catch_stmt
                 | catch_stmt_list catch_stmt
                 ;
 
-try_catch_stmt:   try_stmt catch_stmt_list
+try_catch_stmt:   try_stmt catch_stmt_list /* not supported */
                 | try_stmt
                 ;
 
@@ -192,8 +191,6 @@ stmt:     expr_may_empty ';'
         | match_stmt
         | CONST const_decl_list_not_e ';'
         | RETURN expr_may_empty ';'
-        | YIELD expr_may_empty ';'
-        | YIELD expr R_DOUBLE_ARROW expr ';'
         | html_stmt
         | BREAK ';'
         ;
@@ -278,7 +275,7 @@ expr:     INT_NUMBER
         | expr '[' ']' '=' expr
         | ID '(' expr_list ')'
         | get_value ID brackets
-        | anon_function_expr
+        | anon_function_expr /* not supported */
         | NEW ID '(' expr_list ')'
         | NEW ID
         | NEW get_value ID
@@ -317,7 +314,7 @@ class_def: CLASS ID
         ;
 
 class_stmt_decl:  class_def '{' class_stmt_list '}'
-                | class_access_mod class_def '{' class_stmt_list '}'
+                | STATIC class_def '{' class_stmt_list '}'
                 ;
 
 class_stmt_list: class_stmt_list_not_e
@@ -383,8 +380,8 @@ function_def: FUNCTION ID '(' expr_func_list ')'
 function_stmt_decl: function_def '{' stmt_list '}' 
                 ;
 
-anon_function_expr: anon_function_stmt_decl
-                |   anon_function_short_stmt_decl
+anon_function_expr: anon_function_stmt_decl /* not supported */
+                |   anon_function_short_stmt_decl /* not supported */
                 ;
 
 expr_func_list:   expr_func_list_not_e
@@ -417,13 +414,13 @@ anon_function_def: FUNCTION '(' expr_func_list ')'
                 |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID
                 ;
 
-anon_function_stmt_decl: anon_function_def '{' stmt_list '}'
+anon_function_stmt_decl: anon_function_def '{' stmt_list '}' /* not supported */
                         ;
 
-anon_function_short_def:  FN '(' expr_func_list ')'
-                        | FN '(' expr_func_list ')' ':' ID
-                        | STATIC FN '(' expr_func_list ')'
-                        | STATIC FN '(' expr_func_list ')' ':' ID
+anon_function_short_def:  FN '(' expr_func_list ')' /* not supported */
+                        | FN '(' expr_func_list ')' ':' ID /* not supported */
+                        | STATIC FN '(' expr_func_list ')' /* not supported */
+                        | STATIC FN '(' expr_func_list ')' ':' ID /* not supported */
                         ;
 
 anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr
