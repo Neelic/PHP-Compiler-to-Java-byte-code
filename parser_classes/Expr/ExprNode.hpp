@@ -1,5 +1,7 @@
 #include "ExprType.cpp"
 
+class GetValueNode;
+
 class ExprNode
 {
 public:
