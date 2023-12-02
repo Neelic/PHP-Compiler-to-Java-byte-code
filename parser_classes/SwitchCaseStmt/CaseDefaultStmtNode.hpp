@@ -1,5 +1,7 @@
 #include "CaseDefaultType.cpp"
 
+class ExprNode;
+
 class CaseDefaultStmtNode
 {
 public:

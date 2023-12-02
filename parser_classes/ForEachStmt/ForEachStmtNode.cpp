@@ -6,7 +6,7 @@ ForEachStmtNode* ForEachStmtNode::CreateFromForeachStmt(ExprNode* expr_left, Exp
     tmp->expr_left = expr_left;
     tmp->expr_right = expr_right;
     tmp->stmt = stmt;
-    tmp->type = ForEachStmtType::foreach_stmt;
+    tmp->type = ForEachStmtType::foreach_stmt_type;
     return tmp;
 }
 
@@ -17,7 +17,7 @@ ForEachStmtNode* ForEachStmtNode::CreateFromForeachRightArrowStmt(ExprNode* expr
     tmp->expr_right = expr_right;
     tmp->id = id;
     tmp->stmt = stmt;
-    tmp->type = ForEachStmtType::foreach_r_double_arrow_stmt;
+    tmp->type = ForEachStmtType::foreach_r_double_arrow_stmt_type;
     return tmp;
 }
 
@@ -28,7 +28,7 @@ ForEachStmtNode* ForEachStmtNode::CreateFromForeachRightArrowPointerStmt(ExprNod
     tmp->expr_right = expr_right;
     tmp->id = id;
     tmp->stmt = stmt;
-    tmp->type = ForEachStmtType::foreach_r_double_arrow_pointer_stmt;
+    tmp->type = ForEachStmtType::foreach_r_double_arrow_pointer_stmt_type;
     return tmp;
 }
 
@@ -38,7 +38,7 @@ ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachStmt(ExprNode* expr_left, 
     tmp->expr_left = expr_left;
     tmp->expr_right = expr_right;
     tmp->stmtList = stmtList;
-    tmp->type = ForEachStmtType::end_foreach_stmt;
+    tmp->type = ForEachStmtType::end_foreach_stmt_type;
     return tmp;
 }
 
@@ -49,7 +49,7 @@ ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachRightArrowStmt(ExprNode* e
     tmp->expr_right = expr_right;
     tmp->id = id;
     tmp->stmtList = stmtList;
-    tmp->type = ForEachStmtType::end_foreach_r_double_arrow_stmt;
+    tmp->type = ForEachStmtType::end_foreach_r_double_arrow_stmt_type;
     return tmp;
 }
 
@@ -60,6 +60,6 @@ ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachRightArrowPointerStmt(Expr
     tmp->expr_right = expr_right;
     tmp->id = id;
     tmp->stmtList = stmtList;
-    tmp->type = ForEachStmtType::end_foreach_r_double_arrow_pointer_stmt;
+    tmp->type = ForEachStmtType::end_foreach_r_double_arrow_pointer_stmt_type;
     return tmp;
 }

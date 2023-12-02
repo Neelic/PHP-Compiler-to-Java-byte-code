@@ -7,7 +7,7 @@ ForStmtNode* ForStmtNode::CreateFromForStmt(ExprNode* expr_left, ExprNode* expr_
     tmp->expr_central = expr_central;
     tmp->expr_right = expr_right;
     tmp->stmt = stmt;
-    tmp->type = ForStmtType::for_stmt;
+    tmp->type = ForStmtType::for_stmt_type;
     return tmp;
 }
 
@@ -18,6 +18,6 @@ ForStmtNode* ForStmtNode::CreateFromForEndStmt(ExprNode* expr_left, ExprNode* ex
     tmp->expr_central = expr_central;
     tmp->expr_right = expr_right;
     tmp->stmtList = stmtList;
-    tmp->type = ForStmtType::for_end_stmt;
+    tmp->type = ForStmtType::for_end_stmt_type;
     return tmp;
 }

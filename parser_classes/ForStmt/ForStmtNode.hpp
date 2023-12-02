@@ -1,5 +1,8 @@
 #include "ForStmtType.cpp"
 
+class ExprNode;
+class StmtNode;
+
 class ForStmtNode
 {
 public:

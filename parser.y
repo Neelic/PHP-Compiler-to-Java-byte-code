@@ -53,6 +53,8 @@ void yyerror(char* str);
 %right PUBLIC PRIVATE PROTECTED FINAL STATIC READ_ONLY
 %token INTERFACE
 %token TRAIT
+%token THIS
+%token SELF
 
 %right THROW
 %left LOGIC_OR
@@ -220,6 +222,8 @@ expr:     INT_NUMBER
         | FLOAT_NUMBER
         | STRING
         | COM_STRING
+        | get_value THIS
+        | SELF
         | get_value ID
         | ID
         | expr '=' expr
@@ -314,7 +318,8 @@ class_def: CLASS ID
         ;
 
 class_stmt_decl:  class_def '{' class_stmt_list '}'
-                | STATIC class_def '{' class_stmt_list '}'
+                | FINAL class_def '{' class_stmt_list '}'
+                | ABSTRACT class_def '{' class_stmt_list '}'
                 ;
 
 class_stmt_list: class_stmt_list_not_e
@@ -367,10 +372,7 @@ interface_stmt_list_not_e: interface_stmt
 interface_stmt: class_access_mod_list function_def ';' 
                 ;
 
-trait_expr_def: TRAIT ID 
-                ;
-
-trait_stmt_decl: trait_expr_def '{' class_stmt_list '}' 
+trait_stmt_decl: TRAIT ID  '{' class_stmt_list '}' 
                 ;
 
 function_def: FUNCTION ID '(' expr_func_list ')'

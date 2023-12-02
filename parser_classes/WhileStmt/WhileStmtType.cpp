@@ -1,5 +1,5 @@
 enum WhileStmtType
 {
-    while_stmt,
-    end_while_stmt
+    while_stmt_type,
+    end_while_stmt_type
 };

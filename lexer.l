@@ -105,6 +105,8 @@ include             {printf("Found keyword: %s\n", yytext);}
 require_once        {printf("Found keyword: %s\n", yytext);}
 include_once        {printf("Found keyword: %s\n", yytext);}
 goto                {printf("Found keyword: %s\n", yytext);}
+this                {printf("Found keyword: %s\n", yytext);}
+self                {printf("Found keyword: %s\n", yytext);}
 
 \({SPACE}*[iI][nN][tT]{SPACE}*\)                  {printf("Found int cast: %s\n", yytext);}
 \({SPACE}*[iI][nN][tT][eE][gG][eE][rR]{SPACE}*\)  {printf("Found int cast: %s\n", yytext);}

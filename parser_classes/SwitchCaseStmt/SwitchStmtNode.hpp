@@ -1,5 +1,6 @@
 #include "SwitchStmtType.cpp"
-#include "CaseDefaultStmtNode.hpp"
+
+class ExprNode;
 
 class SwitchStmtNode
 {

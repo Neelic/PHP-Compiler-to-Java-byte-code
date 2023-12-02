@@ -17,7 +17,7 @@ SwitchStmtNode* SwitchStmtNode::CreateFromSwitchDefaultStmt(ExprNode* expr, std:
     return tmp;
 }
 
-StmtListNode* SwitchStmtNode::CreateFromSwitchDefaultEndswitchStmt(ExprNode* expr, std::vector<CaseDefaultStmtNode*>* defaultStmtList)
+SwitchStmtNode* SwitchStmtNode::CreateFromSwitchDefaultEndswitchStmt(ExprNode* expr, std::vector<CaseDefaultStmtNode*>* defaultStmtList)
 {
     SwitchStmtNode* tmp = new SwitchStmtNode();
     tmp->expr = expr;

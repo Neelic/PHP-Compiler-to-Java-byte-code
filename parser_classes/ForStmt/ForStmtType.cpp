@@ -1,5 +1,5 @@
 enum ForStmtType
 {
-    for_stmt,
-    for_end_stmt
+    for_stmt_type,
+    for_end_stmt_type
 };

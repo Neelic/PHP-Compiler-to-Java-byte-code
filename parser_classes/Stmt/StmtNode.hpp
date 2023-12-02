@@ -1,5 +1,14 @@
 #include "../Stmt/StmtType.cpp"
 
+class ExprNode;
+class IfStmtNode;
+class SwitchStmtNode;
+class WhileStmtNode;
+class DoWhileStmtNode;
+class ForStmtNode;
+class ForEachStmtNode;
+class TryCatchStmtNode;
+
 class StmtNode
 {
 public:

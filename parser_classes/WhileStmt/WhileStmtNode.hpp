@@ -1,5 +1,8 @@
 #include "WhileStmtType.cpp"
 
+class ExprNode;
+class StmtNode;
+
 class WhileStmtNode
 {
 public:
