@@ -18,7 +18,7 @@ enum ExprType
     class_inst_field_by_ref_op,
     class_field_ref_op,
     class_field_by_ref_op,
-    branch,
+    bracket,
     minus_op,
     plus_op,
     mult_op,

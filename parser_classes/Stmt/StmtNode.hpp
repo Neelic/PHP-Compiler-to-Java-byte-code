@@ -1,4 +1,6 @@
 #include "../Stmt/StmtType.cpp"
+#include <vector>
+#include <string>
 
 class ExprNode;
 class IfStmtNode;
@@ -8,6 +10,11 @@ class DoWhileStmtNode;
 class ForStmtNode;
 class ForEachStmtNode;
 class TryCatchStmtNode;
+class GlobalVarNode;
+class StaticVarNode;
+class MatchStmtNode;
+class ConstDeclNode;
+class HtmlStmtNode;
 
 class StmtNode
 {

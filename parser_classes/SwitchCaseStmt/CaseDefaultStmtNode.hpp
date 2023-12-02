@@ -1,6 +1,8 @@
 #include "CaseDefaultType.cpp"
+#include <vector>
 
 class ExprNode;
+class StmtNode;
 
 class CaseDefaultStmtNode
 {

@@ -1,4 +1,9 @@
 #include "ForEachStmtType.cpp"
+#include <vector>
+#include <string>
+
+class ExprNode;
+class StmtNode;
 
 class ForEachStmtNode
 {
