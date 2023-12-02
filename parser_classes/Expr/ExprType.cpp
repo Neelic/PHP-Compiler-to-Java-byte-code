@@ -18,6 +18,8 @@ enum ExprType
     class_inst_field_by_ref_op,
     class_field_ref_op,
     class_field_by_ref_op,
+    class_method_ref_op,
+    class_method_by_ref_op,
     branch,
     minus_op,
     plus_op,
@@ -57,6 +59,8 @@ enum ExprType
     call_func,
     call_get_value_func,
     new_decl,
+    new_decl_no_params,
     new_decl_no_id,
-    new_get_value_decl
+    new_get_value_decl,
+    new_get_value_decl_no_params
 };
