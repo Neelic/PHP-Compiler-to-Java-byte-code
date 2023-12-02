@@ -7,6 +7,7 @@
 #include "GlobalVar/GlobalVarNode.hpp"
 #include "ClassDef/ClassDefNode.hpp"
 #include "Expr/ExprNode.hpp"
+#include "ExprFunc/ExprFuncNode.hpp"
 #include "StaticVar/StaticVarNode.hpp"
 #include "ConstDecl/ConstDeclNode.hpp"
 #include "MatchStmt/MatchStmtNode.hpp"
