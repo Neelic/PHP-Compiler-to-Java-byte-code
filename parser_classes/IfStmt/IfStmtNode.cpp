@@ -28,13 +28,12 @@ IfStmtNode* IfStmtNode::CreateFromIfEndIfStmt(ExprNode* expr, std::vector<StmtNo
     return tmp;
 }
 
-IfStmtNode* IfStmtNode::CreateFromIfElseEndIfStmt(ExprNode* expr, StmtNode* stmt_main, StmtNode* stmt_else, std::vector<StmtNode*>* stmtList)
+IfStmtNode* IfStmtNode::CreateFromIfElseEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmtListMain, std::vector<StmtNode*>* stmtListElse)
 {
     IfStmtNode* tmp = new IfStmtNode();
     tmp->expr = expr;
-    tmp->stmt_main = stmt_main;
-    tmp->stmt_else = stmt_else;
-    tmp->stmtList = stmtList;
+    tmp->stmtListMain = stmtListMain;
+    tmp->stmtListElse = stmtListElse;
     tmp->type = IfStmtType::if_else_endif;
     return tmp;
 }

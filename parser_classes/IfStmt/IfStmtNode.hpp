@@ -10,10 +10,11 @@ public:
     ExprNode* expr;
     StmtNode* stmt_main;
     StmtNode* stmt_else;
-    std::vector<StmtNode*>* stmtList;
+    std::vector<StmtNode*>* stmtListMain;
+    std::vector<StmtNode*>* stmtListElse;
 
     static IfStmtNode* CreateFromIfStmt(ExprNode* expr, StmtNode* stmt_main);
     static IfStmtNode* CreateFromIfElseStmt(ExprNode* expr, StmtNode* stmt_main, StmtNode* stmt_else);
-    static IfStmtNode* CreateFromIfEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmtList);
-    static IfStmtNode* CreateFromIfElseEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmt_main_list, std::vector<StmtNode*>* stmt_else_list); //TODO переделать
+    static IfStmtNode* CreateFromIfEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmtListMain);
+    static IfStmtNode* CreateFromIfElseEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmtListMain, std::vector<StmtNode*>* stmtListElse);
 };
