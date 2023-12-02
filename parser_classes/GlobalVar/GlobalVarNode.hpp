@@ -1,3 +1,8 @@
+#include <vector>
+#include <string>
+
+class GetValueNode;
+
 class GlobalVarNode
 {
 public:

@@ -80,6 +80,10 @@ void yyerror(char* str);
 %nonassoc '('')'
 %nonassoc NEW CLONE
 
+%union{IfStmtNode* if_stmt_union;}
+
+%type <if_stmt_union> if_stmt
+
 %%
 
 start:    START_CODE_PHP_TAG top_stmt_list_not_e
@@ -108,10 +112,10 @@ get_value: '$'
         |  get_value '$'
         ;
 
-if_stmt:  IF '(' expr ')' stmt
-        | IF '(' expr ')' stmt ELSE stmt
-        | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'
-        | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';'
+if_stmt:  IF '(' expr ')' stmt                                                        {$$ = IfStmtNode::CreateFromIfStmt($3, $5);}
+        | IF '(' expr ')' stmt ELSE stmt                                              {$$ = IfStmtNode::CreateFromCreateFromIfElseStmt($3, $5, $7);}
+        | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'                          {$$ = IfStmtNode::CreateFromIfEndIfStmt($3, $6);}
+        | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';' {$$ = IfStmtNode::CreateFromIfElseEndIfStmt($3, $6, $8);}  
         ;
 
 switch_stmt: SWITCH '(' expr ')' '{' '}'
@@ -163,7 +167,7 @@ match_arm: expr_list_not_e R_DOUBLE_ARROW expr
         |  DEFAULT ',' R_DOUBLE_ARROW expr
         ;
 
-try_stmt: TRY '{' stmt_list_may_empty '}' /* not supported */
+try_stmt: TRY '{' stmt_list_may_empty '}' {/* not supported */}
         ;
 
 catch_stmt: CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
@@ -174,7 +178,7 @@ catch_stmt_list:  catch_stmt
                 | catch_stmt_list catch_stmt
                 ;
 
-try_catch_stmt:   try_stmt catch_stmt_list /* not supported */
+try_catch_stmt:   try_stmt catch_stmt_list {/* not supported */}
                 | try_stmt
                 ;
 

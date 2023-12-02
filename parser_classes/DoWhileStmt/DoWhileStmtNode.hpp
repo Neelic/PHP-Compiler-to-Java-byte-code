@@ -1,3 +1,6 @@
+class ExprNode;
+class StmtNode;
+
 class DoWhileStmtNode
 {
 public:

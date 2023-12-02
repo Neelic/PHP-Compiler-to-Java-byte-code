@@ -20,7 +20,7 @@ enum ExprType
     class_field_by_ref_op,
     class_method_ref_op,
     class_method_by_ref_op,
-    branch,
+    bracket,
     minus_op,
     plus_op,
     mult_op,

@@ -1,4 +1,8 @@
 #include "IfStmtType.cpp"
+#include <vector>
+
+class ExprNode;
+class StmtNode;
 
 class IfStmtNode
 {

@@ -1,3 +1,7 @@
+#include <string>
+
+class ExprNode;
+
 class ConstDeclNode
 {
 public:

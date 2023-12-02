@@ -1,4 +1,6 @@
 #include "../ClassDef/ClassDefType.cpp"
+#include <vector>
+#include <string>
 
 class ClassDefNode
 {
