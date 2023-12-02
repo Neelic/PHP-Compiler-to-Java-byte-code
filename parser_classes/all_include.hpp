@@ -5,6 +5,7 @@
 #include "GetValue/GetValueNode.hpp"
 #include "GetValueFunc/GetValueFuncNode.hpp"
 #include "GlobalVar/GlobalVarNode.hpp"
+#include "ClassDef/ClassDefNode.hpp"
 #include "Expr/ExprNode.hpp"
 #include "StaticVar/StaticVarNode.hpp"
 #include "ConstDecl/ConstDeclNode.hpp"
