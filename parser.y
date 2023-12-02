@@ -67,11 +67,12 @@ void yyerror(char* str);
 %left '|'
 %left '^'
 %left '&'
-%nonassoc EQUAL EQUAL_STRICT
+%nonassoc EQUAL EQUAL_STRICT EQU_NOT
 %nonassoc '>' '<' EQU_MORE EQU_LESS
 %left SHIFT_L SHIFT_R
 %left '.'
 %left '-' '+'
+%right INC DEC
 %left '/' '*' '%'
 %right '!'
 %right '~' U_MINUS U_PLUS INT_CAST FLOAT_CAST STRING_CAST ARRAY_CAST OBJECT_CAST BOOL_CAST
@@ -167,7 +168,7 @@ match_arm: expr_list_not_e R_DOUBLE_ARROW expr
         |  DEFAULT ',' R_DOUBLE_ARROW expr
         ;
 
-try_stmt: TRY '{' stmt_list_may_empty '}' {/* not supported */}
+try_stmt: TRY '{' stmt_list_may_empty '}' {/*! not supported */}
         ;
 
 catch_stmt: CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
@@ -178,7 +179,7 @@ catch_stmt_list:  catch_stmt
                 | catch_stmt_list catch_stmt
                 ;
 
-try_catch_stmt:   try_stmt catch_stmt_list {/* not supported */}
+try_catch_stmt:   try_stmt catch_stmt_list {/*! not supported */}
                 | try_stmt
                 ;
 
@@ -250,6 +251,8 @@ expr:     INT_NUMBER
         | '(' expr ')'
         | expr '-' expr
         | expr '+' expr
+        | INC expr
+        | DEC expr
         | expr '*' expr
         | expr '/' expr
         | expr '%' expr
@@ -264,6 +267,7 @@ expr:     INT_NUMBER
         | expr LOGIC_AND expr
         | expr EQUAL expr 
         | expr EQUAL_STRICT expr
+        | expr EQU_NOT expr
         | expr EQU_MORE expr
         | expr EQU_LESS expr
         | expr SHIFT_L expr
@@ -283,7 +287,7 @@ expr:     INT_NUMBER
         | expr '[' ']' '=' expr
         | ID '(' expr_list ')'
         | get_value ID brackets
-        | anon_function_expr /* not supported */
+        | anon_function_expr                  /*! not supported */
         | NEW ID '(' expr_list ')'
         | NEW ID
         | NEW get_value ID
@@ -386,8 +390,8 @@ function_def: FUNCTION ID '(' expr_func_list ')'
 function_stmt_decl: function_def '{' stmt_list '}' 
                 ;
 
-anon_function_expr: anon_function_stmt_decl /* not supported */
-                |   anon_function_short_stmt_decl /* not supported */
+anon_function_expr: anon_function_stmt_decl /*! not supported */
+                |   anon_function_short_stmt_decl /*! not supported */
                 ;
 
 expr_func_list:   expr_func_list_not_e
@@ -420,13 +424,13 @@ anon_function_def: FUNCTION '(' expr_func_list ')'
                 |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID
                 ;
 
-anon_function_stmt_decl: anon_function_def '{' stmt_list '}' /* not supported */
+anon_function_stmt_decl: anon_function_def '{' stmt_list '}'      {/*! not supported */}
                         ;
 
-anon_function_short_def:  FN '(' expr_func_list ')' /* not supported */
-                        | FN '(' expr_func_list ')' ':' ID /* not supported */
-                        | STATIC FN '(' expr_func_list ')' /* not supported */
-                        | STATIC FN '(' expr_func_list ')' ':' ID /* not supported */
+anon_function_short_def:  FN '(' expr_func_list ')'               {/*! not supported */}
+                        | FN '(' expr_func_list ')' ':' ID        {/*! not supported */}
+                        | STATIC FN '(' expr_func_list ')'        {/*! not supported */}
+                        | STATIC FN '(' expr_func_list ')' ':' ID {/*! not supported */}
                         ;
 
 anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr
