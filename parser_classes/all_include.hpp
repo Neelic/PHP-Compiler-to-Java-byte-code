@@ -8,6 +8,7 @@
 #include "ClassDef/ClassDefNode.hpp"
 #include "Expr/ExprNode.hpp"
 #include "ExprFunc/ExprFuncNode.hpp"
+#include "FunctionDef/FunctionDefNode.hpp"
 #include "StaticVar/StaticVarNode.hpp"
 #include "ConstDecl/ConstDeclNode.hpp"
 #include "MatchStmt/MatchStmtNode.hpp"
