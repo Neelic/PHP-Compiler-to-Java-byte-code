@@ -31,6 +31,7 @@ void yyerror(char* str);
 %token FOREACH
 %token AS
 %token END_FOREACH
+%token CONTINUE
 
 %token IF
 %token ELSE
@@ -45,6 +46,7 @@ void yyerror(char* str);
 %token FN
 %token USE
 %token GLOBAL
+%token T_ECHO
 
 %token CLASS
 %token ABSTRACT
@@ -81,9 +83,20 @@ void yyerror(char* str);
 %nonassoc '('')'
 %nonassoc NEW CLONE
 
-%union{IfStmtNode* if_stmt_union;}
+%union{
+        std::string* sval;
+        int ival;
+        float fval;
+        IfStmtNode* if_stmt_union;
+        ExprNode* expr_union;
+        StmtNode* stmt_union;
+        GetValueNode* get_value_union;
+        }
 
 %type <if_stmt_union> if_stmt
+%type <expr_union> expr
+%type <stmt_union> stmt
+%type <get_value_union> get_value
 
 %%
 
@@ -96,6 +109,7 @@ start:    START_CODE_PHP_TAG top_stmt_list_not_e
         | START_CODE_PHP_TAG
         | START_CODE_PHP_TAG END_CODE_PHP_TAG
         | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML
+        | HTML
         ;
 
 top_stmt_list_not_e: top_stmt
@@ -113,10 +127,10 @@ get_value: '$'
         |  get_value '$'
         ;
 
-if_stmt:  IF '(' expr ')' stmt                                                        {$$ = IfStmtNode::CreateFromIfStmt($3, $5);}
-        | IF '(' expr ')' stmt ELSE stmt                                              {$$ = IfStmtNode::CreateFromCreateFromIfElseStmt($3, $5, $7);}
-        | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'                          {$$ = IfStmtNode::CreateFromIfEndIfStmt($3, $6);}
-        | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';' {$$ = IfStmtNode::CreateFromIfElseEndIfStmt($3, $6, $8);}  
+if_stmt:  IF '(' expr ')' stmt                                                        {/*$$ = IfStmtNode::CreateFromIfStmt($3, $5);*/}
+        | IF '(' expr ')' stmt ELSE stmt                                              {/*$$ = IfStmtNode::CreateFromCreateFromIfElseStmt($3, $5, $7);*/}
+        | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'                          {/*$$ = IfStmtNode::CreateFromIfEndIfStmt($3, $6);*/}
+        | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';' {/*$$ = IfStmtNode::CreateFromIfElseEndIfStmt($3, $6, $8);*/}  
         ;
 
 switch_stmt: SWITCH '(' expr ')' '{' '}'
@@ -200,6 +214,8 @@ stmt:     expr_may_empty ';'
         | RETURN expr_may_empty ';'
         | html_stmt
         | BREAK ';'
+        | T_ECHO expr ';'
+        | CONTINUE ';'
         ;
 
 static_var_list:  '$' ID
