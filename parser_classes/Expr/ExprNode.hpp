@@ -41,6 +41,10 @@ public:
     static ExprNode* CreateFromFieldReference(ExprNode* left, std::string* id);
     static ExprNode* CreateFromGetValueFieldReference(ExprNode* left, GetValueNode* get_value, std::string* id);
     static ExprNode* CreateFromGetValueWithExprReference(ExprNode* left, GetValueNode* get_value, ExprNode* get_value_expr);
+    
+    static ExprNode* CreateFromMethodReference(ExprNode* left, std::string* id, std::vector<ExprNode*>* listParams);
+    static ExprNode* CreateFromGetValueMethodReference(ExprNode* left, GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams);
+    static ExprNode* CreateFromGetValueWithExprMethodReference(ExprNode* left, GetValueNode* get_value, ExprNode* get_value_expr, std::vector<ExprNode*>* listParams);
     //Quarter Dot
     static ExprNode* CreateFromFieldReferenceDots(ExprNode* left, std::string* id);
     static ExprNode* CreateFromGetValueFieldReferenceDots(ExprNode* left, GetValueNode* get_value, std::string* id);
@@ -95,8 +99,10 @@ public:
 
     //Declaration
     static ExprNode* CreateFromNewDecl(std::string* id, std::vector<ExprNode*>* listParams);
+    static ExprNode* CreateFromNewDeclNoParams(std::string* id);
     static ExprNode* CreateFromNewDeclNoId(ExprNode* left);
     static ExprNode* CreateFromGetValueDecl(GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams);
+    static ExprNode* CreateFromGetValueDeclNoParams(GetValueNode* get_value, std::string* id);
 
     //TODO продолжить список
 };

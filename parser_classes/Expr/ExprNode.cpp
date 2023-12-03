@@ -157,6 +157,39 @@ ExprNode* ExprNode::CreateFromGetValueWithExprReference(ExprNode* left, GetValue
     return tmp;
 }
 
+ExprNode* ExprNode::CreateFromMethodReference(ExprNode* left, std::string* id, std::vector<ExprNode*>* listParams)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->id = id;
+    tmp->listParams = listParams;
+    tmp->exprType = ExprType::class_method_ref_op;
+    return tmp;
+}
+
+ExprNode* ExprNode::CreateFromGetValueMethodReference(ExprNode* left, GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->id = id;
+    tmp->get_value = get_value;
+    tmp->listParams = listParams;
+    tmp->exprType = ExprType::class_method_ref_op;
+    return tmp;
+}
+
+ExprNode* ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode* left, GetValueNode* get_value, ExprNode* get_value_expr, std::vector<ExprNode*>* listParams)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->left = left;
+    tmp->id = id;
+    tmp->get_value = get_value;
+    tmp->right = get_value_expr;
+    tmp->listParams = listParams;
+    tmp->exprType = ExprType::class_method_by_ref_op;
+    return tmp;
+}
+
 //Quarter Dot
 ExprNode* ExprNode::CreateFromFieldReferenceDots(ExprNode* left, std::string* id)
 {
@@ -522,6 +555,14 @@ ExprNode* ExprNode::CreateFromNewDecl(std::string* id, std::vector<ExprNode*>* l
     return tmp;
 }
 
+ExprNode* ExprNode::CreateFromNewDeclNoParams(std::string* id)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->id = id;
+    tmp->exprType = ExprType::new_decl_no_params;
+    return tmp;
+}
+
 ExprNode* ExprNode::CreateFromNewDeclNoId(ExprNode* left)
 {
     ExprNode* tmp = new ExprNode();
@@ -537,6 +578,15 @@ ExprNode* ExprNode::CreateFromGetValueDecl(GetValueNode* get_value, std::string*
     tmp->id = id;
     tmp->listParams = listParams;
     tmp->exprType = ExprType::new_get_value_decl;
+    return tmp;
+}
+
+ExprNode* ExprNode::CreateFromGetValueDeclNoParams(GetValueNode* get_value, std::string* id)
+{
+    ExprNode* tmp = new ExprNode();
+    tmp->get_value = get_value;
+    tmp->id = id;
+    tmp->exprType = ExprType::new_get_value_decl_no_params;
     return tmp;
 }
 

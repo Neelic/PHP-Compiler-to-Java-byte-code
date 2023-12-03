@@ -61,7 +61,7 @@ try 		          {printf("Found keyword: %s\n", yytext); return TRY;}
 catch		          {printf("Found keyword: %s\n", yytext); return CATCH;}
 clone		          {printf("Found keyword: %s\n", yytext); return CLONE;}
 continue	        {printf("Found keyword: %s\n", yytext); return CONTINUE;}
-echo		          {printf("Found keyword: %s\n", yytext); return ECHO;}
+echo		          {printf("Found keyword: %s\n", yytext); return T_ECHO;}
 die	    	        {printf("Found keyword: %s\n", yytext); /*return DIE;*/}
 new		            {printf("Found keyword: %s\n", yytext); return NEW;}
 class		          {printf("Found keyword: %s\n", yytext); return CLASS;}

@@ -1,8 +1,8 @@
 class InterfaceStmtNode
 {
-private:
-    /* data */
 public:
-    InterfaceStmtNode(/* args */);
-    ~InterfaceStmtNode();
+    std::vector<ClassAccessMod>* access_mod;
+    FunctionDefNode* function_def;
+
+    static InterfaceStmtNode* Create(std::vector<ClassAccessMod>* access_mod, FunctionDefNode* function_def);
 };
