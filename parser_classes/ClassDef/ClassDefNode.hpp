@@ -7,7 +7,7 @@ class ClassDefNode
 public:
     std::string* class_id;
     std::string* extend_id;
-    std::vector<std::string*>* id_list;
+    std::vector<std::string*>* impl_id_list;
     ClassDefType type;
 
     static ClassDefNode* CreateFromClassDef(std::string* id);
