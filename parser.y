@@ -1,19 +1,34 @@
 %{
 #include <stdio.h>
-#include "parser_classes/all_include.hpp"
+/* #include "parser_classes/all_include.hpp" */
+#include "parser.tab.h"
 extern int yylex();
 void yyerror(char* str);
 %}
+
+%code requires {
+#include <string>
+#include "parser_classes/all_include.hpp"
+}
+%union{
+        std::string* sval;
+        int ival;
+        float fval;
+        IfStmtNode* if_stmt_union;
+        ExprNode* expr_union;
+        StmtNode* stmt_union;
+        GetValueNode* get_value_union;
+        }
 
 %token START_CODE_PHP_TAG
 %token END_CODE_PHP_TAG
 %token HTML
 
-%token ID
-%token INT_NUMBER
-%token FLOAT_NUMBER
-%token STRING
-%token COM_STRING
+%token <sval> ID
+%token <ival> INT_NUMBER
+%token <fval> FLOAT_NUMBER
+%token <sval> STRING
+%token <sval> COM_STRING
 %token CONST
 %token RETURN
 
@@ -82,16 +97,6 @@ void yyerror(char* str);
 %right POW
 %nonassoc '('')'
 %nonassoc NEW CLONE
-
-%union{
-        std::string* sval;
-        int ival;
-        float fval;
-        IfStmtNode* if_stmt_union;
-        ExprNode* expr_union;
-        StmtNode* stmt_union;
-        GetValueNode* get_value_union;
-        }
 
 %type <if_stmt_union> if_stmt
 %type <expr_union> expr

@@ -72,7 +72,7 @@ protected	        {printf("Found keyword: %s\n", yytext); return PROTECTED;}
 static		        {printf("Found keyword: %s\n", yytext); return STATIC;}
 extends         	{printf("Found keyword: %s\n", yytext); return EXTENDS;}
 final         	  {printf("Found keyword: %s\n", yytext); return FINAL;}
-finally         	{printf("Found keyword: %s\n", yytext); return FINALLY}
+finally         	{printf("Found keyword: %s\n", yytext); return FINALLY;}
 fn          	    {printf("Found keyword: %s\n", yytext); return FN;}
 implements        {printf("Found keyword: %s\n", yytext); return IMPLEMENTS;}
 instanceof        {printf("Found keyword: %s\n", yytext); /* return INSTANCE_OF; */}
@@ -194,10 +194,13 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                       inCode = false; 
                       str = ""; 
                       BEGIN(NOT_IN_PHP_CODE);
-                      mis_symbols.push_back(&END_CODE_PHP_TAG); /*! TODO Не факт, что работает */
+                      mis_symbols.push_back(END_CODE_PHP_TAG); /*! TODO Не факт, что работает */
                       return ';';
                     }
-{IDENTIFIER}        {printf("Found identifier: %s\n", yytext); yylval.sval=&std::string(yytext); return ID;}
+{IDENTIFIER}        { printf("Found identifier: %s\n", yytext);
+                      std::string tmp = std::string(yytext);
+                      yylval.sval=&tmp;
+                      return ID;}
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext); yylval.ival=atoi(yytext); return INT_NUMBER;}
 {INT_HEXIDECIMAL}   {squeeze(yytext, '_'); printf("Found integer hexidecimal number: %s\n", yytext); /*TODO do convert*/}
 {INT_OCTAL}         {squeeze(yytext, '_'); printf("Found integer octal number: %s\n", yytext); /*TODO do convert*/}
