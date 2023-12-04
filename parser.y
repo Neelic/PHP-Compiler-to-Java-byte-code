@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
-/* #include "parser_classes/all_include.hpp" */
 #include "parser.tab.h"
+
 extern int yylex();
 void yyerror(char* str);
 %}
@@ -10,6 +10,7 @@ void yyerror(char* str);
 #include <string>
 #include "parser_classes/all_include.hpp"
 }
+
 %union{
         std::string* sval;
         int ival;
@@ -18,6 +19,7 @@ void yyerror(char* str);
         ExprNode* expr_union;
         StmtNode* stmt_union;
         GetValueNode* get_value_union;
+        std::vector<ExprNode*>* expr_list_union;
         }
 
 %token START_CODE_PHP_TAG
@@ -100,8 +102,11 @@ void yyerror(char* str);
 
 %type <if_stmt_union> if_stmt
 %type <expr_union> expr
+%type <expr_union> expr_may_empty
 %type <stmt_union> stmt
 %type <get_value_union> get_value
+%type <expr_list_union> expr_list
+%type <expr_list_union> expr_list_not_e
 
 %%
 
@@ -132,10 +137,10 @@ get_value: '$'
         |  get_value '$'
         ;
 
-if_stmt:  IF '(' expr ')' stmt                                                        {/*$$ = IfStmtNode::CreateFromIfStmt($3, $5);*/}
-        | IF '(' expr ')' stmt ELSE stmt                                              {/*$$ = IfStmtNode::CreateFromCreateFromIfElseStmt($3, $5, $7);*/}
-        | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'                          {/*$$ = IfStmtNode::CreateFromIfEndIfStmt($3, $6);*/}
-        | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';' {/*$$ = IfStmtNode::CreateFromIfElseEndIfStmt($3, $6, $8);*/}  
+if_stmt:  IF '(' expr ')' stmt                                                        {$$=IfStmtNode::CreateFromIfStmt($3, $5);}
+        | IF '(' expr ')' stmt ELSE stmt                                              {$$=IfStmtNode::CreateFromCreateFromIfElseStmt($3, $5, $7);}
+        | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'                          {$$=IfStmtNode::CreateFromIfEndIfStmt($3, $6);}
+        | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';' {$$=IfStmtNode::CreateFromIfElseEndIfStmt($3, $6, $8);}  
         ;
 
 switch_stmt: SWITCH '(' expr ')' '{' '}'
@@ -244,25 +249,25 @@ stmt_list_may_empty: stmt_list
 html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG
         ;
 
-expr:     INT_NUMBER
-        | FLOAT_NUMBER
-        | STRING
-        | COM_STRING
-        | get_value THIS
-        | SELF
-        | get_value ID
-        | ID
-        | expr '=' expr
-        | expr '=' '&' expr
-        | INT_CAST expr
-        | FLOAT_CAST expr
-        | STRING_CAST expr
-        | ARRAY_CAST expr
-        | OBJECT_CAST expr
-        | BOOL_CAST expr
-        | expr R_ARROW ID
-        | expr R_ARROW get_value ID
-        | expr R_ARROW get_value '{' expr '}'
+expr:     INT_NUMBER                                                 {$$=ExprNode::CreateFromIntValue($1);}
+        | FLOAT_NUMBER                                               {$$=ExprNode::CreateFromFloatValue($1);}
+        | STRING                                                     {$$=ExprNode::CreateFromStringValue($1);}
+        | COM_STRING                                                 {$$=ExprNode::CreateFromComStringValue($1);}
+        | '$' THIS     
+        | SELF     
+        | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, $2);}
+        | ID                                                         {$$=ExprNode::CreateFromId($1);}
+        | expr '=' expr                                              {$$=ExprNode::CreateFromAssignOp($1, $3);}
+        | expr '=' '&' expr                                          {$$=ExprNode::CreateFromAssignRefOp($1, $3);}
+        | INT_CAST expr                                              {$$=ExprNode::CreateFromIntCast($2);}
+        | FLOAT_CAST expr                                            {$$=ExprNode::CreateFromFloatCast($2);}
+        | STRING_CAST expr                                           {$$=ExprNode::CreateFromStringCast($2);}
+        | ARRAY_CAST expr                                            {$$=ExprNode::CreateFromArrayCast($2);}
+        | OBJECT_CAST expr                                           {$$=ExprNode::CreateFromObjectCast($2);}
+        | BOOL_CAST expr                                             {$$=ExprNode::CreateFromBoolCast($2);}
+        | expr R_ARROW ID                                            {$$=ExprNode::CreateFromFieldReference($1, $3);}
+        | expr R_ARROW get_value ID                                  {$$=ExprNode::CreateFromGetValueFieldReference($1, $3, $4);}
+        | expr R_ARROW get_value '{' expr '}'                        {$$=ExprNode::CreateFromGetValueWithExprReference($1, $3, $5);}
         | expr R_ARROW ID '(' expr_list ')'
         | expr R_ARROW get_value ID '(' expr_list ')'
         | expr R_ARROW get_value ID '{' expr '}' '(' expr_list ')'
@@ -316,8 +321,8 @@ expr:     INT_NUMBER
         | NEW '(' expr ')'
         ;
 
-expr_may_empty: expr
-                | /* empty */
+expr_may_empty: expr                                                 {$$=$1;}
+                | /* empty */                                        {}
                 ;
 
 brackets: '(' expr_list ')'
@@ -328,8 +333,8 @@ id_list:  ID
         | id_list ',' ID
         ;
 
-expr_list_not_e:  expr
-                | expr_list_not_e ',' expr
+expr_list_not_e:  expr                                               {std::vector<ExprNode*> tmp;$$=tmp.push_back($1);/*! Не факт, что сработает*/}
+                | expr_list_not_e ',' expr                           {$$=$1.push_back($3);/*! Не факт, что сработает*/}
                 ;
 
 expr_list: expr_list_not_e
