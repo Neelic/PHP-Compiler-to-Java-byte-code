@@ -14,7 +14,7 @@ Step 2:
 
 Step 3: compile
 ``` bash
-gcc -o result parser.tab.c lex.yy.c
+g++ -o result lex.yy.c
 ```
 
 Step 4:
