@@ -20,6 +20,17 @@ void yyerror(char* str);
         StmtNode* stmt_union;
         GetValueNode* get_value_union;
         std::vector<ExprNode*>* expr_list_union;
+        TopStmtNode* top_stmt_union;
+        FunctionStmtDeclNode* function_stmt_decl_union;
+        ClassStmtDeclNode* class_stmt_decl_union;
+        InterfaceStmtDeclNode* interface_stmt_decl_union;
+        TraitStmtDeclNode* trait_stmt_decl_union;
+        std::vector<TopStmtNode*>* top_stmt_list_union;
+        StartNode* start_union;
+        SwitchStmtNode* switch_stmt_union;
+        std::vector<CaseDefaultStmtNode*>* case_default_stmt_list_union;
+        CaseDefaultStmtNode* case_default_stmt_union;
+        ForStmtNode* for_stmt_union;
         }
 
 %token START_CODE_PHP_TAG
@@ -100,6 +111,8 @@ void yyerror(char* str);
 %nonassoc '('')'
 %nonassoc NEW CLONE
 
+%type <start_union> start
+%type <top_stmt_union> top_stmt
 %type <if_stmt_union> if_stmt
 %type <expr_union> expr
 %type <expr_union> expr_may_empty
@@ -107,30 +120,39 @@ void yyerror(char* str);
 %type <get_value_union> get_value
 %type <expr_list_union> expr_list
 %type <expr_list_union> expr_list_not_e
+%type <function_stmt_decl_union> function_stmt_decl
+%type <class_stmt_decl_union> class_stmt_decl
+%type <interface_stmt_decl_union> interface_stmt_decl
+%type <trait_stmt_decl_union> trait_stmt_decl
+%type <top_stmt_list_union> top_stmt_list_not_e
+%type <switch_stmt_union> switch_stmt
+%type <case_default_stmt_list_union> case_default_stmt_list
+%type <case_default_stmt_union> case_default_stmt
+%type <for_stmt_union> for_stmt
 
 %%
 
-start:    START_CODE_PHP_TAG top_stmt_list_not_e
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML
-        | START_CODE_PHP_TAG
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML
-        | HTML
+start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {$$=StartStmt::Create($2);}                     
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {$$=StartStmt::Create($2);}
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {$$=StartStmt::Create($2);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {$$=StartStmt::Create($3);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {$$=StartStmt::Create($3);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {$$=StartStmt::Create($3);}
+        | START_CODE_PHP_TAG                                                          {}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {}
+        | HTML                                                                        {}
         ;
 
-top_stmt_list_not_e: top_stmt
-                |    top_stmt_list_not_e top_stmt
+top_stmt_list_not_e: top_stmt                                                         {std::vector<TopStmt*>* tmp; $$=tmp.push_back($1);}                                                                                                           
+                |    top_stmt_list_not_e top_stmt                                     {$$=$1.push_back($2);}
                 ;
 
-top_stmt: stmt
-        | function_stmt_decl
-        | class_stmt_decl
-        | interface_stmt_decl
-        | trait_stmt_decl
+top_stmt: stmt                                                                        {$$=TopStmt::CreateFromStmt($1);}
+        | function_stmt_decl                                                          {$$=TopStmt::CreateFromFunctionDecl($1);}
+        | class_stmt_decl                                                             {$$=TopStmt::CreateFromClassDecl($1);}
+        | interface_stmt_decl                                                         {$$=TopStmt::CreateFromInterfaceDecl($1);}
+        | trait_stmt_decl                                                             {$$=TopStmt::CreateFromTraitDecl($1);}
         ;
 
 get_value: '$'                                                                        {$$=GetValue::create();}
@@ -143,22 +165,22 @@ if_stmt:  IF '(' expr ')' stmt                                                  
         | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';' {$$=IfStmtNode::CreateFromIfElseEndIfStmt($3, $6, $8);}  
         ;
 
-switch_stmt: SWITCH '(' expr ')' '{' '}'
-        |    SWITCH '(' expr ')' '{' case_default_stmt_list '}'
-        |    SWITCH '(' expr ')' ':' case_default_stmt_list END_SWITCH ';'
+switch_stmt: SWITCH '(' expr ')' '{' '}'                                              {$$=SwitchStmtNode::CreateFromSwitchStmt($3);}                                       
+        |    SWITCH '(' expr ')' '{' case_default_stmt_list '}'                       {$$=SwitchStmtNode::CreateFromSwitchDefaultStmt($3, $6);}
+        |    SWITCH '(' expr ')' ':' case_default_stmt_list END_SWITCH ';'            {$$=SwitchStmtNode::CreateFromSwitchDefaultEndswitchStmt($3, $6);}
         ;
 
-case_default_stmt_list: case_default_stmt
-                |       case_default_stmt_list case_default_stmt
+case_default_stmt_list: case_default_stmt                                             {std::vector<CaseDefaultStmt*>* tmp; $$=tmp.push_back($1);}                          
+                |       case_default_stmt_list case_default_stmt                      {$$=$1.push_back($2);}
                 ;
 
-case_default_stmt: CASE expr ':' stmt_list_may_empty
-                |  DEFAULT ':' stmt_list_may_empty
-                |  FINALLY '{' stmt_list_may_empty '}' 
+case_default_stmt: CASE expr ':' stmt_list_may_empty                                  {$$=CaseDefaultStmtNode::CreateFromCaseStmt($2, $4);}
+                |  DEFAULT ':' stmt_list_may_empty                                    {$$=CaseDefaultStmtNode::CreateFromDefaultStmt($3);}
+                |  FINALLY '{' stmt_list_may_empty '}'                                {$$=CaseDefaultStmtNode::CreateFromFinallyStmt($3);}
                 ;
 
-for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt
-        | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'
+for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt       {$$=ForStmtNode::CreateFromForStmt($3, $5, $7, $9)}
+        | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'  {$$=ForStmtNode::CreateFromForEndStmt($3, $5, $7, $10)}
         ;
 
 foreach_stmt: FOREACH '(' expr AS expr ')' stmt
