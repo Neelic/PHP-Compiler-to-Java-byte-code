@@ -44,17 +44,15 @@ public:
     
     static ExprNode* CreateFromMethodReference(ExprNode* left, std::string* id, std::vector<ExprNode*>* listParams);
     static ExprNode* CreateFromGetValueMethodReference(ExprNode* left, GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams);
-    static ExprNode* CreateFromGetValueWithExprMethodReference(ExprNode* left, GetValueNode* get_value, ExprNode* get_value_expr, std::vector<ExprNode*>* listParams);
+    static ExprNode* CreateFromGetValueWithExprMethodReference(ExprNode* left, GetValueNode* get_value, std::string* id, ExprNode* get_value_expr, std::vector<ExprNode*>* listParams);
     //Quarter Dot
     static ExprNode* CreateFromFieldReferenceDots(ExprNode* left, std::string* id);
     static ExprNode* CreateFromGetValueFieldReferenceDots(ExprNode* left, GetValueNode* get_value, std::string* id);
     static ExprNode* CreateFromGetValueWithExprReferenceDots(ExprNode* left, GetValueNode* get_value, ExprNode* get_value_expr);
-    //Brackets
-    static ExprNode* CreateFromExprInBrackets(ExprNode* left);
     //Math signs
-    static ExprNode* CreateFromSubstraction(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromSubtraction(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromAddition(ExprNode* left, ExprNode* right);
-    static ExprNode* CreateFromMultipliction(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromMultiplication(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromDivision(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromMod(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromPower(ExprNode* left, ExprNode* right);
@@ -89,13 +87,13 @@ public:
     //Ternary
     static ExprNode* CreateFromTernaryOp(ExprNode* left, ExprNode* right, ExprNode* central);
     //Ref op - уточнить
-    static ExprNode* CreateFromRefOp(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromRefOp(GetValueNode* get_value, ExprNode* right);
     //Array
-    static ExprNode* CreateFromGetArrayVal(GetValueNode* get_value, ExprNode* left);
+    static ExprNode* CreateFromGetArrayVal(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromArrayValueById(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromAssignArrayValById(ExprNode* left, ExprNode* right);
     //Functions
-    static ExprNode* CreateFromGetValueFunction(GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams);
+    static ExprNode* CreateFromGetValueFunction(std::string* id, std::vector<ExprNode*>* listParams);
 
     //Declaration
     static ExprNode* CreateFromNewDecl(std::string* id, std::vector<ExprNode*>* listParams);

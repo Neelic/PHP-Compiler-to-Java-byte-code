@@ -133,8 +133,8 @@ top_stmt: stmt
         | trait_stmt_decl
         ;
 
-get_value: '$'
-        |  get_value '$'
+get_value: '$'                                                                        {$$=GetValue::create();}
+        |  get_value '$'                                                              {$1.count+=1;$$=$1;}
         ;
 
 if_stmt:  IF '(' expr ')' stmt                                                        {$$=IfStmtNode::CreateFromIfStmt($3, $5);}
@@ -268,51 +268,49 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr R_ARROW ID                                            {$$=ExprNode::CreateFromFieldReference($1, $3);}
         | expr R_ARROW get_value ID                                  {$$=ExprNode::CreateFromGetValueFieldReference($1, $3, $4);}
         | expr R_ARROW get_value '{' expr '}'                        {$$=ExprNode::CreateFromGetValueWithExprReference($1, $3, $5);}
-        | expr R_ARROW ID '(' expr_list ')'
-        | expr R_ARROW get_value ID '(' expr_list ')'
-        | expr R_ARROW get_value ID '{' expr '}' '(' expr_list ')'
-        | expr QUARTER_DOT ID
-        | expr QUARTER_DOT get_value ID
-        | expr QUARTER_DOT get_value '{' expr '}'
-        | '(' expr ')'
-        | expr '-' expr
-        | expr '+' expr
-        | INC expr
-        | DEC expr
-        | expr '*' expr
-        | expr '/' expr
-        | expr '%' expr
-        | expr POW expr
-        | expr '.' expr
-        | expr '>' expr
-        | expr '<' expr
-        | expr BOOLEAN_OR expr
-        | expr BOOLEAN_AND expr
-        | expr LOGIC_OR expr
-        | expr LOGIC_XOR expr
-        | expr LOGIC_AND expr
-        | expr EQUAL expr 
-        | expr EQUAL_STRICT expr
-        | expr EQU_NOT expr
-        | expr EQU_MORE expr
-        | expr EQU_LESS expr
-        | expr SHIFT_L expr
-        | expr SHIFT_R expr
-        | expr '^' expr
-        | expr '|' expr
-        | expr '&' expr
-        | '-' expr %prec U_MINUS
-        | '+' expr %prec U_PLUS
-        | '!' expr
-        | '~' expr
-        | CLONE expr
-        | expr '?' expr ':' expr
-        | expr '?' ':' expr
-        | get_value '{' expr '}'
-        | expr '[' expr ']'
-        | expr '[' ']' '=' expr
-        | ID '(' expr_list ')'
-        | get_value ID brackets
+        | expr R_ARROW ID '(' expr_list ')'                          {$$=ExprNode::CreateFromMethodReference($1, $3, $5);}
+        | expr R_ARROW get_value ID '(' expr_list ')'                {$$=ExprNode::CreateFromGetValueMethodReference($1, $3, $4, $6);}
+        | expr R_ARROW get_value ID '{' expr '}' '(' expr_list ')'   {$$=ExprNode::CreateFromGetValueWithExprMethodReference($1, $3, $4, $6, $9);}
+        | expr QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots($1, $3);}
+        | expr QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots($1, $3, $4);}
+        | expr QUARTER_DOT get_value '{' expr '}'                    {$$=ExprNode::CreateFromGetValueWithExprReferenceDots($1, $3, $4);}
+        | '(' expr ')'                                               {$$=$2;}
+        | expr '-' expr                                              {$$=ExprNode::CreateFromSubtraction($1, $3);}
+        | expr '+' expr                                              {$$=ExprNode::CreateFromAddition($1, $3);}
+        | expr '*' expr                                              {$$=ExprNode::CreateFromMultiplication($1, $3);}
+        | expr '/' expr                                              {$$=ExprNode::CreateFromDivision($1, $3);}
+        | expr '%' expr                                              {$$=ExprNode::CreateFromMod($1, $3);}
+        | expr POW expr                                              {$$=ExprNode::CreateFromPower($1, $3);}
+        | expr '.' expr                                              {$$=ExprNode::CreateFromConcatenation($1, $3);}
+        | expr '>' expr                                              {$$=ExprNode::CreateFromBooleanOpMore($1, $3);}
+        | expr '<' expr                                              {$$=ExprNode::CreateFromBooleanOpLess($1, $3);}
+        | expr BOOLEAN_OR expr                                       {$$=ExprNode::CreateFromBooleanOpOr($1, $3);}
+        | expr BOOLEAN_AND expr                                      {$$=ExprNode::CreateFromBooleanOpAnd($1, $3);}
+        | expr LOGIC_OR expr                                         {$$=ExprNode::CreateFromLogicOpOr($1, $3);}
+        | expr LOGIC_XOR expr                                        {$$=ExprNode::CreateFromLogicOpXor($1, $3);}
+        | expr LOGIC_AND expr                                        {$$=ExprNode::CreateFromLogicOpAnd($1, $3);}
+        | expr EQUAL expr                                            {$$=ExprNode::CreateFromBooleanOpEqual($1, $3);}
+        | expr EQUAL_STRICT expr                                     {$$=ExprNode::CreateFromBooleanOpEqualStrict($1, $3);}
+        | expr EQU_NOT expr                                          {}
+        | expr EQU_MORE expr                                         {$$=ExprNode::CreateFromBooleanOpEqualMore($1, $3);}
+        | expr EQU_LESS expr                                         {$$=ExprNode::CreateFromBooleanOpEqualLess($1, $3);}
+        | expr SHIFT_L expr                                          {$$=ExprNode::CreateFromShiftLeft($1, $3);}
+        | expr SHIFT_R expr                                          {$$=ExprNode::CreateFromShiftRight($1, $3);}
+        | expr '^' expr                                              {$$=ExprNode::CreateFromBitwiseXor($1, $3);}
+        | expr '|' expr                                              {$$=ExprNode::CreateFromBitwiseOr($1, $3);}
+        | expr '&' expr                                              {$$=ExprNode::CreateFromBitwiseAnd($1, $3);}
+        | '-' expr %prec U_MINUS                                     {$$=ExprNode::CreateFromUnaryMinus($2);}
+        | '+' expr %prec U_PLUS                                      {$$=ExprNode::CreateFromUnaryPlus($2);}
+        | '!' expr                                                   {$$=ExprNode::CreateFromBooleanOpNot($2);}
+        | '~' expr                                                   {$$=ExprNode::CreateFromBitwiseNot($2);}
+        | CLONE expr                                                 {$$=ExprNode::CreateFromCloneOp($2);}
+        | expr '?' expr ':' expr                                     {$$=ExprNode::CreateFromTernaryOp($1, $3, $5);}
+        | expr '?' ':' expr                                          {$$=ExprNode::CreateFromTernaryOp($1, NULL, $4);}
+        | get_value '{' expr '}'                                     {$$=ExprNode::CreateFromRefOp($1, $3);}
+        | expr '[' expr ']'                                          {$$=ExprNode::CreateFromGetArrayVal($1, $3);}
+        | expr '[' ']' '=' expr                                      {$$=/*! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
+        | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromGetValueFunction($1, $3);}
+        | get_value ID brackets                                      {$$=/*! Не нашел фунции*/}
         | anon_function_expr                  /*! not supported */
         | NEW ID '(' expr_list ')'
         | NEW ID
@@ -333,7 +331,7 @@ id_list:  ID
         | id_list ',' ID
         ;
 
-expr_list_not_e:  expr                                               {std::vector<ExprNode*> tmp;$$=tmp.push_back($1);/*! Не факт, что сработает*/}
+expr_list_not_e:  expr                                               {std::vector<ExprNode*>tmp;$$=tmp.push_back($1);/*! Не факт, что сработает*/}
                 | expr_list_not_e ',' expr                           {$$=$1.push_back($3);/*! Не факт, что сработает*/}
                 ;
 

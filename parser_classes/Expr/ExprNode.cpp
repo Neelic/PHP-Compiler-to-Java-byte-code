@@ -178,7 +178,7 @@ ExprNode* ExprNode::CreateFromGetValueMethodReference(ExprNode* left, GetValueNo
     return tmp;
 }
 
-ExprNode* ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode* left, GetValueNode* get_value, ExprNode* get_value_expr, std::vector<ExprNode*>* listParams)
+ExprNode* ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode* left, GetValueNode* get_value, std::string* id, ExprNode* get_value_expr, std::vector<ExprNode*>* listParams)
 {
     ExprNode* tmp = new ExprNode();
     tmp->left = left;
@@ -220,15 +220,6 @@ ExprNode* ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode* left, GetV
     return tmp;
 }
 
-//Brackets
-ExprNode* ExprNode::CreateFromExprInBrackets(ExprNode* left)
-{
-    ExprNode* tmp = new ExprNode();
-    tmp->left = left;
-    tmp->exprType = ExprType::bracket;
-    return tmp;
-}
-
 //Math signs
 ExprNode* ExprNode::CreateFromAddition(ExprNode* left, ExprNode* right)
 {
@@ -239,7 +230,7 @@ ExprNode* ExprNode::CreateFromAddition(ExprNode* left, ExprNode* right)
     return tmp;
 }
 
-ExprNode* ExprNode::CreateFromSubstraction(ExprNode* left, ExprNode* right)
+ExprNode* ExprNode::CreateFromSubtraction(ExprNode* left, ExprNode* right)
 {
     ExprNode* tmp = new ExprNode();
     tmp->left = left;
@@ -248,7 +239,7 @@ ExprNode* ExprNode::CreateFromSubstraction(ExprNode* left, ExprNode* right)
     return tmp;
 }
 
-ExprNode* ExprNode::CreateFromMultipliction(ExprNode* left, ExprNode* right)
+ExprNode* ExprNode::CreateFromMultiplication(ExprNode* left, ExprNode* right)
 {
     ExprNode* tmp = new ExprNode();
     tmp->left = left;
@@ -285,7 +276,7 @@ ExprNode* ExprNode::CreateFromPower(ExprNode* left, ExprNode* right)
 }
 
 //Concatenation
-ExprNode* ExprNode::CreateFromPower(ExprNode* left, ExprNode* right)
+ExprNode* ExprNode::CreateFromConcatenation(ExprNode* left, ExprNode* right)
 {
     ExprNode* tmp = new ExprNode();
     tmp->left = left;
@@ -497,25 +488,25 @@ ExprNode* ExprNode::CreateFromTernaryOp(ExprNode* left, ExprNode* right, ExprNod
 }
 
 //Ref op
-ExprNode* ExprNode::CreateFromRefOp(ExprNode* left, ExprNode* right)
+ExprNode* ExprNode::CreateFromRefOp(GetValueNode* get_value, ExprNode* right)
 {
     ExprNode* tmp = new ExprNode();
-    tmp->left = left;
+    tmp->get_value = get_value;
     tmp->right = right;
     tmp->exprType = ExprType::ref_op;
     return tmp;
 }
 
 //Array
-ExprNode* ExprNode::CreateFromGetArrayVal(GetValueNode* get_value, ExprNode* left)
+ExprNode* ExprNode::CreateFromGetArrayVal(ExprNode* left, ExprNode* right)
 {
     ExprNode* tmp = new ExprNode();
     tmp->left = left;
-    tmp->get_value = get_value;
+    tmp->right = right;
     tmp->exprType = ExprType::get_value_array;
     return tmp;
 }
-
+//TODO ЭТОГО НЕТ В ПАРСЕРЕ
 ExprNode* ExprNode::CreateFromArrayValueById(ExprNode* left, ExprNode* right)
 {
     ExprNode* tmp = new ExprNode();
@@ -533,12 +524,11 @@ ExprNode* ExprNode::CreateFromAssignArrayValById(ExprNode* left, ExprNode* right
     tmp->exprType = ExprType::add_array_val;
     return tmp;
 }
-
+//TODO ДО ЭТОГО МОМЕНТА
 //Functions
-ExprNode* ExprNode::CreateFromGetValueFunction(GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams)
+ExprNode* ExprNode::CreateFromGetValueFunction(std::string* id, std::vector<ExprNode*>* listParams)
 {
     ExprNode* tmp = new ExprNode();
-    tmp->get_value = get_value;
     tmp->id = id;
     tmp->listParams = listParams;
     tmp->exprType = ExprType::call_get_value_func;
