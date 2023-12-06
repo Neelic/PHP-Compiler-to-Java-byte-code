@@ -152,3 +152,18 @@ StmtNode* StmtNode::CreateFromBreakStmt()
     return tmp;
 }
 
+StmtNode* StmtNode::CreateFromTEchoStmt(ExprNode* expr_left)
+{
+    StmtNode* tmp = new StmtNode();
+    tmp->expr_left = expr_left;
+    tmp->type = StmtType::t_echo_stmt;
+    return tmp;
+}
+
+StmtNode* StmtNode::CreateFromContinueStmt()
+{
+    StmtNode* tmp = new StmtNode();
+    tmp->type = StmtType::continue_stmt;
+    return tmp;
+}
+

@@ -18,5 +18,8 @@ enum StmtType
     yield_stmt,
     yield_r_arrow_stmt,
     html_stmt,
-    break_stmt
+    break_stmt,
+    continue_stmt,
+    t_echo_stmt,
+    continue_stmt
 };

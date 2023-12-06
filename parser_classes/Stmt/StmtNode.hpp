@@ -55,4 +55,6 @@ public:
     static StmtNode* CreateFromYieldDoubleArrowStmt(ExprNode* expr_left, ExprNode* expr_right);
     static StmtNode* CreateFromHtmlStmt(HtmlStmtNode* html_stmt);
     static StmtNode* CreateFromBreakStmt();
+    static StmtNode* CreateFromTEchoStmt(ExprNode* expr_left);
+    static StmtNode* CreateFromContinueStmt();
 };
