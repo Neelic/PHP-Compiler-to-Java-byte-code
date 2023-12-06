@@ -33,6 +33,18 @@ using namespace std;
         vector<CaseDefaultStmtNode*>* case_default_stmt_list_union;
         CaseDefaultStmtNode* case_default_stmt_union;
         ForStmtNode* for_stmt_union;
+        ForEachStmtNode* foreach_stmt_union;
+        WhileStmtNode* while_stmt_union;
+        DoWhileStmtNode* do_while_stmt_union;
+        MatchStmtNode* match_stmt_union;
+        vector<MatchArmNode*>* match_stmt_list_union;
+        MatchArmNode* match_arm_union;
+        vector<StaticVarNode*>* static_var_list_union;
+        vector<GlobalVarNode*>* global_var_list_union;
+        vector<StmtList*>* stmt_list_union;
+        HtmlStmtNode* html_stmt_union;
+        vector<string*>* id_list_union;
+        vector<ConstDeclNode*>* const_decl_list_union;
         }
 
 %token START_CODE_PHP_TAG
@@ -131,33 +143,47 @@ using namespace std;
 %type <case_default_stmt_list_union> case_default_stmt_list
 %type <case_default_stmt_union> case_default_stmt
 %type <for_stmt_union> for_stmt
+%type <foreach_stmt_union> foreach_stmt
+%type <while_stmt_union> while_stmt
+%type <do_while_stmt_union> do_while_stmt
+%type <match_stmt_union> match_stmt
+%type <match_stmt_list_union> match_stmt_list
+%type <match_stmt_list_union> match_stmt_list_not_e
+%type <match_arm_union> match_arm
+%type <static_var_list_union> static_var_list
+%type <global_var_list_union> global_var_list
+%type <stmt_list_union> stmt_list
+%type <stmt_list_union> stmt_list_may_empty
+%type <html_stmt_union> html_stmt
+%type <id_list_union> id_list
+%type <const_decl_list_union> const_decl_list_not_e
 
 %%
 
-start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {$$=StartStmt::Create($2);}                     
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {$$=StartStmt::Create($2);}
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {$$=StartStmt::Create($2);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {$$=StartStmt::Create($3);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {$$=StartStmt::Create($3);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {$$=StartStmt::Create($3);}
+start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {$$=StartStmtNode::Create($2);}                     
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {$$=StartStmtNode::Create($2);}
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {$$=StartStmtNode::Create($2);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {$$=StartStmtNode::Create($3);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {$$=StartStmtNode::Create($3);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {$$=StartStmtNode::Create($3);}
         | START_CODE_PHP_TAG                                                          {}
         | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {}
         | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {}
         | HTML                                                                        {}
         ;
 
-top_stmt_list_not_e: top_stmt                                                         {vector<TopStmt*>tmp;tmp.push_back($1);$$=&tmp;}                                                                                                           
+top_stmt_list_not_e: top_stmt                                                         {vector<TopStmtNode*>tmp;tmp.push_back($1);$$=&tmp;}                                                                                                           
                 |    top_stmt_list_not_e top_stmt                                     {$1.push_back($2);$$=$1;}
                 ;
 
-top_stmt: stmt                                                                        {$$=TopStmt::CreateFromStmt($1);}
-        | function_stmt_decl                                                          {$$=TopStmt::CreateFromFunctionDecl($1);}
-        | class_stmt_decl                                                             {$$=TopStmt::CreateFromClassDecl($1);}
-        | interface_stmt_decl                                                         {$$=TopStmt::CreateFromInterfaceDecl($1);}
-        | trait_stmt_decl                                                             {$$=TopStmt::CreateFromTraitDecl($1);}
+top_stmt: stmt                                                                        {$$=TopStmtNode::CreateFromStmt($1);}
+        | function_stmt_decl                                                          {$$=TopStmtNode::CreateFromFunctionDecl($1);}
+        | class_stmt_decl                                                             {$$=TopStmtNode::CreateFromClassDecl($1);}
+        | interface_stmt_decl                                                         {$$=TopStmtNode::CreateFromInterfaceDecl($1);}
+        | trait_stmt_decl                                                             {$$=TopStmtNode::CreateFromTraitDecl($1);}
         ;
 
-get_value: '$'                                                                        {$$=GetValue::create();}
+get_value: '$'                                                                        {$$=GetValueNode::create();}
         |  get_value '$'                                                              {$1.count+=1;$$=$1;}
         ;
 
@@ -172,7 +198,7 @@ switch_stmt: SWITCH '(' expr ')' '{' '}'                                        
         |    SWITCH '(' expr ')' ':' case_default_stmt_list END_SWITCH ';'            {$$=SwitchStmtNode::CreateFromSwitchDefaultEndswitchStmt($3, $6);}
         ;
 
-case_default_stmt_list: case_default_stmt                                             {vector<CaseDefaultStmt*>tmp;tmp.push_back($1);$$=&tmp;}                          
+case_default_stmt_list: case_default_stmt                                             {vector<CaseDefaultStmtNode*>tmp;tmp.push_back($1);$$=&tmp;}                          
                 |       case_default_stmt_list case_default_stmt                      {$1.push_back($2);$$=$1;}
                 ;
 
@@ -181,39 +207,39 @@ case_default_stmt: CASE expr ':' stmt_list_may_empty                            
                 |  FINALLY '{' stmt_list_may_empty '}'                                {$$=CaseDefaultStmtNode::CreateFromFinallyStmt($3);}
                 ;
 
-for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt                                 {$$=ForStmtNode::CreateFromForStmt($3, $5, $7, $9)}
-        | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'  {$$=ForStmtNode::CreateFromForEndStmt($3, $5, $7, $10)}
+for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt                                 {$$=ForStmtNode::CreateFromForStmt($3, $5, $7, $9);}
+        | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'  {$$=ForStmtNode::CreateFromForEndStmt($3, $5, $7, $10);}
         ;
 
-foreach_stmt: FOREACH '(' expr AS expr ')' stmt
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' stmt
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' stmt
-        |     FOREACH '(' expr AS expr ')' ':' stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'
+foreach_stmt: FOREACH '(' expr AS expr ')' stmt                                                                 {$$=ForEachStmtNode::CreateFromForeachStmt($3, $5, $7);}
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' stmt                                           {$$=ForEachStmtNode::CreateFromForeachRightArrowStmt($3, $5, $8, $10);}
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' stmt                                       {$$=ForEachStmtNode::CreateFromForeachRightArrowPointerStmt($3, $5, $9, $11);}
+        |     FOREACH '(' expr AS expr ')' ':' stmt_list_may_empty END_FOREACH ';'                              {$$=ForEachStmtNode::CreateFromEndForeachStmt($3, $5, $8);}
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'        {$$=ForEachStmtNode::CreateFromEndForeachRightArrowStmt($3, $5, $8, $11);}
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'    {$$=ForEachStmtNode::CreateFromEndForeachRightArrowPointerStmt($3, $5, $9, $12);}
         ;
 
-while_stmt: WHILE '(' expr ')' stmt
-        |   WHILE '(' expr ')' ':' stmt_list_may_empty END_WHILE ';'
+while_stmt: WHILE '(' expr ')' stmt                                                   {$$=WhileStmtNode::CreateFromWhileStmt($3, $5);}
+        |   WHILE '(' expr ')' ':' stmt_list_may_empty END_WHILE ';'                  {$$=WhileStmtNode::CreateFromEndWhileStmt($3, $6);}
         ;
 
-do_while_stmt: DO stmt WHILE '(' expr ')' ';'
+do_while_stmt: DO stmt WHILE '(' expr ')' ';'                                         {$$=DoWhileStmtNode::CreateFromDoWhileStmt($2, $5);}
         ;
 
-match_stmt: MATCH '(' expr ')' '{' match_stmt_list '}' ';'
+match_stmt: MATCH '(' expr ')' '{' match_stmt_list '}' ';'                            {$$=MatchStmtNode::CreateFromMatchStmtNode($3, $6);}
         ;
 
-match_stmt_list:  match_stmt_list_not_e
-                | /* empty */
+match_stmt_list:  match_stmt_list_not_e                                               {$$=$1;}
+                | /* empty */                                                         {}
                 ;
 
-match_stmt_list_not_e:    match_arm 
-                        | match_stmt_list_not_e ',' match_arm
+match_stmt_list_not_e:    match_arm                                                   {vector<MatchArmNode*>tmp;tmp.push_back($1);$$=&tmp;}
+                        | match_stmt_list_not_e ',' match_arm                         {$1.push_back($3);$$=$1;}
                         ;
 
-match_arm: expr_list_not_e R_DOUBLE_ARROW expr
-        |  DEFAULT R_DOUBLE_ARROW expr
-        |  DEFAULT ',' R_DOUBLE_ARROW expr
+match_arm: expr_list_not_e R_DOUBLE_ARROW expr                                        {$$=MatchArmNode::CreateFromMatchArmStmt($1, $3);}
+        |  DEFAULT R_DOUBLE_ARROW expr                                                {$$=MatchArmNode::CreateFromDefaultArmStmt($3);}
+        |  DEFAULT ',' R_DOUBLE_ARROW expr                                            {$$=MatchArmNode::CreateFromDefaultArmWithCommaStmt($4);}
         ;
 
 try_stmt: TRY '{' stmt_list_may_empty '}' {/*! not supported */}
@@ -231,46 +257,46 @@ try_catch_stmt:   try_stmt catch_stmt_list {/*! not supported */}
                 | try_stmt
                 ;
 
-stmt:     expr_may_empty ';'
-        | if_stmt
-        | switch_stmt
-        | '{'stmt_list'}'
-        | STATIC static_var_list ';'
-        | GLOBAL global_var_list ';'
-        | while_stmt
-        | do_while_stmt
-        | for_stmt
-        | foreach_stmt
-        | THROW expr ';'
-        | try_catch_stmt
-        | match_stmt
-        | CONST const_decl_list_not_e ';'
-        | RETURN expr_may_empty ';'
-        | html_stmt
-        | BREAK ';'
-        | T_ECHO expr ';'
-        | CONTINUE ';'
+stmt:     expr_may_empty ';'                                                          {$$=StmtNode::CreateFromExpr($1);}
+        | if_stmt                                                                     {$$=StmtNode::CreateFromIfStmt($1);}
+        | switch_stmt                                                                 {$$=StmtNode::CreateFromSwitchStmt($1);}
+        | '{'stmt_list'}'                                                             {$$=StmtNode::CreateFromStmtList($2);}
+        | STATIC static_var_list ';'                                                  {$$=StmtNode::CreateFromStaticVar($2);}
+        | GLOBAL global_var_list ';'                                                  {$$=StmtNode::CreateFromGlobalVar($2);}
+        | while_stmt                                                                  {$$=StmtNode::CreateFromWhileStmt($1);}
+        | do_while_stmt                                                               {$$=StmtNode::CreateFromDoWhileStmt($1);}
+        | for_stmt                                                                    {$$=StmtNode::CreateFromForStmt($1);}
+        | foreach_stmt                                                                {$$=StmtNode::CreateFromForEachStmt($1);}
+        | THROW expr ';'                                                              {$$=StmtNode::CreateFromThrowStmt($2);}
+        | try_catch_stmt {/*! not supported?*/}
+        | match_stmt                                                                  {$$=StmtNode::CreateFromMatchStmt($1);}
+        | CONST const_decl_list_not_e ';'                                             {$$=StmtNode::CreateFromConstDecl($2);}
+        | RETURN expr_may_empty ';'                                                   {$$=StmtNode::CreateFromReturnStmt($2);}
+        | html_stmt                                                                   {$$=StmtNode::CreateFromHtmlStmt($1);}
+        | BREAK ';'                                                                   {$$=StmtNode::CreateFromBreakStmt();}
+        | T_ECHO expr ';'                                                             {$$=StmtNode::CreateFromTEchoStmt($2);}
+        | CONTINUE ';'                                                                {$$=StmtNode::CreateFromContinueStmt();}
         ;
 
-static_var_list:  '$' ID
-                | '$' ID '=' expr
-                | static_var_list ',' '$' ID
-                | static_var_list ',' '$' ID '=' expr
+static_var_list:  '$' ID                                                              {vector<StaticVarNode*>tmp; tmp.push_back(StaticVarNode::CreateFromId($2)); $$=&tmp;}
+                | '$' ID '=' expr                                                     {vector<StaticVarNode*>tmp; tmp.push_back(StaticVarNode::CreateFromIdAssign($2, $4)); $$=&tmp;}
+                | static_var_list ',' '$' ID                                          {$1.push_back(StaticVarNode::CreateFromId($4));$$=$1;}
+                | static_var_list ',' '$' ID '=' expr                                 {$1.push_back(StaticVarNode::CreateFromIdAssign($4, $6));$$=$1;}
                 ;
 
-global_var_list:  get_value ID
-                | global_var_list ',' get_value ID
+global_var_list:  get_value ID                                                        {vector<GlobalVarNode*>tmp; tmp.push_back(GlobalVarNode::CreateFromGlobalValue($1, $2)); $$=&tmp;}
+                | global_var_list ',' get_value ID                                    {$1.push_back(GlobalVarNode::CreateFromGlobalValue($3, $4));$$=$1;}                    
                 ;
 
-stmt_list: stmt
-	|  stmt_list stmt
+stmt_list: stmt                                                                       {vector<StmtNode*>tmp;tmp.push_back($1);$$=&tmp;}
+	|  stmt_list stmt                                                             {$1.push_back($2);$$=$1;}
         ;
 
-stmt_list_may_empty: stmt_list
-                |    /* empty */
+stmt_list_may_empty: stmt_list                                                        {$$=$1}
+                |    /* empty */                                                      {}
                 ;
 
-html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG
+html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG                  {$$=HtmlStmtNode::Create($2)}
         ;
 
 expr:     INT_NUMBER                                                 {$$=ExprNode::CreateFromIntValue($1);}
@@ -332,7 +358,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr '?' ':' expr                                          {$$=ExprNode::CreateFromTernaryOp($1, NULL, $4);}
         | get_value '{' expr '}'                                     {$$=ExprNode::CreateFromRefOp($1, $3);}
         | expr '[' expr ']'                                          {$$=ExprNode::CreateFromGetArrayVal($1, $3);}
-        | expr '[' ']' '=' expr                                      {$$=/*! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/}
+        | expr '[' ']' '=' expr                                      {$$=ExprNode::CreateFromAssignArrayValByExpr($1, $5);}
         | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromGetValueFunction($1, $3);}
         | get_value ID brackets                                      {$$=/*! Не нашел фунции*/}
         | anon_function_expr                  /*! not supported */
@@ -351,20 +377,20 @@ brackets: '(' expr_list ')'
         | brackets '(' expr_list ')'
         ;
 
-id_list:  ID
-        | id_list ',' ID
+id_list:  ID                                                         {vector<string*>tmp;tmp.push_back($1);$$=&tmp;}
+        | id_list ',' ID                                             {$1.push_back($3);$$=$1;}
         ;
 
 expr_list_not_e:  expr                                               {vector<ExprNode*>tmp;tmp.push_back($1);$$=&tmp;}
                 | expr_list_not_e ',' expr                           {$1.push_back($3);$$=$1;}
                 ;
 
-expr_list: expr_list_not_e
-	| /* empty */ 
+expr_list: expr_list_not_e                                           {$$=$1}
+	| /* empty */                                                {}
         ;
 
-const_decl_list_not_e:    ID '=' expr
-                        | const_decl_list_not_e ',' ID '=' expr
+const_decl_list_not_e:    ID '=' expr                                {vector<ConstDeclNode*>tmp;tmp.push_back(ConstDeclNode::CreateFromConstDeclaration($1, $3));$$=&tmp;}
+                        | const_decl_list_not_e ',' ID '=' expr      {$1.push_back(ConstDeclNode::CreateFromConstDeclaration($3, $5));$$=$1;}
                         ;
 
 class_def: CLASS ID 
