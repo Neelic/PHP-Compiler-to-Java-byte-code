@@ -45,6 +45,20 @@ using namespace std;
         HtmlStmtNode* html_stmt_union;
         vector<string*>* id_list_union;
         vector<ConstDeclNode*>* const_decl_list_union;
+        ClassDefNode* class_def_union;
+        vector<ClassStmtNode*>* class_stmt_list_union;
+        ClassAccessMod class_access_mod_union;
+        vector<ClassAccessMod>* class_access_mod_list_union;
+        ClassStmtNode* class_stmt_union;
+        ClassExprNode* class_expr_union;
+        InterfaceExprDefNode* interface_expr_def_union;
+        vector<InterfaceStmtNode*>* interface_stmt_list_union;
+        InterfaceStmtNode* interface_stmt_union;
+        FunctionDefNode* function_def_union;
+        vector<ExprFuncNode*> expr_func_list_union;
+        GetValueFuncNode* get_value_func_union;
+        vector<GetValueFuncNode*> get_value_func_list_union;
+
         }
 
 %token START_CODE_PHP_TAG
@@ -157,6 +171,22 @@ using namespace std;
 %type <html_stmt_union> html_stmt
 %type <id_list_union> id_list
 %type <const_decl_list_union> const_decl_list_not_e
+%type <class_def_union> class_def
+%type <class_stmt_list_union> class_stmt_list
+%type <class_access_mod_union> class_access_mod
+%type <class_access_mod_list_union> class_access_mod_list
+%type <class_stmt_list_union> class_stmt_list_not_e
+%type <class_stmt_union> class_stmt
+%type <class_expr_union> class_expr
+%type <interface_expr_def_union> interface_expr_def
+%type <interface_stmt_list_union> interface_stmt_list
+%type <interface_stmt_list_union> interface_stmt_list_not_e
+%type <interface_stmt_union> interface_stmt
+%type <function_def_union> function_def
+%type <expr_func_list_union> expr_func_list
+%type <get_value_func_union> get_value_func
+%type <get_value_func_list_union> get_value_func_list_not_e
+%type <expr_func_list_union> expr_func_list_not_e 
 
 %%
 
@@ -385,7 +415,7 @@ expr_list_not_e:  expr                                               {vector<Exp
                 | expr_list_not_e ',' expr                           {$1.push_back($3);$$=$1;}
                 ;
 
-expr_list: expr_list_not_e                                           {$$=$1}
+expr_list: expr_list_not_e                                           {$$=$1;}
 	| /* empty */                                                {}
         ;
 
@@ -393,99 +423,99 @@ const_decl_list_not_e:    ID '=' expr                                {vector<Con
                         | const_decl_list_not_e ',' ID '=' expr      {$1.push_back(ConstDeclNode::CreateFromConstDeclaration($3, $5));$$=$1;}
                         ;
 
-class_def: CLASS ID 
-        |  CLASS ID EXTENDS ID
-        |  CLASS ID IMPLEMENTS id_list
-        |  CLASS ID EXTENDS ID IMPLEMENTS id_list
+class_def: CLASS ID                                                  {$$=ClassDefNode::CreateFromClassDef($2);}                     
+        |  CLASS ID EXTENDS ID                                       {$$=ClassDefNode::CreateFromExtendedDef($2, $4);}
+        |  CLASS ID IMPLEMENTS id_list                               {$$=ClassDefNode::CreateFromImplementDef($2, $4);}
+        |  CLASS ID EXTENDS ID IMPLEMENTS id_list                    {$$=ClassDefNode::CreateFromExtendedImplementedDef($2, $4, $6);}                   
         ;
 
-class_stmt_decl:  class_def '{' class_stmt_list '}'
-                | FINAL class_def '{' class_stmt_list '}'
-                | ABSTRACT class_def '{' class_stmt_list '}'
+class_stmt_decl:  class_def '{' class_stmt_list '}'                  {$$=ClassStmtDeclNode::CreateFromNoModDefinition($1, $3);}
+                | FINAL class_def '{' class_stmt_list '}'            {$$=ClassStmtDeclNode::CreateFromFinalModDefinition($2, $4);}
+                | ABSTRACT class_def '{' class_stmt_list '}'         {$$=ClassStmtDeclNode::CreateFromAbstractModDefinition($2, $4);}
                 ;
 
-class_stmt_list: class_stmt_list_not_e
-                | /* empty */
+class_stmt_list: class_stmt_list_not_e                               {$$=$1;}
+                | /* empty */                                        {}
                 ;
 
-class_access_mod: PUBLIC
-                | PROTECTED
-                | PRIVATE
-                | FINAL
-                | ABSTRACT
-                | READ_ONLY
-                | STATIC
+class_access_mod: PUBLIC                                             {$$=ClassAccessMod::public_node;}
+                | PROTECTED                                          {$$=ClassAccessMod::private_node;}
+                | PRIVATE                                            {$$=ClassAccessMod::protected_node;}
+                | FINAL                                              {$$=ClassAccessMod::final_node;}
+                | ABSTRACT                                           {$$=ClassAccessMod::abstract_node}
+                | READ_ONLY                                          {$$=ClassAccessMod::read_only_node;}
+                | STATIC                                             {$$=ClassAccessMod::static_node;}
                 ;
 
-class_access_mod_list:    class_access_mod
-                        | class_access_mod_list class_access_mod
+class_access_mod_list:    class_access_mod                           {vector<ClassAccessMod>tmp;tmp.push_back($1);$$=&tmp;}
+                        | class_access_mod_list class_access_mod     {$1.push_back($2);$$=$1;}
                         ;
 
-class_stmt_list_not_e:    class_stmt
-                        | class_stmt_list_not_e class_stmt
+class_stmt_list_not_e:    class_stmt                                 {vector<ClassStmt*>tmp;tmp.push_back($1);$$=&tmp;}
+                        | class_stmt_list_not_e class_stmt           {$1.push_back($2);$$=$1;}
                         ;
 
-class_stmt: class_expr ';'
-        |   class_access_mod_list function_stmt_decl
-        |   USE id_list ';'
-        |   class_stmt_decl
+class_stmt: class_expr ';'                                           {$$=ClassStmt::CreateFromClassExpr($1);}
+        |   class_access_mod_list function_stmt_decl                 {$$=ClassStmt::CreateFromFunctionStmtDecl($1, $2);}
+        |   USE id_list ';'                                          {$$=ClassStmt::CreateFromIdList($2);}
+        |   class_stmt_decl                                          {$$=ClassStmt::CreateFromClassStmtDecl($1);}
+        ;       
+
+class_expr: class_access_mod_list get_value ID '=' expr              {$$=ClassExpr::CreateFromGetValueAssign($1, $2, $3, $5);}
+        |   class_access_mod_list get_value ID                       {$$=ClassExpr::CreateFromGetValue($1, $2, $3);}
+        |   class_access_mod_list CONST const_decl_list_not_e ';'    {$$=ClassExpr::CreateFromConstant($1, $3);}
         ;
 
-class_expr: class_access_mod_list get_value ID '=' expr
-        |   class_access_mod_list get_value ID
-        |   class_access_mod_list CONST const_decl_list_not_e ';'
-        ;
-
-interface_expr_def: INTERFACE ID 
-                |   INTERFACE ID EXTENDS id_list
+interface_expr_def: INTERFACE ID                                     {$$=InterfaceExprDefNode::CreateFromNoExtendedDefinition($2);}
+                |   INTERFACE ID EXTENDS id_list                     {$$=InterfaceExprDefNode::CreatedFromDefinitionWithExtended($2, $4);}
                 ;
 
-interface_stmt_decl: interface_expr_def '{' interface_stmt_list '}'
+interface_stmt_decl: interface_expr_def '{' interface_stmt_list '}'  {$$=InterfaceStmtDeclNode::Create($1, $3);}
                 ;
 
-interface_stmt_list: interface_stmt_list_not_e
-                |    /* empty */
+interface_stmt_list: interface_stmt_list_not_e                       {$$=$1;}
+                |    /* empty */                                     {}
                 ;
 
-interface_stmt_list_not_e: interface_stmt
-                        |  interface_stmt_list_not_e interface_stmt
+interface_stmt_list_not_e: interface_stmt                            {vector<InterfaceStmtNode*>tmp;tmp.push_back($1);$$=&tmp;}
+                        |  interface_stmt_list_not_e interface_stmt  {$1.push_back($2);$$=$1;}
                         ;
 
-interface_stmt: class_access_mod_list function_def ';' 
+interface_stmt: class_access_mod_list function_def ';'               {$$=InterfaceStmtNode::Create($1, $2);}
                 ;
 
-trait_stmt_decl: TRAIT ID  '{' class_stmt_list '}' 
+trait_stmt_decl: TRAIT ID  '{' class_stmt_list '}'                   {$$=TraitStmtDeclNode::Create($2, $4);}
                 ;
 
-function_def: FUNCTION ID '(' expr_func_list ')'
-        |     FUNCTION ID '(' expr_func_list ')' ':' ID
+function_def: FUNCTION ID '(' expr_func_list ')'                     {$$=FunctionDefNode::CreateFromDefWithNoType($2, $4);}
+        |     FUNCTION ID '(' expr_func_list ')' ':' ID              {$$=FunctionDefNode::CreateFromDefWithType($2, $4, $7);}
         ;
 
-function_stmt_decl: function_def '{' stmt_list '}' 
+function_stmt_decl: function_def '{' stmt_list '}'                   {$$=FunctionStmtDeclNode::Create($1, $3);}
                 ;
 
 anon_function_expr: anon_function_stmt_decl /*! not supported */
                 |   anon_function_short_stmt_decl /*! not supported */
                 ;
 
-expr_func_list:   expr_func_list_not_e
-                | /* empty */
+expr_func_list:   expr_func_list_not_e                               {$$=$1;}
+                | /* empty */                                        {}
                 ;
 
-get_value_func:   '&' '$' ID
-                | '$' ID
-                | ID '&' '$' ID
-                | ID '$' ID
+get_value_func:   '&' '$' ID                                         {$$=GetValueFuncNode::CreateFromRefValue($3);}
+                | '$' ID                                             {$$=GetValueFuncNode::CreateFromGetValue($2);}
+                | ID '&' '$' ID                                      {$$=GetValueFuncNode::CreateFromRefValueWithType($4, $1);}
+                | ID '$' ID                                          {$$=GetValueFuncNode::CreateFromGetValueWithType($3, $1);}
                 ;
 
-get_value_func_list_not_e: get_value_func
-                        |  get_value_func_list_not_e ',' get_value_func
+get_value_func_list_not_e: get_value_func                                       {vector<GetValueFuncNode*>tmp;tmp.push_back($1);$$=&tmp;}
+                        |  get_value_func_list_not_e ',' get_value_func         {$1.push_back($3);$$=$1;}
                         ;
 
-expr_func_list_not_e: get_value_func
-                |     get_value_func '=' expr
-                |     expr_func_list_not_e ',' get_value_func
-                |     expr_func_list_not_e ',' get_value_func '=' expr
+expr_func_list_not_e: get_value_func                                            {vector<ExprFuncNode*>tmp;tmp.push_back(ExprFuncNode::CreateFromGetValueFunc($1));$$=&tmp;}
+                |     get_value_func '=' expr                                   {vector<ExprFuncNode*>tmp;tmp.push_back(ExprFuncNode::CreateFromGetValueFuncAssign($1, $3));$$=&tmp;}
+                |     expr_func_list_not_e ',' get_value_func                   {$1.push_back(ExprFuncNode::CreateFromGetValueFunc($3));$$=$1;}
+                |     expr_func_list_not_e ',' get_value_func '=' expr          {$1.push_back(ExprFuncNode::CreateFromGetValueFunc(ExprFuncNode::CreateFromGetValueFuncAssign($3, $5)));$$=$1;}
                 ;
 
 anon_function_def: FUNCTION '(' expr_func_list ')'
