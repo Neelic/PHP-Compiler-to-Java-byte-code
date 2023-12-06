@@ -90,8 +90,7 @@ public:
     static ExprNode* CreateFromRefOp(GetValueNode* get_value, ExprNode* right);
     //Array
     static ExprNode* CreateFromGetArrayVal(ExprNode* left, ExprNode* right);
-    static ExprNode* CreateFromArrayValueById(ExprNode* left, ExprNode* right);
-    static ExprNode* CreateFromAssignArrayValById(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromAssignArrayValByExpr(ExprNode*left, ExprNode* right);
     //Functions
     static ExprNode* CreateFromGetValueFunction(std::string* id, std::vector<ExprNode*>* listParams);
 
@@ -101,6 +100,4 @@ public:
     static ExprNode* CreateFromNewDeclNoId(ExprNode* left);
     static ExprNode* CreateFromGetValueDecl(GetValueNode* get_value, std::string* id, std::vector<ExprNode*>* listParams);
     static ExprNode* CreateFromGetValueDeclNoParams(GetValueNode* get_value, std::string* id);
-
-    //TODO продолжить список
 };

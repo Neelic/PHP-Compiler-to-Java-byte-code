@@ -506,17 +506,7 @@ ExprNode* ExprNode::CreateFromGetArrayVal(ExprNode* left, ExprNode* right)
     tmp->exprType = ExprType::get_value_array;
     return tmp;
 }
-//TODO ЭТОГО НЕТ В ПАРСЕРЕ
-ExprNode* ExprNode::CreateFromArrayValueById(ExprNode* left, ExprNode* right)
-{
-    ExprNode* tmp = new ExprNode();
-    tmp->left = left;
-    tmp->right = right;
-    tmp->exprType = ExprType::get_array_val;
-    return tmp;
-}
-
-ExprNode* ExprNode::CreateFromAssignArrayValById(ExprNode* left, ExprNode* right)
+ExprNode* ExprNode::CreateFromAssignArrayValByExpr(ExprNode*left, ExprNode* right)
 {
     ExprNode* tmp = new ExprNode();
     tmp->left = left;
@@ -524,7 +514,6 @@ ExprNode* ExprNode::CreateFromAssignArrayValById(ExprNode* left, ExprNode* right
     tmp->exprType = ExprType::add_array_val;
     return tmp;
 }
-//TODO ДО ЭТОГО МОМЕНТА
 //Functions
 ExprNode* ExprNode::CreateFromGetValueFunction(std::string* id, std::vector<ExprNode*>* listParams)
 {
