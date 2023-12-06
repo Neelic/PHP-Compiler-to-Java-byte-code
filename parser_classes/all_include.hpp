@@ -30,8 +30,8 @@
 
 #include "TraitStmtDecl/TraitStmtDeclNode.hpp"
 
-#include "MatchStmt/MatchStmtNode.hpp"
 #include "MatchStmt/MatchArmNode.hpp"
+#include "MatchStmt/MatchStmtNode.hpp"
 
 #include "Stmt/StmtNode.hpp"
 
