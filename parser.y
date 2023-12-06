@@ -8,27 +8,29 @@ void yyerror(char* str);
 
 %code requires {
 #include <string>
+#include <vector>
 #include "parser_classes/all_include.hpp"
+using namespace std;
 }
 
 %union{
-        std::string* sval;
+        string* sval;
         int ival;
         float fval;
         IfStmtNode* if_stmt_union;
         ExprNode* expr_union;
         StmtNode* stmt_union;
         GetValueNode* get_value_union;
-        std::vector<ExprNode*>* expr_list_union;
+        vector<ExprNode*>* expr_list_union;
         TopStmtNode* top_stmt_union;
         FunctionStmtDeclNode* function_stmt_decl_union;
         ClassStmtDeclNode* class_stmt_decl_union;
         InterfaceStmtDeclNode* interface_stmt_decl_union;
         TraitStmtDeclNode* trait_stmt_decl_union;
-        std::vector<TopStmtNode*>* top_stmt_list_union;
+        vector<TopStmtNode*>* top_stmt_list_union;
         StartNode* start_union;
         SwitchStmtNode* switch_stmt_union;
-        std::vector<CaseDefaultStmtNode*>* case_default_stmt_list_union;
+        vector<CaseDefaultStmtNode*>* case_default_stmt_list_union;
         CaseDefaultStmtNode* case_default_stmt_union;
         ForStmtNode* for_stmt_union;
         }
@@ -144,8 +146,8 @@ start:    START_CODE_PHP_TAG top_stmt_list_not_e                                
         | HTML                                                                        {}
         ;
 
-top_stmt_list_not_e: top_stmt                                                         {std::vector<TopStmt*>* tmp; $$=tmp.push_back($1);}                                                                                                           
-                |    top_stmt_list_not_e top_stmt                                     {$$=$1.push_back($2);}
+top_stmt_list_not_e: top_stmt                                                         {vector<TopStmt*>tmp;tmp.push_back($1);$$=&tmp;}                                                                                                           
+                |    top_stmt_list_not_e top_stmt                                     {$1.push_back($2);$$=$1;}
                 ;
 
 top_stmt: stmt                                                                        {$$=TopStmt::CreateFromStmt($1);}
@@ -170,8 +172,8 @@ switch_stmt: SWITCH '(' expr ')' '{' '}'                                        
         |    SWITCH '(' expr ')' ':' case_default_stmt_list END_SWITCH ';'            {$$=SwitchStmtNode::CreateFromSwitchDefaultEndswitchStmt($3, $6);}
         ;
 
-case_default_stmt_list: case_default_stmt                                             {std::vector<CaseDefaultStmt*>* tmp; $$=tmp.push_back($1);}                          
-                |       case_default_stmt_list case_default_stmt                      {$$=$1.push_back($2);}
+case_default_stmt_list: case_default_stmt                                             {vector<CaseDefaultStmt*>tmp;tmp.push_back($1);$$=&tmp;}                          
+                |       case_default_stmt_list case_default_stmt                      {$1.push_back($2);$$=$1;}
                 ;
 
 case_default_stmt: CASE expr ':' stmt_list_may_empty                                  {$$=CaseDefaultStmtNode::CreateFromCaseStmt($2, $4);}
@@ -179,7 +181,7 @@ case_default_stmt: CASE expr ':' stmt_list_may_empty                            
                 |  FINALLY '{' stmt_list_may_empty '}'                                {$$=CaseDefaultStmtNode::CreateFromFinallyStmt($3);}
                 ;
 
-for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt       {$$=ForStmtNode::CreateFromForStmt($3, $5, $7, $9)}
+for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt                                 {$$=ForStmtNode::CreateFromForStmt($3, $5, $7, $9)}
         | FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' ':' stmt_list_may_empty END_FOR ';'  {$$=ForStmtNode::CreateFromForEndStmt($3, $5, $7, $10)}
         ;
 
@@ -353,8 +355,8 @@ id_list:  ID
         | id_list ',' ID
         ;
 
-expr_list_not_e:  expr                                               {std::vector<ExprNode*>tmp;$$=tmp.push_back($1);/*! Не факт, что сработает*/}
-                | expr_list_not_e ',' expr                           {$$=$1.push_back($3);/*! Не факт, что сработает*/}
+expr_list_not_e:  expr                                               {vector<ExprNode*>tmp;tmp.push_back($1);$$=&tmp;}
+                | expr_list_not_e ',' expr                           {$1.push_back($3);$$=$1;}
                 ;
 
 expr_list: expr_list_not_e
