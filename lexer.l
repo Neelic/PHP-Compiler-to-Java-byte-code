@@ -8,6 +8,7 @@
   #include <iomanip>
   #include <sstream>
   #include <vector>
+  // #include "FlexLexer.h"
   #include "parser.tab.h"
 
   extern int yyparse(void);
@@ -41,8 +42,8 @@ SPACE [\t\r\t\f\v ]
   int tmp;
   float test = .0;
   int nestingCount = 0;
-  int static lineCount = 1;
-  bool static inCode = false;
+  static int lineCount = 1;
+  static bool inCode = false;
 
   if (!mis_symbols.empty()) {
     int tmp = mis_symbols[mis_symbols.size() - 1];
@@ -325,6 +326,8 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 
 %%
 
+/* std::string GRAPH_STR; */
+
 int main(int argc, char *argv[]) {
   FILE *file = NULL;
   if (argc > 1) {
@@ -339,8 +342,13 @@ int main(int argc, char *argv[]) {
   yyin = file;
 
   /* while (yylex() != 0); */
-  yyparse() != 0;
+  yyparse();
 
+  fclose(file);
+
+  GRAPH_STR += "}";
+  file = fopen("graph.dot", "w");
+  fputs(GRAPH_STR.c_str(), file);
   fclose(file);
 
   return 0;

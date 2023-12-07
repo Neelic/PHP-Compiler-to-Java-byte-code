@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include "parser.tab.h"
 
-extern int yylex();
 void yyerror(char* str);
+extern int yylex(void);
 %}
 
 %code requires {
@@ -41,7 +41,7 @@ using namespace std;
         MatchArmNode* match_arm_union;
         vector<StaticVarNode*>* static_var_list_union;
         vector<GlobalVarNode*>* global_var_list_union;
-        vector<StmtList*>* stmt_list_union;
+        vector<StmtNode*>* stmt_list_union;
         HtmlStmtNode* html_stmt_union;
         vector<string*>* id_list_union;
         vector<ConstDeclNode*>* const_decl_list_union;
@@ -63,7 +63,7 @@ using namespace std;
 
 %token START_CODE_PHP_TAG
 %token END_CODE_PHP_TAG
-%token HTML
+%token <sval> HTML
 
 %token <sval> ID
 %token <ival> INT_NUMBER
@@ -338,7 +338,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, $2);}
         | ID                                                         {$$=ExprNode::CreateFromId($1);}
         | expr '=' expr                                              {$$=ExprNode::CreateFromAssignOp($1, $3);}
-        | expr '=' '&' expr                                          {$$=ExprNode::CreateFromAssignRefOp($1, $3);}
+        | expr '=' '&' expr                                          {$$=ExprNode::CreateFromAssignRefOp($1, $4);}
         | INT_CAST expr                                              {$$=ExprNode::CreateFromIntCast($2);}
         | FLOAT_CAST expr                                            {$$=ExprNode::CreateFromFloatCast($2);}
         | STRING_CAST expr                                           {$$=ExprNode::CreateFromStringCast($2);}
@@ -353,7 +353,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr R_ARROW get_value ID '{' expr '}' '(' expr_list ')'   {$$=ExprNode::CreateFromGetValueWithExprMethodReference($1, $3, $4, $6, $9);}
         | expr QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots($1, $3);}
         | expr QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots($1, $3, $4);}
-        | expr QUARTER_DOT get_value '{' expr '}'                    {$$=ExprNode::CreateFromGetValueWithExprReferenceDots($1, $3, $4);}
+        | expr QUARTER_DOT get_value '{' expr '}'                    {$$=ExprNode::CreateFromGetValueWithExprReferenceDots($1, $3, $5);}
         | '(' expr ')'                                               {$$=$2;}
         | expr '-' expr                                              {$$=ExprNode::CreateFromSubtraction($1, $3);}
         | expr '+' expr                                              {$$=ExprNode::CreateFromAddition($1, $3);}
@@ -391,7 +391,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr '[' ']' '=' expr                                      {$$=ExprNode::CreateFromAssignArrayValByExpr($1, $5);}
         | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromGetValueFunction($1, $3);}
         | get_value ID brackets                                      {$$=/*! Не нашел фунции*/}
-        | anon_function_expr                  /*! not supported */
+        | anon_function_expr                                         {/*! not supported */}
         | NEW ID '(' expr_list ')'
         | NEW ID
         | NEW get_value ID

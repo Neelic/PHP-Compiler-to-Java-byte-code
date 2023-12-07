@@ -2,11 +2,17 @@
 #include <string>
 #include <vector>
 
+// std::string GRAPH_STR;
+int GLOBAL_ID;
+
 class GetValueNode;
 
 class ExprNode
 {
 public:
+    static int GLOBAL_ID;
+    int cur_id;
+
     ExprType exprType;
     int int_val;
     float float_val;

@@ -53,3 +53,5 @@
 #include "IfStmt/IfStmtNode.hpp"
 
 #include "Start/StartNode.cpp"
+
+extern std::string GRAPH_STR("digraph Tree {\n");
