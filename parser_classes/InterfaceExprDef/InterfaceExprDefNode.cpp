@@ -8,7 +8,7 @@ InterfaceExprDefNode* InterfaceExprDefNode::CreateFromNoExtendedDefinition(std::
     return tmp;
 }
 
-InterfaceExprDefNode* InterfaceExprDefNode::CreatedFromDefinitionWithExtended(std::string* id, std::vector<std::string*>* id_extended_list)
+InterfaceExprDefNode* InterfaceExprDefNode::CreatedFromDefinitionWithExtended(std::string* id, IdListNode* id_extended_list)
 {
     InterfaceExprDefNode* tmp = new InterfaceExprDefNode();
     tmp->id = id;

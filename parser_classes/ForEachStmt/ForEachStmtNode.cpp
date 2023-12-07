@@ -32,7 +32,7 @@ ForEachStmtNode* ForEachStmtNode::CreateFromForeachRightArrowPointerStmt(ExprNod
     return tmp;
 }
 
-ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachStmt(ExprNode* expr_left, ExprNode* expr_right, std::vector<StmtNode*>* stmtList)
+ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachStmt(ExprNode* expr_left, ExprNode* expr_right, StmtList* stmtList)
 {
     ForEachStmtNode* tmp = new ForEachStmtNode();
     tmp->expr_left = expr_left;
@@ -42,7 +42,7 @@ ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachStmt(ExprNode* expr_left, 
     return tmp;
 }
 
-ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachRightArrowStmt(ExprNode* expr_left, ExprNode* expr_right, std::string id, std::vector<StmtNode*>* stmtList)
+ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachRightArrowStmt(ExprNode* expr_left, ExprNode* expr_right, std::string id, StmtList* stmtList)
 {
     ForEachStmtNode* tmp = new ForEachStmtNode();
     tmp->expr_left = expr_left;
@@ -53,7 +53,7 @@ ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachRightArrowStmt(ExprNode* e
     return tmp;
 }
 
-ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachRightArrowPointerStmt(ExprNode* expr_left, ExprNode* expr_right, std::string id, std::vector<StmtNode*>* stmtList)
+ForEachStmtNode* ForEachStmtNode::CreateFromEndForeachRightArrowPointerStmt(ExprNode* expr_left, ExprNode* expr_right, std::string id, StmtList* stmtList)
 {
     ForEachStmtNode* tmp = new ForEachStmtNode();
     tmp->expr_left = expr_left;

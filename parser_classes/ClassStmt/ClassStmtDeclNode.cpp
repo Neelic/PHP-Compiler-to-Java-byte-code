@@ -1,6 +1,6 @@
 #include "ClassStmtDeclNode.hpp"
 
-ClassStmtDeclNode* ClassStmtDeclNode::CreateFromNoModDefinition(ClassDefNode* class_def, std::vector<ClassStmtNode*>* class_stmt_list)
+ClassStmtDeclNode* ClassStmtDeclNode::CreateFromNoModDefinition(ClassDefNode* class_def, ClassStmtList* class_stmt_list)
 {
     ClassStmtDeclNode* tmp = new ClassStmtDeclNode();
     tmp->class_def = class_def;
@@ -9,7 +9,7 @@ ClassStmtDeclNode* ClassStmtDeclNode::CreateFromNoModDefinition(ClassDefNode* cl
     return tmp;
 }
 
-ClassStmtDeclNode* ClassStmtDeclNode::CreateFromFinalModDefinition(ClassDefNode* class_def, std::vector<ClassStmtNode*>* class_stmt_list)
+ClassStmtDeclNode* ClassStmtDeclNode::CreateFromFinalModDefinition(ClassDefNode* class_def, ClassStmtList* class_stmt_list)
 {
     ClassStmtDeclNode* tmp = new ClassStmtDeclNode();
     tmp->class_def = class_def;
@@ -18,7 +18,7 @@ ClassStmtDeclNode* ClassStmtDeclNode::CreateFromFinalModDefinition(ClassDefNode*
     return tmp;
 }
 
-ClassStmtDeclNode* ClassStmtDeclNode::CreateFromAbstractModDefinition(ClassDefNode* class_def, std::vector<ClassStmtNode*>* class_stmt_list)
+ClassStmtDeclNode* ClassStmtDeclNode::CreateFromAbstractModDefinition(ClassDefNode* class_def, ClassStmtList* class_stmt_list)
 {
     ClassStmtDeclNode* tmp = new ClassStmtDeclNode();
     tmp->class_def = class_def;

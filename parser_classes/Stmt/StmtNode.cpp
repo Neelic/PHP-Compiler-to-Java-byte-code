@@ -24,7 +24,7 @@ StmtNode* StmtNode::CreateFromSwitchStmt(SwitchStmtNode* switch_stmt)
     return tmp;
 }
 
-StmtNode* StmtNode::CreateFromStmtList(std::vector<StmtNode*>* stmtList)
+StmtNode* StmtNode::CreateFromStmtList(StmtList* stmtList)
 {
     StmtNode* tmp = new StmtNode();
     tmp->stmtList = stmtList;

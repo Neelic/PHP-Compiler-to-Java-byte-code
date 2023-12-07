@@ -7,11 +7,11 @@ class ClassDefNode
 public:
     std::string* class_id;
     std::string* extend_id;
-    std::vector<std::string*>* impl_id_list;
+    IdListNode* impl_id_list;
     ClassDefType type;
 
     static ClassDefNode* CreateFromClassDef(std::string* id);
     static ClassDefNode* CreateFromExtendedDef(std::string* class_id, std::string* extend_id);
-    static ClassDefNode* CreateFromImplementDef(std::string* class_id, std::vector<std::string*>* id_list);
-    static ClassDefNode* CreateFromExtendedImplementedDef(std::string* class_id, std::string* extend_id, std::vector<std::string*>* id_list);
+    static ClassDefNode* CreateFromImplementDef(std::string* class_id, IdListNode* id_list);
+    static ClassDefNode* CreateFromExtendedImplementedDef(std::string* class_id, std::string* extend_id, IdListNode* id_list);
 };

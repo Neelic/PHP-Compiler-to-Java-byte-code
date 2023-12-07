@@ -1,6 +1,6 @@
 #include "ClassExprNode.hpp"
 
-ClassExprNode* ClassExprNode::CreateFromGetValueAssign(std::vector<ClassAccessMod>* access_mod_list, GetValueNode* get_value, std::string* id, ExprNode* expr)
+ClassExprNode* ClassExprNode::CreateFromGetValueAssign(ClassAccessModList* access_mod_list, GetValueNode* get_value, std::string* id, ExprNode* expr)
 {
     ClassExprNode* tmp = new ClassExprNode();
     tmp->access_mod_list = access_mod_list;
@@ -11,7 +11,7 @@ ClassExprNode* ClassExprNode::CreateFromGetValueAssign(std::vector<ClassAccessMo
     return tmp;
 }
 
-ClassExprNode* ClassExprNode::CreateFromGetValue(std::vector<ClassAccessMod>* access_mod_list, GetValueNode* get_value, std::string* id)
+ClassExprNode* ClassExprNode::CreateFromGetValue(ClassAccessModList* access_mod_list, GetValueNode* get_value, std::string* id)
 {
     ClassExprNode* tmp = new ClassExprNode();
     tmp->access_mod_list = access_mod_list;
@@ -21,7 +21,7 @@ ClassExprNode* ClassExprNode::CreateFromGetValue(std::vector<ClassAccessMod>* ac
     return tmp;
 }
 
-ClassExprNode* ClassExprNode::CreateFromConstant(std::vector<ClassAccessMod>* access_mod_list, std::vector<ConstDeclNode*>* const_decl_list)
+ClassExprNode* ClassExprNode::CreateFromConstant(ClassAccessModList* access_mod_list, ConstDeclList* const_decl_list)
 {
     ClassExprNode* tmp = new ClassExprNode();
     tmp->access_mod_list = access_mod_list;

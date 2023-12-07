@@ -17,7 +17,7 @@ ClassDefNode* ClassDefNode::CreateFromExtendedDef(std::string* class_id, std::st
     return tmp;
 }
 
-ClassDefNode* ClassDefNode::CreateFromImplementDef(std::string* class_id, std::vector<std::string*>* id_list)
+ClassDefNode* ClassDefNode::CreateFromImplementDef(std::string* class_id, IdListNode* id_list)
 {
     ClassDefNode* tmp = new ClassDefNode();
     tmp->class_id = class_id;
@@ -26,7 +26,7 @@ ClassDefNode* ClassDefNode::CreateFromImplementDef(std::string* class_id, std::v
     return tmp;
 }
 
-ClassDefNode* ClassDefNode::CreateFromExtendedImplementedDef(std::string* class_id, std::string* extend_id, std::vector<std::string*>* id_list)
+ClassDefNode* ClassDefNode::CreateFromExtendedImplementedDef(std::string* class_id, std::string* extend_id, IdListNode* id_list)
 {
     ClassDefNode* tmp = new ClassDefNode();
     tmp->class_id = class_id;

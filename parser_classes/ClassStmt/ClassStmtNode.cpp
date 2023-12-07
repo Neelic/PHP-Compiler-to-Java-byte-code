@@ -8,7 +8,7 @@ ClassStmtNode* ClassStmtNode::CreateFromClassExpr(ClassExprNode* class_expr)
     return tmp;
 }
 
-ClassStmtNode* ClassStmtNode::CreateFromFunctionStmtDecl(std::vector<ClassAccessMod>* access_mod, FunctionStmtDeclNode* function_stmt_decl)
+ClassStmtNode* ClassStmtNode::CreateFromFunctionStmtDecl(ClassAccessModList* access_mod, FunctionStmtDeclNode* function_stmt_decl)
 {
     ClassStmtNode* tmp = new ClassStmtNode();
     tmp->access_mod = access_mod;
@@ -17,7 +17,7 @@ ClassStmtNode* ClassStmtNode::CreateFromFunctionStmtDecl(std::vector<ClassAccess
     return tmp;
 }
 
-ClassStmtNode* ClassStmtNode::CreateFromIdList(std::vector<std::string*>* id_list)
+ClassStmtNode* ClassStmtNode::CreateFromIdList(IdListNode* id_list)
 {
     ClassStmtNode* tmp = new ClassStmtNode();
     tmp->id_list = id_list;

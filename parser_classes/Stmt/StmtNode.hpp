@@ -15,6 +15,7 @@ class StaticVarNode;
 class MatchStmtNode;
 class ConstDeclNode;
 class HtmlStmtNode;
+class StmtList;
 
 class StmtNode
 {
@@ -23,7 +24,7 @@ public:
     ExprNode* expr_right;
     IfStmtNode* if_stmt;
     SwitchStmtNode* switch_stmt;
-    std::vector<StmtNode*>* stmtList;
+    StmtList* stmtList;
     StaticVarNode* static_var;
     GlobalVarNode* global_var;
     WhileStmtNode* while_stmt;
@@ -39,7 +40,7 @@ public:
     static StmtNode* CreateFromExpr(ExprNode* expr);
     static StmtNode* CreateFromIfStmt(IfStmtNode* if_stmt);
     static StmtNode* CreateFromSwitchStmt(SwitchStmtNode* switch_stmt);
-    static StmtNode* CreateFromStmtList(std::vector<StmtNode*>* stmtList);
+    static StmtNode* CreateFromStmtList(StmtList* stmtList);
     static StmtNode* CreateFromStaticVar(StaticVarNode* static_var);
     static StmtNode* CreateFromGlobalVar(GlobalVarNode* global_var);
     static StmtNode* CreateFromWhileStmt(WhileStmtNode* while_stmt);

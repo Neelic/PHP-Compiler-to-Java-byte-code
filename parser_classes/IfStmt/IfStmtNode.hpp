@@ -3,6 +3,7 @@
 
 class ExprNode;
 class StmtNode;
+class StmtList;
 
 class IfStmtNode
 {
@@ -11,11 +12,11 @@ public:
     ExprNode* expr;
     StmtNode* stmt_main;
     StmtNode* stmt_else;
-    std::vector<StmtNode*>* stmtListMain;
-    std::vector<StmtNode*>* stmtListElse;
+    StmtList* stmtListMain;
+    StmtList* stmtListElse;
 
     static IfStmtNode* CreateFromIfStmt(ExprNode* expr, StmtNode* stmt_main);
     static IfStmtNode* CreateFromIfElseStmt(ExprNode* expr, StmtNode* stmt_main, StmtNode* stmt_else);
-    static IfStmtNode* CreateFromIfEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmtListMain);
-    static IfStmtNode* CreateFromIfElseEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmtListMain, std::vector<StmtNode*>* stmtListElse);
+    static IfStmtNode* CreateFromIfEndIfStmt(ExprNode* expr, StmtList* stmtListMain);
+    static IfStmtNode* CreateFromIfElseEndIfStmt(ExprNode* expr, StmtList* stmtListMain, StmtList* stmtListElse);
 };

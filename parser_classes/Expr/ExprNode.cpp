@@ -17,7 +17,7 @@ ExprNode *ExprNode::CreateFromId(std::string *id)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromFunctionCall(std::string *id, std::vector<ExprNode *> *listParams)
+ExprNode *ExprNode::CreateFromFunctionCall(std::string *id, ExprList *listParams)
 {
     ExprNode *tmp = new ExprNode();
     tmp->id = id;
@@ -211,7 +211,7 @@ ExprNode *ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValue
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromMethodReference(ExprNode *left, std::string *id, std::vector<ExprNode *> *listParams)
+ExprNode *ExprNode::CreateFromMethodReference(ExprNode *left, std::string *id, ExprList *listParams)
 {
     ExprNode *tmp = new ExprNode();
     tmp->left = left;
@@ -221,7 +221,7 @@ ExprNode *ExprNode::CreateFromMethodReference(ExprNode *left, std::string *id, s
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id, std::vector<ExprNode *> *listParams)
+ExprNode *ExprNode::CreateFromGetValueMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id, ExprList *listParams)
 {
     ExprNode *tmp = new ExprNode();
     tmp->left = left;
@@ -232,7 +232,7 @@ ExprNode *ExprNode::CreateFromGetValueMethodReference(ExprNode *left, GetValueNo
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id, ExprNode *get_value_expr, std::vector<ExprNode *> *listParams)
+ExprNode *ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id, ExprNode *get_value_expr, ExprList *listParams)
 {
     ExprNode *tmp = new ExprNode();
     tmp->left = left;
@@ -569,7 +569,7 @@ ExprNode *ExprNode::CreateFromAssignArrayValByExpr(ExprNode *left, ExprNode *rig
     return tmp;
 }
 // Functions
-ExprNode *ExprNode::CreateFromGetValueFunction(std::string *id, std::vector<ExprNode *> *listParams)
+ExprNode *ExprNode::CreateFromGetValueFunction(std::string *id, ExprList *listParams)
 {
     ExprNode *tmp = new ExprNode();
     tmp->id = id;
@@ -579,7 +579,7 @@ ExprNode *ExprNode::CreateFromGetValueFunction(std::string *id, std::vector<Expr
 }
 
 // Declarations
-ExprNode *ExprNode::CreateFromNewDecl(std::string *id, std::vector<ExprNode *> *listParams)
+ExprNode *ExprNode::CreateFromNewDecl(std::string *id, ExprList *listParams)
 {
     ExprNode *tmp = new ExprNode();
     tmp->id = id;
@@ -604,7 +604,7 @@ ExprNode *ExprNode::CreateFromNewDeclNoId(ExprNode *left)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueDecl(GetValueNode *get_value, std::string *id, std::vector<ExprNode *> *listParams)
+ExprNode *ExprNode::CreateFromGetValueDecl(GetValueNode *get_value, std::string *id, ExprList *listParams)
 {
     ExprNode *tmp = new ExprNode();
     tmp->get_value = get_value;

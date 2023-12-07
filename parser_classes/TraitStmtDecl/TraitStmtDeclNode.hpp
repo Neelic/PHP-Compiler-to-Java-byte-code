@@ -2,7 +2,7 @@ class TraitStmtDeclNode
 {
 public:
     std::string* id;
-    std::vector<ClassStmtNode*>* stmt_list;
+    ClassStmtList* stmt_list;
 
-    static TraitStmtDeclNode* Create(std::string* id, std::vector<ClassStmtNode*>* stmt_list);
+    static TraitStmtDeclNode* Create(std::string* id, ClassStmtList* stmt_list);
 };

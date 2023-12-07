@@ -8,7 +8,7 @@ SwitchStmtNode* SwitchStmtNode::CreateFromSwitchStmt(ExprNode* expr)
     return tmp;
 }
 
-SwitchStmtNode* SwitchStmtNode::CreateFromSwitchDefaultStmt(ExprNode* expr, std::vector<CaseDefaultStmtNode*>* defaultStmtList)
+SwitchStmtNode* SwitchStmtNode::CreateFromSwitchDefaultStmt(ExprNode* expr, CaseDefaultStmtList* defaultStmtList)
 {
     SwitchStmtNode* tmp = new SwitchStmtNode();
     tmp->expr = expr;
@@ -17,7 +17,7 @@ SwitchStmtNode* SwitchStmtNode::CreateFromSwitchDefaultStmt(ExprNode* expr, std:
     return tmp;
 }
 
-SwitchStmtNode* SwitchStmtNode::CreateFromSwitchDefaultEndswitchStmt(ExprNode* expr, std::vector<CaseDefaultStmtNode*>* defaultStmtList)
+SwitchStmtNode* SwitchStmtNode::CreateFromSwitchDefaultEndswitchStmt(ExprNode* expr, CaseDefaultStmtList* defaultStmtList)
 {
     SwitchStmtNode* tmp = new SwitchStmtNode();
     tmp->expr = expr;
