@@ -9,3 +9,8 @@ ExprList* ExprList::Create(std::vector<ExprNode*>* vector)
   return tmp;
 }
 
+void ExprList::Insert(ExprNode* element)
+{
+  this->vector->push_back(element);
+}
+

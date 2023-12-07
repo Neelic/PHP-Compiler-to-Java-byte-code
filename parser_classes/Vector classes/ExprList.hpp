@@ -10,4 +10,5 @@ public:
   std::vector<ExprNode*>* vector;
 
   static ExprList* Create(std::vector<ExprNode*>* vector);
+  void Insert(ExprNode* element);
 };
