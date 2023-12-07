@@ -272,19 +272,19 @@ match_arm: expr_list_not_e R_DOUBLE_ARROW expr                                  
         |  DEFAULT ',' R_DOUBLE_ARROW expr                                            {$$=MatchArmNode::CreateFromDefaultArmWithCommaStmt($4);}
         ;
 
-try_stmt: TRY '{' stmt_list_may_empty '}' {/*! not supported */}
+try_stmt: TRY '{' stmt_list_may_empty '}'                                             {/*! not supported */}
         ;
 
-catch_stmt: CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'
-        |   CATCH'(' ID ')' '{' stmt_list_may_empty '}'
+catch_stmt: CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'                        {/*! not supported */}
+        |   CATCH'(' ID ')' '{' stmt_list_may_empty '}'                               {/*! not supported */}
         ;
 
-catch_stmt_list:  catch_stmt
-                | catch_stmt_list catch_stmt
+catch_stmt_list:  catch_stmt                                                          {/*! not supported */}
+                | catch_stmt_list catch_stmt                                          {/*! not supported */}
                 ;
 
-try_catch_stmt:   try_stmt catch_stmt_list {/*! not supported */}
-                | try_stmt
+try_catch_stmt:   try_stmt catch_stmt_list                                            {/*! not supported */}
+                | try_stmt                                                            {/*! not supported */}
                 ;
 
 stmt:     expr_may_empty ';'                                                          {$$=StmtNode::CreateFromExpr($1);}
@@ -298,7 +298,7 @@ stmt:     expr_may_empty ';'                                                    
         | for_stmt                                                                    {$$=StmtNode::CreateFromForStmt($1);}
         | foreach_stmt                                                                {$$=StmtNode::CreateFromForEachStmt($1);}
         | THROW expr ';'                                                              {$$=StmtNode::CreateFromThrowStmt($2);}
-        | try_catch_stmt {/*! not supported?*/}
+        | try_catch_stmt                                                              {/*! not supported?*/}
         | match_stmt                                                                  {$$=StmtNode::CreateFromMatchStmt($1);}
         | CONST const_decl_list_not_e ';'                                             {$$=StmtNode::CreateFromConstDecl($2);}
         | RETURN expr_may_empty ';'                                                   {$$=StmtNode::CreateFromReturnStmt($2);}
@@ -333,8 +333,8 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | FLOAT_NUMBER                                               {$$=ExprNode::CreateFromFloatValue($1);}
         | STRING                                                     {$$=ExprNode::CreateFromStringValue($1);}
         | COM_STRING                                                 {$$=ExprNode::CreateFromComStringValue($1);}
-        | '$' THIS     
-        | SELF     
+        | '$' THIS                                                   {/*TODO доделать*/}
+        | SELF                                                       {/*TODO доделать*/}
         | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, $2);}
         | ID                                                         {$$=ExprNode::CreateFromId($1);}
         | expr '=' expr                                              {$$=ExprNode::CreateFromAssignOp($1, $3);}
@@ -390,7 +390,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr '[' expr ']'                                          {$$=ExprNode::CreateFromGetArrayVal($1, $3);}
         | expr '[' ']' '=' expr                                      {$$=ExprNode::CreateFromAssignArrayValByExpr($1, $5);}
         | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromGetValueFunction($1, $3);}
-        | get_value ID brackets                                      {$$=/*! Не нашел фунции*/}
+        | get_value ID brackets                                      {/*! not supported */}
         | anon_function_expr                                         {/*! not supported */}
         | NEW ID '(' expr_list ')'
         | NEW ID
@@ -494,8 +494,8 @@ function_def: FUNCTION ID '(' expr_func_list ')'                     {$$=Functio
 function_stmt_decl: function_def '{' stmt_list '}'                   {$$=FunctionStmtDeclNode::Create($1, $3);}
                 ;
 
-anon_function_expr: anon_function_stmt_decl /*! not supported */
-                |   anon_function_short_stmt_decl /*! not supported */
+anon_function_expr: anon_function_stmt_decl                           {/*! not supported */}
+                |   anon_function_short_stmt_decl                     {/*! not supported */}
                 ;
 
 expr_func_list:   expr_func_list_not_e                               {$$=$1;}
@@ -518,14 +518,14 @@ expr_func_list_not_e: get_value_func                                            
                 |     expr_func_list_not_e ',' get_value_func '=' expr          {$1.push_back(ExprFuncNode::CreateFromGetValueFunc(ExprFuncNode::CreateFromGetValueFuncAssign($3, $5)));$$=$1;}
                 ;
 
-anon_function_def: FUNCTION '(' expr_func_list ')'
-                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'
-                |  STATIC FUNCTION '(' expr_func_list ')'
-                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'
-                |  FUNCTION '(' expr_func_list ')' ':' ID
-                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID
-                |  STATIC FUNCTION '(' expr_func_list ')' ':' ID
-                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID
+anon_function_def: FUNCTION '(' expr_func_list ')'                                                      {/*! not supported */}
+                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'                {/*! not supported */}
+                |  STATIC FUNCTION '(' expr_func_list ')'                                               {/*! not supported */}
+                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'         {/*! not supported */}
+                |  FUNCTION '(' expr_func_list ')' ':' ID                                               {/*! not supported */}
+                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID         {/*! not supported */}
+                |  STATIC FUNCTION '(' expr_func_list ')' ':' ID                                        {/*! not supported */}
+                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID  {/*! not supported */}
                 ;
 
 anon_function_stmt_decl: anon_function_def '{' stmt_list '}'      {/*! not supported */}

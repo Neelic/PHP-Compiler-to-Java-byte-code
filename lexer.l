@@ -217,7 +217,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 
 "`"                 {str = ""; BEGIN(EXECUTION_OPERATOR);}
 
-<<EOF>> {printf("Found special character: ;\n");}
+<<EOF>>             {printf("Found special character: ;\n"); return ';';}
 
 .                   {printf("Unknown character: %s\n", yytext);}
 
