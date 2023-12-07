@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 
+#include "Vector classes/ClassAccessModList/ClassAccessModList.hpp"
 #include "ClassAccessMod/ClassAccessModNode.cpp"
 
 #include "HtmlStmt/HtmlStmtNode.cpp"
