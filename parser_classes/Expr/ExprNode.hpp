@@ -33,6 +33,9 @@ public:
     static ExprNode* CreateFromStringValue(std::string* string_val);
     static ExprNode* CreateFromComStringValue(std::string* string_com_val);
     static ExprNode* CreateFromGetValueId(GetValueNode* get_value, std::string* id);
+    //Keywords
+    static ExprNode* CreateFromThisKeyword();
+    static ExprNode* CreateFromSelfKeyword();
     //Assign
     static ExprNode* CreateFromAssignOp(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromAssignRefOp(ExprNode* left, ExprNode* right);

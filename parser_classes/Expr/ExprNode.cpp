@@ -86,6 +86,20 @@ ExprNode *ExprNode::CreateFromComStringValue(std::string *value)
     return tmp;
 }
 
+ExprNode *ExprNode::CreateFromThisKeyword()
+{
+    ExprNode *tmp = new ExprNode();
+    tmp->exprType = ExprType::this_keyword;
+    return tmp;
+}
+
+ExprNode *ExprNode::CreateFromSelfKeyword()
+{
+    ExprNode *tmp = new ExprNode();
+    tmp->exprType = ExprType::self_keyword;
+    return tmp;
+}
+
 ExprNode *ExprNode::CreateFromGetValueId(GetValueNode *get_value, std::string *id)
 {
     ExprNode *tmp = new ExprNode();

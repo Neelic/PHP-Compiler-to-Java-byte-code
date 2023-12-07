@@ -361,8 +361,8 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | FLOAT_NUMBER                                               {$$=ExprNode::CreateFromFloatValue($1);}
         | STRING                                                     {$$=ExprNode::CreateFromStringValue($1);}
         | COM_STRING                                                 {$$=ExprNode::CreateFromComStringValue($1);}
-        | '$' THIS                                                   {/*TODO доделать*/}
-        | SELF                                                       {/*TODO доделать*/}
+        | '$' THIS                                                   {$$=ExprNode::CreateFromThisKeyword();}
+        | SELF                                                       {$$=ExprNode::CreateFromSelfKeyword();}
         | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, $2);}
         | ID                                                         {$$=ExprNode::CreateFromId($1);}
         | expr '=' expr                                              {$$=ExprNode::CreateFromAssignOp($1, $3);}
@@ -420,11 +420,11 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromGetValueFunction($1, $3);}
         | get_value ID brackets                                      {/*! not supported */}
         | anon_function_expr                                         {/*! not supported */}
-        | NEW ID '(' expr_list ')'
-        | NEW ID
-        | NEW get_value ID
-        | NEW get_value ID '(' expr_list ')'
-        | NEW '(' expr ')'
+        | NEW ID '(' expr_list ')'                                   {$$=ExprNode::CreateFromNewDecl($2, $4);}
+        | NEW ID                                                     {$$=ExprNode::CreateFromNewDeclNoParams($2);}
+        | NEW get_value ID                                           {$$=ExprNode::CreateFromGetValueDeclNoParams($2, $3);}
+        | NEW get_value ID '(' expr_list ')'                         {$$=ExprNode::CreateFromGetValueDecl($2, $3, $5);}
+        | NEW '(' expr ')'                                           {$$=ExprNode::CreateFromNewDeclNoId($3);}
         ;
 
 expr_may_empty: expr                                                 {$$=$1;}

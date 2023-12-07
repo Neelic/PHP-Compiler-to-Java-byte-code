@@ -4,6 +4,8 @@ enum ExprType
     float_val,
     string_val,
     command_string_val,
+    this_keyword,
+    self_keyword,
     variable,
     constant,
     assign_op,
