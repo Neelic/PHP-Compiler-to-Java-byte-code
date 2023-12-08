@@ -1,3 +1,5 @@
+class TopStmtList;
+
 class StartNode
 {
 public:

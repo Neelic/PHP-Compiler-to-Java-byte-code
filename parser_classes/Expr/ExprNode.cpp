@@ -9,8 +9,8 @@ ExprNode *ExprNode::CreateFromId(std::string *id)
     tmp->id = id;
     tmp->exprType = constant;
 
-    int tmp_id = ExprNode::GLOBAL_ID;
-    GRAPH_STR += "Expr" + std::to_string(ExprNode::GLOBAL_ID++) + " [label=\"ID\"];\n";
+    int tmp_id = ExprNode::GLOBAL_ID++;
+    GRAPH_STR += "Expr" + std::to_string(tmp_id) + " [label=\"ID\"];\n";
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     GRAPH_STR += "Expr" + std::to_string(tmp->cur_id) + " [label=\"Expr id\"];\n";
     GRAPH_STR += "Expr" + std::to_string(tmp_id) + " -> " + std::to_string(tmp->cur_id);
@@ -27,11 +27,11 @@ ExprNode *ExprNode::CreateFromFunctionCall(std::string *id, ExprList *listParams
     GRAPH_STR += "Expr" + std::to_string(ExprNode::GLOBAL_ID++) + " [label=\"ID\"];\n";
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     GRAPH_STR += "Expr" + std::to_string(tmp->cur_id) + " [label=\"Expr func call\"];\n";
-    for (int i = 0; i < listParams->size(); i++)
-    {
-        ExprNode *tmp_exp = (*listParams)[i];
-        GRAPH_STR += "Expr" + std::to_string(tmp_exp->cur_id) + " -> Expr" + std::to_string(tmp->cur_id) + "\n";
-    }
+    // for (int i = 0; i < listParams->vector->size(); i++)
+    // {
+    //     ExprNode *tmp_exp = (*listParams->vector)[i];
+    //     GRAPH_STR += "Expr" + std::to_string(tmp_exp->cur_id) + " -> Expr" + std::to_string(tmp->cur_id) + "\n";
+    // }
     return tmp;
 }
 
@@ -495,11 +495,10 @@ ExprNode *ExprNode::CreateFromBitwiseOr(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBitwiseNot(ExprNode *left, ExprNode *right)
+ExprNode *ExprNode::CreateFromBitwiseNot(ExprNode *left)
 {
     ExprNode *tmp = new ExprNode();
     tmp->left = left;
-    tmp->right = right;
     tmp->exprType = ExprType::bitwise_not;
     return tmp;
 }

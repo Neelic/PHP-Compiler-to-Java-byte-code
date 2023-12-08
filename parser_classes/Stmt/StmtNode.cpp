@@ -32,7 +32,7 @@ StmtNode* StmtNode::CreateFromStmtList(StmtList* stmtList)
     return tmp;
 }
 
-StmtNode* StmtNode::CreateFromStaticVar(StaticVarNode* static_var)
+StmtNode* StmtNode::CreateFromStaticVar(StaticVarList* static_var)
 {
     StmtNode* tmp = new StmtNode();
     tmp->static_var = static_var;
@@ -40,7 +40,7 @@ StmtNode* StmtNode::CreateFromStaticVar(StaticVarNode* static_var)
     return tmp;
 }
 
-StmtNode* StmtNode::CreateFromGlobalVar(GlobalVarNode* global_var)
+StmtNode* StmtNode::CreateFromGlobalVar(GlobalVarList* global_var)
 {
     StmtNode* tmp = new StmtNode();
     tmp->global_var = global_var;
@@ -104,7 +104,7 @@ StmtNode* StmtNode::CreateFromMatchStmt(MatchStmtNode* match_stmt)
     return tmp;
 }
 
-StmtNode* StmtNode::CreateFromConstDecl(ConstDeclNode* const_decl)
+StmtNode* StmtNode::CreateFromConstDecl(ConstDeclList* const_decl)
 {
     StmtNode* tmp = new StmtNode();
     tmp->const_decl = const_decl;

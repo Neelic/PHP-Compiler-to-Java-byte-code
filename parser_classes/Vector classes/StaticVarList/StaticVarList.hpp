@@ -1,5 +1,7 @@
 #include <vector>
 
+class StaticVarNode;
+
 class StaticVarList
 {
 public:

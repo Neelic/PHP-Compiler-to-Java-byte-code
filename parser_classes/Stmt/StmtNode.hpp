@@ -1,4 +1,5 @@
 #include "../Stmt/StmtType.cpp"
+// #include "../Vector classes/ConstDeclList/ConstDeclList.hpp";
 #include <vector>
 #include <string>
 
@@ -16,6 +17,9 @@ class MatchStmtNode;
 class ConstDeclNode;
 class HtmlStmtNode;
 class StmtList;
+class ConstDeclList;
+class StaticVarList;
+class GlobalVarList;
 
 class StmtNode
 {
@@ -25,15 +29,15 @@ public:
     IfStmtNode* if_stmt;
     SwitchStmtNode* switch_stmt;
     StmtList* stmtList;
-    StaticVarNode* static_var;
-    GlobalVarNode* global_var;
+    StaticVarList* static_var;
+    GlobalVarList* global_var;
     WhileStmtNode* while_stmt;
     DoWhileStmtNode* do_while_stmt;
     ForStmtNode* for_stmt;
     ForEachStmtNode* foreach_stmt;
     TryCatchStmtNode* try_catch_stmt;
     MatchStmtNode* match_stmt;
-    ConstDeclNode* const_decl;
+    ConstDeclList* const_decl;
     HtmlStmtNode* html_stmt;
     StmtType type;
 
@@ -41,8 +45,8 @@ public:
     static StmtNode* CreateFromIfStmt(IfStmtNode* if_stmt);
     static StmtNode* CreateFromSwitchStmt(SwitchStmtNode* switch_stmt);
     static StmtNode* CreateFromStmtList(StmtList* stmtList);
-    static StmtNode* CreateFromStaticVar(StaticVarNode* static_var);
-    static StmtNode* CreateFromGlobalVar(GlobalVarNode* global_var);
+    static StmtNode* CreateFromStaticVar(StaticVarList* static_var);
+    static StmtNode* CreateFromGlobalVar(GlobalVarList* global_var);
     static StmtNode* CreateFromWhileStmt(WhileStmtNode* while_stmt);
     static StmtNode* CreateFromDoWhileStmt(DoWhileStmtNode* do_while_stmt);
     static StmtNode* CreateFromForStmt(ForStmtNode* for_stmt);
@@ -50,7 +54,7 @@ public:
     static StmtNode* CreateFromThrowStmt(ExprNode* expr);
     static StmtNode* CreateFromTryCatchStmt(TryCatchStmtNode* try_catch_stmt);
     static StmtNode* CreateFromMatchStmt(MatchStmtNode* match_stmt);
-    static StmtNode* CreateFromConstDecl(ConstDeclNode* const_decl);
+    static StmtNode* CreateFromConstDecl(ConstDeclList* const_decl);
     static StmtNode* CreateFromReturnStmt(ExprNode* expr_left);
     static StmtNode* CreateFromYieldStmt(ExprNode* expr_left);
     static StmtNode* CreateFromYieldDoubleArrowStmt(ExprNode* expr_left, ExprNode* expr_right);

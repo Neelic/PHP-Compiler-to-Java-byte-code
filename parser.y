@@ -101,7 +101,7 @@ class StmtList;
         FunctionDefNode* function_def_union;
         ExprFuncList* expr_func_list_union;
         GetValueFuncNode* get_value_func_union;
-        vector<GetValueFuncNode*>* get_value_func_list_union;
+        GetValueFuncList* get_value_func_list_union;
         }
 
 %token START_CODE_PHP_TAG
@@ -233,12 +233,12 @@ class StmtList;
 
 %%
 
-start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {$$=StartStmtNode::Create($2);}                     
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {$$=StartStmtNode::Create($2);}
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {$$=StartStmtNode::Create($2);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {$$=StartStmtNode::Create($3);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {$$=StartStmtNode::Create($3);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {$$=StartStmtNode::Create($3);}
+start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {$$=StartNode::Create($2);}                     
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {$$=StartNode::Create($2);}
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {$$=StartNode::Create($2);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {$$=StartNode::Create($3);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {$$=StartNode::Create($3);}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {$$=StartNode::Create($3);}
         | START_CODE_PHP_TAG                                                          {}
         | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {}
         | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {}
@@ -246,7 +246,7 @@ start:    START_CODE_PHP_TAG top_stmt_list_not_e                                
         ;
 
 top_stmt_list_not_e: top_stmt                                                         {vector<TopStmtNode*> tmp; tmp.push_back($1); $$=TopStmtList::Create(&tmp);}                                                                                                           
-                |    top_stmt_list_not_e top_stmt                                     {$$=$1->Insert($2);}
+                |    top_stmt_list_not_e top_stmt                                     {$1->Insert($2);$$=$1;}
                 ;
 
 top_stmt: stmt                                                                        {$$=TopStmtNode::CreateFromStmt($1);}
@@ -261,7 +261,7 @@ get_value: '$'                                                                  
         ;
 
 if_stmt:  IF '(' expr ')' stmt                                                        {$$=IfStmtNode::CreateFromIfStmt($3, $5);}
-        | IF '(' expr ')' stmt ELSE stmt                                              {$$=IfStmtNode::CreateFromCreateFromIfElseStmt($3, $5, $7);}
+        | IF '(' expr ')' stmt ELSE stmt                                              {$$=IfStmtNode::CreateFromIfElseStmt($3, $5, $7);}
         | IF '(' expr ')' ':' stmt_list_may_empty END_IF ';'                          {$$=IfStmtNode::CreateFromIfEndIfStmt($3, $6);}
         | IF '(' expr ')' ':' stmt_list_may_empty ELSE stmt_list_may_empty END_IF ';' {$$=IfStmtNode::CreateFromIfElseEndIfStmt($3, $6, $8);}  
         ;
@@ -272,7 +272,7 @@ switch_stmt: SWITCH '(' expr ')' '{' '}'                                        
         ;
 
 case_default_stmt_list: case_default_stmt                                             {vector<CaseDefaultStmtNode*>tmp;tmp.push_back($1);$$=CaseDefaultStmtList::Create(&tmp);}                          
-                |       case_default_stmt_list case_default_stmt                      {$$=$1->Insert($2);}
+                |       case_default_stmt_list case_default_stmt                      {$1->Insert($2);$$=$1;}
                 ;
 
 case_default_stmt: CASE expr ':' stmt_list_may_empty                                  {$$=CaseDefaultStmtNode::CreateFromCaseStmt($2, $4);}
@@ -307,7 +307,7 @@ match_stmt_list:  match_stmt_list_not_e                                         
                 ;
 
 match_stmt_list_not_e:    match_arm                                                   {vector<MatchArmNode*>tmp;tmp.push_back($1);$$=MatchArmList::Create(&tmp);}
-                        | match_stmt_list_not_e ',' match_arm                         {$$=$1->Insert($3);}
+                        | match_stmt_list_not_e ',' match_arm                         {$1->Insert($3);$$=$1;}
                         ;
 
 match_arm: expr_list_not_e R_DOUBLE_ARROW expr                                        {$$=MatchArmNode::CreateFromMatchArmStmt($1, $3);}
@@ -353,16 +353,16 @@ stmt:     expr_may_empty ';'                                                    
 
 static_var_list:  '$' ID                                                              {vector<StaticVarNode*>tmp; tmp.push_back(StaticVarNode::CreateFromId($2)); $$=StaticVarList::Create(&tmp);}
                 | '$' ID '=' expr                                                     {vector<StaticVarNode*>tmp; tmp.push_back(StaticVarNode::CreateFromIdAssign($2, $4)); $$=StaticVarList::Create(&tmp);}
-                | static_var_list ',' '$' ID                                          {$$=$1->Insert($4);}
-                | static_var_list ',' '$' ID '=' expr                                 {$$=$1->Insert(StaticVarNode::CreateFromIdAssign($4, $6));}
+                | static_var_list ',' '$' ID                                          {$1->Insert(StaticVarNode::CreateFromId($4));$$=$1;}
+                | static_var_list ',' '$' ID '=' expr                                 {$1->Insert(StaticVarNode::CreateFromIdAssign($4, $6));$$=$1;}
                 ;
 
 global_var_list:  get_value ID                                                        {vector<GlobalVarNode*>tmp; tmp.push_back(GlobalVarNode::CreateFromGlobalValue($1, $2)); $$=GlobalVarList::Create(&tmp);}
-                | global_var_list ',' get_value ID                                    {$$=$1->Insert(GlobalVarNode::CreateFromGlobalValue($3, $4));}                    
+                | global_var_list ',' get_value ID                                    {$1->Insert(GlobalVarNode::CreateFromGlobalValue($3, $4));$$=$1;}                    
                 ;
 
 stmt_list: stmt                                                                       {vector<StmtNode*>tmp;tmp.push_back($1);$$=StmtList::Create(&tmp);}
-	|  stmt_list stmt                                                             {$$=$1->Insert($2);}
+	|  stmt_list stmt                                                             {$1->Insert($2);$$=$1;}
         ;
 
 stmt_list_may_empty: stmt_list                                                        {$$=$1;}
@@ -451,11 +451,11 @@ brackets: '(' expr_list ')'
         ;
 
 id_list:  ID                                                         {vector<string*>tmp;tmp.push_back($1);$$=IdListNode::Create(&tmp);}
-        | id_list ',' ID                                             {$$=$1->Insert($3);}
+        | id_list ',' ID                                             {$1->Insert($3);$$=$1;}
         ;
 
 expr_list_not_e:  expr                                               {vector<ExprNode*> tmp; tmp.push_back($1); $$=ExprList::Create(&tmp);}
-                | expr_list_not_e ',' expr                           {$$=$1->Insert($3);}
+                | expr_list_not_e ',' expr                           {$1->Insert($3);$$=$1;}
                 ;
 
 expr_list: expr_list_not_e                                           {$$=$1;}
@@ -463,7 +463,7 @@ expr_list: expr_list_not_e                                           {$$=$1;}
         ;
 
 const_decl_list_not_e:    ID '=' expr                                {vector<ConstDeclNode*>tmp;tmp.push_back(ConstDeclNode::CreateFromConstDeclaration($1, $3));$$=ConstDeclList::Create(&tmp);}
-                        | const_decl_list_not_e ',' ID '=' expr      {$$=$1->Insert(ConstDeclNode::CreateFromConstDeclaration($3, $5));}
+                        | const_decl_list_not_e ',' ID '=' expr      {$1->Insert(ConstDeclNode::CreateFromConstDeclaration($3, $5));$$=$1;}
                         ;
 
 class_def: CLASS ID                                                  {$$=ClassDefNode::CreateFromClassDef($2);}                     
@@ -490,12 +490,12 @@ class_access_mod: PUBLIC                                             {$$=ClassAc
                 | STATIC                                             {$$=ClassAccessMod::static_node;}
                 ;
 
-class_access_mod_list:    class_access_mod                           {vector<ClassAccessMod>tmp;tmp.push_back($1);$$=ClassAccessModList::Create(&tmp);}
-                        | class_access_mod_list class_access_mod     {$$=$1->Insert($2);}
+class_access_mod_list:    class_access_mod                           {vector<ClassAccessMod*>tmp;tmp.push_back($1);$$=ClassAccessModList::Create(&tmp);}
+                        | class_access_mod_list class_access_mod     {$1->Insert($2);$$=$1;}
                         ;
 
 class_stmt_list_not_e:    class_stmt                                 {vector<ClassStmtNode*>tmp;tmp.push_back($1);$$=ClassStmtList::Create(&tmp);}
-                        | class_stmt_list_not_e class_stmt           {$$=$1->Insert($2);}
+                        | class_stmt_list_not_e class_stmt           {$1->Insert($2);$$=$1;}
                         ;
 
 class_stmt: class_expr ';'                                           {$$=ClassStmtNode::CreateFromClassExpr($1);}
@@ -521,7 +521,7 @@ interface_stmt_list: interface_stmt_list_not_e                       {$$=$1;}
                 ;
 
 interface_stmt_list_not_e: interface_stmt                            {vector<InterfaceStmtNode*>tmp;tmp.push_back($1);$$=InterfaceStmtList::Create(&tmp);}
-                        |  interface_stmt_list_not_e interface_stmt  {$$=$1->Insert($2);}
+                        |  interface_stmt_list_not_e interface_stmt  {$1->Insert($2);$$=$1;}
                         ;
 
 interface_stmt: class_access_mod_list function_def ';'               {$$=InterfaceStmtNode::Create($1, $2);}
@@ -552,13 +552,13 @@ get_value_func:   '&' '$' ID                                         {$$=GetValu
                 ;
 
 get_value_func_list_not_e: get_value_func                                       {vector<GetValueFuncNode*>tmp;tmp.push_back($1);$$=GetValueFuncList::Create(&tmp);}
-                        |  get_value_func_list_not_e ',' get_value_func         {$$=$1->Insert($3);}
+                        |  get_value_func_list_not_e ',' get_value_func         {$1->Insert($3);$$=$1;}
                         ;
 
 expr_func_list_not_e: get_value_func                                            {vector<ExprFuncNode*>tmp;tmp.push_back(ExprFuncNode::CreateFromGetValueFunc($1));$$=ExprFuncList::Create(&tmp);}
                 |     get_value_func '=' expr                                   {vector<ExprFuncNode*>tmp;tmp.push_back(ExprFuncNode::CreateFromGetValueFuncAssign($1, $3));$$=ExprFuncList::Create(&tmp);}
-                |     expr_func_list_not_e ',' get_value_func                   {$1.push_back(ExprFuncNode::CreateFromGetValueFunc($3));$$=$1;}
-                |     expr_func_list_not_e ',' get_value_func '=' expr          {$1.push_back(ExprFuncNode::CreateFromGetValueFunc(ExprFuncNode::CreateFromGetValueFuncAssign($3, $5)));$$=$1;}
+                |     expr_func_list_not_e ',' get_value_func                   {$1->Insert(ExprFuncNode::CreateFromGetValueFunc($3));$$=$1;}
+                |     expr_func_list_not_e ',' get_value_func '=' expr          {$1->Insert(ExprFuncNode::CreateFromGetValueFuncAssign($3, $5));$$=$1;}
                 ;
 
 anon_function_def: FUNCTION '(' expr_func_list ')'                                                      {/*! not supported */}

@@ -1,11 +1,13 @@
-#include "ExprType.cpp"
 #include <string>
 #include <vector>
+#include "ExprType.cpp"
+// #include "../Vector classes/ExprList.hpp"
 
 // std::string GRAPH_STR;
 int GLOBAL_ID;
 
 class GetValueNode;
+class ExprList;
 
 class ExprNode
 {
@@ -87,7 +89,7 @@ public:
     static ExprNode* CreateFromBitwiseXor(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromBitwiseAnd(ExprNode* left, ExprNode* right);
     static ExprNode* CreateFromBitwiseOr(ExprNode* left, ExprNode* right);
-    static ExprNode* CreateFromBitwiseNot(ExprNode* left, ExprNode* right);
+    static ExprNode* CreateFromBitwiseNot(ExprNode* left);
     //Unary
     static ExprNode* CreateFromUnaryPlus(ExprNode* left);
     static ExprNode* CreateFromUnaryMinus(ExprNode* left);
