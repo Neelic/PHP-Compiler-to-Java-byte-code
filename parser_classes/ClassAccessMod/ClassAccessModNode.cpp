@@ -1,10 +1,16 @@
-enum ClassAccessMod
+#include "ClassAccessMod.cpp"
+
+class ClassAccessModNode
 {
-    public_node,
-    private_node,
-    protected_node,
-    final_node,
-    abstract_node,
-    read_only_node,
-    static_node
+public:
+    ClassAccessMod access_mod;
+
+    static ClassAccessModNode* Create(ClassAccessMod access_mod);
+};
+
+ClassAccessModNode* ClassAccessModNode::Create(ClassAccessMod access_mod)
+{
+    ClassAccessModNode* tmp = new ClassAccessModNode();
+    tmp->access_mod = access_mod;
+    return tmp;
 };
