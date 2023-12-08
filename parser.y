@@ -542,14 +542,14 @@ anon_function_expr: anon_function_stmt_decl                           {/*! not s
                 |   anon_function_short_stmt_decl                     {/*! not supported */}
                 ;
 
-expr_func_list:   expr_func_list_not_e                               {$$=$1;}
-                | /* empty */                                        {}
+expr_func_list:   expr_func_list_not_e                                {$$=$1;}
+                | /* empty */                                         {}
                 ;
 
-get_value_func:   '&' '$' ID                                         {$$=GetValueFuncNode::CreateFromRefValue($3);}
-                | '$' ID                                             {$$=GetValueFuncNode::CreateFromGetValue($2);}
-                | ID '&' '$' ID                                      {$$=GetValueFuncNode::CreateFromRefValueWithType($4, $1);}
-                | ID '$' ID                                          {$$=GetValueFuncNode::CreateFromGetValueWithType($3, $1);}
+get_value_func:   '&' '$' ID                                          {$$=GetValueFuncNode::CreateFromRefValue($3);}
+                | '$' ID                                              {$$=GetValueFuncNode::CreateFromGetValue($2);}
+                | ID '&' '$' ID                                       {$$=GetValueFuncNode::CreateFromRefValueWithType($4, $1);}
+                | ID '$' ID                                           {$$=GetValueFuncNode::CreateFromGetValueWithType($3, $1);}
                 ;
 
 get_value_func_list_not_e: get_value_func                                       {vector<GetValueFuncNode*>tmp;tmp.push_back($1);$$=GetValueFuncList::Create(&tmp);}
@@ -572,16 +572,16 @@ anon_function_def: FUNCTION '(' expr_func_list ')'                              
                 |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID  {/*! not supported */}
                 ;
 
-anon_function_stmt_decl: anon_function_def '{' stmt_list '}'      {/*! not supported */}
+anon_function_stmt_decl: anon_function_def '{' stmt_list '}'                                            {/*! not supported */}
                         ;
 
-anon_function_short_def:  FN '(' expr_func_list ')'               {/*! not supported */}
-                        | FN '(' expr_func_list ')' ':' ID        {/*! not supported */}
-                        | STATIC FN '(' expr_func_list ')'        {/*! not supported */}
-                        | STATIC FN '(' expr_func_list ')' ':' ID {/*! not supported */}
+anon_function_short_def:  FN '(' expr_func_list ')'                                                     {/*! not supported */}
+                        | FN '(' expr_func_list ')' ':' ID                                              {/*! not supported */}
+                        | STATIC FN '(' expr_func_list ')'                                              {/*! not supported */}
+                        | STATIC FN '(' expr_func_list ')' ':' ID                                       {/*! not supported */}
                         ;
 
-anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr
+anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr                              {/*! not supported */}
                         ;
 
 %%
