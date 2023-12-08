@@ -71,6 +71,6 @@
 
 #include "IfStmt/IfStmtNode.hpp"
 
-#include "Start/StartNode.cpp"
+#include "Start/StartNode.hpp"
 
 std::string GRAPH_STR("digraph Tree {\n");
