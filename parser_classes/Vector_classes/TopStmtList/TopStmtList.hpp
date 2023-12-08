@@ -9,6 +9,6 @@ public:
   int cur_id;
   std::vector<TopStmtNode*>* vector;
 
-  static TopStmtList* Create(std::vector<TopStmtNode*>* vector);
+  static TopStmtList* CreateNode(std::vector<TopStmtNode*>* vector);
   void Insert(TopStmtNode* element);
 };

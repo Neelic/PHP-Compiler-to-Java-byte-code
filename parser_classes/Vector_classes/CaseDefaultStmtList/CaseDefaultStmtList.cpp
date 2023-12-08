@@ -2,7 +2,7 @@
 
 int CaseDefaultStmtList::GLOBAL_ID = 0;
 
-CaseDefaultStmtList* CaseDefaultStmtList::Create(std::vector<CaseDefaultStmtNode *> *vector)
+CaseDefaultStmtList* CaseDefaultStmtList::CreateNode(std::vector<CaseDefaultStmtNode *> *vector)
 {
   CaseDefaultStmtList* tmp = new CaseDefaultStmtList();
   tmp->cur_id = CaseDefaultStmtList::GLOBAL_ID++;

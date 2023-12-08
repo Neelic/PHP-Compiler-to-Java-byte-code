@@ -1,7 +1,7 @@
 #include "ExprNode.hpp"
 
 int ExprNode::GLOBAL_ID = 0;
-std::string GRAPH_STR;
+extern std::string GRAPH_STR;
 
 ExprNode *ExprNode::CreateFromId(std::string *id)
 {

@@ -9,6 +9,6 @@ public:
   int cur_id;
   std::vector<ExprFuncNode*>* vector;
 
-  static ExprFuncList* Create(std::vector<ExprFuncNode*>* vector);
+  static ExprFuncList* CreateNode(std::vector<ExprFuncNode*>* vector);
   void Insert(ExprFuncNode* element);
 };

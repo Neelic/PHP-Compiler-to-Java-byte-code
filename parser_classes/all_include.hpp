@@ -73,4 +73,4 @@
 
 #include "Start/StartNode.cpp"
 
-extern std::string GRAPH_STR("digraph Tree {\n");
+std::string GRAPH_STR("digraph Tree {\n");

@@ -1,6 +1,6 @@
 #include "TraitStmtDeclNode.hpp"
 
-TraitStmtDeclNode* TraitStmtDeclNode::Create(std::string* id, ClassStmtList* stmt_list)
+TraitStmtDeclNode* TraitStmtDeclNode::CreateNode(std::string* id, ClassStmtList* stmt_list)
 {
     TraitStmtDeclNode* tmp = new TraitStmtDeclNode();
     tmp->id = id;

@@ -2,7 +2,7 @@
 
 int GetValueFuncList::GLOBAL_ID = 0;
 
-GetValueFuncList* GetValueFuncList::Create(std::vector<GetValueFuncNode*>* vector)
+GetValueFuncList* GetValueFuncList::CreateNode(std::vector<GetValueFuncNode*>* vector)
 {
   GetValueFuncList* tmp = new GetValueFuncList();
   tmp->cur_id = GetValueFuncList::GLOBAL_ID++;

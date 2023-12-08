@@ -9,6 +9,6 @@ public:
   int cur_id;
   std::vector<ConstDeclNode*>* vector;
 
-  static ConstDeclList* Create(std::vector<ConstDeclNode*>* vector);
+  static ConstDeclList* CreateNode(std::vector<ConstDeclNode*>* vector);
   void Insert(ConstDeclNode* element);
 };

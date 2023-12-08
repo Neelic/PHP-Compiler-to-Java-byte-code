@@ -9,6 +9,6 @@ public:
   int cur_id;
   std::vector<GetValueFuncNode*>* vector;
 
-  static GetValueFuncList* Create(std::vector<GetValueFuncNode*>* vector);
+  static GetValueFuncList* CreateNode(std::vector<GetValueFuncNode*>* vector);
   void Insert(GetValueFuncNode* element);
 };

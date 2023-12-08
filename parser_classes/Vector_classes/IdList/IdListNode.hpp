@@ -8,6 +8,6 @@ public:
   int cur_id;
   std::vector<std::string*>* vector;
 
-  static IdListNode* Create(std::vector<std::string*>* vector);
+  static IdListNode* CreateNode(std::vector<std::string*>* vector);
   void Insert(std::string* element);
 };

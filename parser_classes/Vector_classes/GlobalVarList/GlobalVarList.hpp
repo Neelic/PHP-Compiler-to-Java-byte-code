@@ -9,6 +9,6 @@ public:
   int cur_id;
   std::vector<GlobalVarNode*>* vector;
 
-  static GlobalVarList* Create(std::vector<GlobalVarNode*>* vector);
+  static GlobalVarList* CreateNode(std::vector<GlobalVarNode*>* vector);
   void Insert(GlobalVarNode* element);
 };

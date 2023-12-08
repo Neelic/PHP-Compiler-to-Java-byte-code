@@ -2,7 +2,7 @@
 
 int ClassAccessModList::GLOBAL_ID = 0;
 
-ClassAccessModList* ClassAccessModList::Create(std::vector<ClassAccessModNode*>* vector)
+ClassAccessModList* ClassAccessModList::CreateNode(std::vector<ClassAccessModNode*>* vector)
 {
   ClassAccessModList* tmp = new ClassAccessModList();
   tmp->cur_id = ClassAccessModList::GLOBAL_ID++;

@@ -2,7 +2,7 @@
 
 int ClassStmtList::GLOBAL_ID = 0;
 
-ClassStmtList* ClassStmtList::Create(std::vector<ClassStmtNode*>* vector)
+ClassStmtList* ClassStmtList::CreateNode(std::vector<ClassStmtNode*>* vector)
 {
   ClassStmtList* tmp = new ClassStmtList();
   tmp->cur_id = ClassStmtList::GLOBAL_ID++;

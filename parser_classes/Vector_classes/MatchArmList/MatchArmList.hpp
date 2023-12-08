@@ -9,6 +9,6 @@ public:
   int cur_id;
   std::vector<MatchArmNode*>* vector;
 
-  static MatchArmList* Create(std::vector<MatchArmNode*>* vector);
+  static MatchArmList* CreateNode(std::vector<MatchArmNode*>* vector);
   void Insert(MatchArmNode* element);
 };

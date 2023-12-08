@@ -9,6 +9,6 @@ public:
   int cur_id;
   std::vector<InterfaceStmtNode*>* vector;
 
-  static InterfaceStmtList* Create(std::vector<InterfaceStmtNode*>* vector);
+  static InterfaceStmtList* CreateNode(std::vector<InterfaceStmtNode*>* vector);
   void Insert(InterfaceStmtNode* element);
 };

@@ -2,7 +2,7 @@
 
 int IdListNode::GLOBAL_ID = 0;
 
-IdListNode* IdListNode::Create(std::vector<std::string*>* vector)
+IdListNode* IdListNode::CreateNode(std::vector<std::string*>* vector)
 {
   IdListNode* tmp = new IdListNode();
   tmp->cur_id = IdListNode::GLOBAL_ID++;

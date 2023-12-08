@@ -2,7 +2,7 @@
 
 int GlobalVarList::GLOBAL_ID = 0;
 
-GlobalVarList* GlobalVarList::Create(std::vector<GlobalVarNode*>* vector)
+GlobalVarList* GlobalVarList::CreateNode(std::vector<GlobalVarNode*>* vector)
 {
   GlobalVarList* tmp = new GlobalVarList();
   tmp->cur_id = GlobalVarList::GLOBAL_ID++;

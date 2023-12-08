@@ -2,7 +2,7 @@
 
 int ExprFuncList::GLOBAL_ID = 0;
 
-ExprFuncList* ExprFuncList::Create(std::vector<ExprFuncNode*>* vector)
+ExprFuncList* ExprFuncList::CreateNode(std::vector<ExprFuncNode*>* vector)
 {
   ExprFuncList* tmp = new ExprFuncList();
   tmp->cur_id = ExprFuncList::GLOBAL_ID++;

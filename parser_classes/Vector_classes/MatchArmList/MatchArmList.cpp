@@ -2,7 +2,7 @@
 
 int MatchArmList::GLOBAL_ID = 0;
 
-MatchArmList* MatchArmList::Create(std::vector<MatchArmNode*>* vector)
+MatchArmList* MatchArmList::CreateNode(std::vector<MatchArmNode*>* vector)
 {
   MatchArmList* tmp = new MatchArmList();
   tmp->cur_id = MatchArmList::GLOBAL_ID++;

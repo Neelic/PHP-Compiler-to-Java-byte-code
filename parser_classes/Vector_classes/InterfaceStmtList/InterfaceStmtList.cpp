@@ -2,7 +2,7 @@
 
 int InterfaceStmtList::GLOBAL_ID = 0;
 
-InterfaceStmtList* InterfaceStmtList::Create(std::vector<InterfaceStmtNode*>* vector)
+InterfaceStmtList* InterfaceStmtList::CreateNode(std::vector<InterfaceStmtNode*>* vector)
 {
   InterfaceStmtList* tmp = new InterfaceStmtList();
   tmp->cur_id = InterfaceStmtList::GLOBAL_ID++;

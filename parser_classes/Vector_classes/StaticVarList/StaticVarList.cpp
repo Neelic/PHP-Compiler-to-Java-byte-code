@@ -2,7 +2,7 @@
 
 int StaticVarList::GLOBAL_ID = 0;
 
-StaticVarList* StaticVarList::Create(std::vector<StaticVarNode*>* vector)
+StaticVarList* StaticVarList::CreateNode(std::vector<StaticVarNode*>* vector)
 {
   StaticVarList* tmp = new StaticVarList();
   tmp->cur_id = StaticVarList::GLOBAL_ID++;

@@ -1,6 +1,6 @@
 #include "GetValueNode.hpp"
 
-GetValueNode *GetValueNode::Create()
+GetValueNode *GetValueNode::CreateNode()
 {
     return new GetValueNode();
 }

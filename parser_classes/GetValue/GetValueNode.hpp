@@ -3,5 +3,5 @@ class GetValueNode
 public:
     int count = 1;
 
-    static GetValueNode* Create();
+    static GetValueNode* CreateNode();
 };

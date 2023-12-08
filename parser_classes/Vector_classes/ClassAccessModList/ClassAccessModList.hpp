@@ -9,6 +9,6 @@ public:
   int cur_id;
   std::vector<ClassAccessModNode*>* vector;
 
-  static ClassAccessModList* Create(std::vector<ClassAccessModNode*>* vector);
+  static ClassAccessModList* CreateNode(std::vector<ClassAccessModNode*>* vector);
   void Insert(ClassAccessModNode* element);
 };
