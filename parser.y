@@ -32,7 +32,8 @@ class MatchStmtNode;
 class MatchArmNode;
 class HtmlStmtNode;
 class ClassDefNode;
-class ClassAccessMode;
+enum ClassAccessMod;
+class ClassAccessModNode;
 class ClassStmtNode;
 class ClassExprNode;
 class InterfaceExprDefNode;
@@ -91,7 +92,7 @@ class StmtList;
         ConstDeclList* const_decl_list_union;
         ClassDefNode* class_def_union;
         ClassStmtList* class_stmt_list_union;
-        ClassAccessMod class_access_mod_union;
+        ClassAccessModNode* class_access_mod_union;
         ClassAccessModList* class_access_mod_list_union;
         ClassStmtNode* class_stmt_union;
         ClassExprNode* class_expr_union;
@@ -481,16 +482,16 @@ class_stmt_list: class_stmt_list_not_e                               {$$=$1;}
                 | /* empty */                                        {}
                 ;
 
-class_access_mod: PUBLIC                                             {$$=ClassAccessMod::public_node;}
-                | PROTECTED                                          {$$=ClassAccessMod::private_node;}
-                | PRIVATE                                            {$$=ClassAccessMod::protected_node;}
-                | FINAL                                              {$$=ClassAccessMod::final_node;}
-                | ABSTRACT                                           {$$=ClassAccessMod::abstract_node;}
-                | READ_ONLY                                          {$$=ClassAccessMod::read_only_node;}
-                | STATIC                                             {$$=ClassAccessMod::static_node;}
+class_access_mod: PUBLIC                                             {$$=ClassAccessModNode::Create(ClassAccessMod::public_node);}
+                | PROTECTED                                          {$$=ClassAccessModNode::Create(ClassAccessMod::private_node);}
+                | PRIVATE                                            {$$=ClassAccessModNode::Create(ClassAccessMod::protected_node);}
+                | FINAL                                              {$$=ClassAccessModNode::Create(ClassAccessMod::final_node);}
+                | ABSTRACT                                           {$$=ClassAccessModNode::Create(ClassAccessMod::abstract_node);}
+                | READ_ONLY                                          {$$=ClassAccessModNode::Create(ClassAccessMod::read_only_node);}
+                | STATIC                                             {$$=ClassAccessModNode::Create(ClassAccessMod::static_node);}
                 ;
 
-class_access_mod_list:    class_access_mod                           {vector<ClassAccessMod*>tmp;tmp.push_back($1);$$=ClassAccessModList::Create(&tmp);}
+class_access_mod_list:    class_access_mod                           {vector<ClassAccessModNode*>tmp;tmp.push_back($1);$$=ClassAccessModList::Create(&tmp);}
                         | class_access_mod_list class_access_mod     {$1->Insert($2);$$=$1;}
                         ;
 
