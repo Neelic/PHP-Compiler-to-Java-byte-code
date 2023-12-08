@@ -1,4 +1,10 @@
 #include "ClassExprType.cpp"
+#include <string>
+
+class ClassAccessModList;
+class GetValueNode;
+class ExprNode;
+class ConstDeclList;
 
 class ClassExprNode
 {

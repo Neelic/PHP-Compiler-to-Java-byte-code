@@ -1,4 +1,7 @@
+#include <string>
 #include "FunctionDefType.cpp"
+
+class ExprFuncList;
 
 class FunctionDefNode
 {

@@ -1,3 +1,6 @@
+class ExprNode;
+class MatchArmList;
+
 class MatchStmtNode
 {
 public:

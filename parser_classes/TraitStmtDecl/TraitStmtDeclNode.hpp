@@ -1,3 +1,7 @@
+#include <string>
+
+class ClassStmtList;
+
 class TraitStmtDeclNode
 {
 public:

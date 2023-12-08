@@ -25,7 +25,7 @@ GetValueFuncNode* GetValueFuncNode::CreateFromRefValueWithType(std::string* id_v
     return tmp;
 }
 
-GetValueFuncNode* GetValueFuncNode::CreateFromRefValueWithType(std::string* id_value, std::string* id_type)
+GetValueFuncNode *GetValueFuncNode::CreateFromGetValueWithType(std::string *id_value, std::string *id_type)
 {
     GetValueFuncNode* tmp = new GetValueFuncNode();
     tmp->id_value = id_value;

@@ -7,7 +7,7 @@ ClassExprNode* ClassExprNode::CreateFromGetValueAssign(ClassAccessModList* acces
     tmp->get_value = get_value;
     tmp->id = id;
     tmp->expr = expr;
-    tmp->type = ClassExprType::get_value_assign_type;
+    tmp->type = ClassExprType::get_value_assign_class_type;
     return tmp;
 }
 
@@ -17,7 +17,7 @@ ClassExprNode* ClassExprNode::CreateFromGetValue(ClassAccessModList* access_mod_
     tmp->access_mod_list = access_mod_list;
     tmp->get_value = get_value;
     tmp->id = id;
-    tmp->type = ClassExprType::get_value_type;
+    tmp->type = ClassExprType::get_value_class_type;
     return tmp;
 }
 
@@ -26,6 +26,6 @@ ClassExprNode* ClassExprNode::CreateFromConstant(ClassAccessModList* access_mod_
     ClassExprNode* tmp = new ClassExprNode();
     tmp->access_mod_list = access_mod_list;
     tmp->const_decl_list = const_decl_list;
-    tmp->type = ClassExprType::const_type;
+    tmp->type = ClassExprType::const_class_type;
     return tmp;
 }

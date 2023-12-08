@@ -1,4 +1,7 @@
+#include <string>
 #include "InterfaceExprDefType.cpp"
+
+class IdListNode;
 
 class InterfaceExprDefNode
 {

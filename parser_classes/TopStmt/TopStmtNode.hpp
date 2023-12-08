@@ -1,5 +1,11 @@
 #include "TopStmtType.cpp"
 
+class StmtNode;
+class FunctionStmtDeclNode;
+class ClassStmtDeclNode;
+class InterfaceStmtDeclNode;
+class TraitStmtDeclNode;
+
 class TopStmtNode
 {
 public:

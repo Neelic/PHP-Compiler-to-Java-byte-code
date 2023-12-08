@@ -1,5 +1,8 @@
 #include "ExprFuncType.cpp"
 
+class GetValueFuncNode;
+class ExprNode;
+
 class ExprFuncNode
 {
 public:

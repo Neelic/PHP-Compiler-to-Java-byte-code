@@ -1,3 +1,6 @@
+class ClassAccessModList;
+class FunctionDefNode;
+
 class InterfaceStmtNode
 {
 public:

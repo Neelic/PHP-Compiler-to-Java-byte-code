@@ -1,5 +1,8 @@
 #include "MatchArmType.cpp"
 
+class ExprList;
+class ExprNode;
+
 class MatchArmNode
 {
 public:

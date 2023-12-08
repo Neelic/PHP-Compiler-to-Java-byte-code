@@ -1,3 +1,6 @@
+class FunctionDefNode;
+class StmtList;
+
 class FunctionStmtDeclNode
 {
 public:

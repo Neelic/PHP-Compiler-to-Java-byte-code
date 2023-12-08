@@ -1,5 +1,11 @@
 #include "ClassStmtType.cpp"
 
+class ClassExprNode;
+class ClassAccessModList;
+class FunctionStmtDeclNode;
+class IdListNode;
+class ClassStmtDeclNode;
+
 class ClassStmtNode
 {
 public:

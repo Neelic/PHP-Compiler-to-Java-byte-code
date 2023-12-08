@@ -1,4 +1,7 @@
+#include <string>
 #include "StaticVarType.cpp"
+
+class ExprNode;
 
 class StaticVarNode
 {

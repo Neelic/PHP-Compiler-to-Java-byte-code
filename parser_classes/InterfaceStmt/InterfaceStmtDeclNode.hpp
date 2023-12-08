@@ -1,3 +1,6 @@
+class InterfaceExprDefNode;
+class InterfaceStmtList;
+
 class InterfaceStmtDeclNode
 {
 public:

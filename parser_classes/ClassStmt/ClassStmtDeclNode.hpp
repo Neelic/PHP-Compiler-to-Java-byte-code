@@ -1,6 +1,7 @@
 #include "ClassStmtDeclType.cpp"
 
 class ClassStmtList;
+class ClassDefNode;
 
 class ClassStmtDeclNode
 {

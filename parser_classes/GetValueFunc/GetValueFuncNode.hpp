@@ -1,3 +1,4 @@
+#include <string>
 #include "GetValueFuncType.cpp"
 
 class GetValueFuncNode
