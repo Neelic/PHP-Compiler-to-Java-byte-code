@@ -19,16 +19,16 @@ IfStmtNode* IfStmtNode::CreateFromIfElseStmt(ExprNode* expr, StmtNode* stmt_main
     return tmp;
 }
 
-IfStmtNode* IfStmtNode::CreateFromIfEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmtList)
+IfStmtNode* IfStmtNode::CreateFromIfEndIfStmt(ExprNode* expr, StmtList* stmtList)
 {
     IfStmtNode* tmp = new IfStmtNode();
     tmp->expr = expr;
-    tmp->stmtList = stmtList;
+    tmp->stmtListMain = stmtList;
     tmp->type = IfStmtType::end_if;
     return tmp;
 }
 
-IfStmtNode* IfStmtNode::CreateFromIfElseEndIfStmt(ExprNode* expr, std::vector<StmtNode*>* stmtListMain, std::vector<StmtNode*>* stmtListElse)
+IfStmtNode* IfStmtNode::CreateFromIfElseEndIfStmt(ExprNode* expr, StmtList* stmtListMain, StmtList* stmtListElse)
 {
     IfStmtNode* tmp = new IfStmtNode();
     tmp->expr = expr;

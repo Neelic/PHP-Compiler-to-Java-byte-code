@@ -3,11 +3,11 @@
 class MatchArmNode
 {
 public:
-    std::vector<ExprNode*>* exprList;
+    ExprList* exprList;
     ExprNode* expr;
     MatchArmType type;
 
-    static MatchArmNode* CreateFromMatchArmStmt(std::vector<ExprNode*>* exprList, ExprNode* expr);
+    static MatchArmNode* CreateFromMatchArmStmt(ExprList* exprList, ExprNode* expr);
     static MatchArmNode* CreateFromDefaultArmStmt(ExprNode* expr);
     static MatchArmNode* CreateFromDefaultArmWithCommaStmt(ExprNode* expr);
 };

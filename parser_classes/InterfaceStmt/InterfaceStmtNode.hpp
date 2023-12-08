@@ -1,8 +1,8 @@
 class InterfaceStmtNode
 {
-private:
-    /* data */
 public:
-    InterfaceStmtNode(/* args */);
-    ~InterfaceStmtNode();
+    ClassAccessModList* access_mod;
+    FunctionDefNode* function_def;
+
+    static InterfaceStmtNode* Create(ClassAccessModList* access_mod, FunctionDefNode* function_def);
 };

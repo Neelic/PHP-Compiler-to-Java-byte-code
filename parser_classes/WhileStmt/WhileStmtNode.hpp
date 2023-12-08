@@ -2,15 +2,16 @@
 
 class ExprNode;
 class StmtNode;
+class StmtList;
 
 class WhileStmtNode
 {
 public:
     ExprNode* expr;
     StmtNode* stmt;
-    std::vector<StmtNode*>* stmtList;
+    StmtList* stmtList;
     WhileStmtType type;
 
     static WhileStmtNode* CreateFromWhileStmt(ExprNode* expr, StmtNode* stmt);
-    static WhileStmtNode* CreateFromEndWhileStmt(ExprNode* expr, std::vector<StmtNode*>* stmtList);
+    static WhileStmtNode* CreateFromEndWhileStmt(ExprNode* expr, StmtList* stmtList);
 };

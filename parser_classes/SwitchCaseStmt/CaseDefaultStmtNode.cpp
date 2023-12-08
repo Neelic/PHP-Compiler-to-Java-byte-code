@@ -1,6 +1,6 @@
 #include "CaseDefaultStmtNode.hpp"
 
-CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromCaseStmt(ExprNode* expr, std::vector<StmtNode*>* stmtList)
+CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromCaseStmt(ExprNode* expr, StmtList* stmtList)
 {
     CaseDefaultStmtNode* tmp = new CaseDefaultStmtNode();
     tmp->expr = expr;
@@ -9,7 +9,7 @@ CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromCaseStmt(ExprNode* expr, std
     return tmp;
 }
 
-CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromDefaultStmt(std::vector<StmtNode*>* stmtList)
+CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromDefaultStmt(StmtList* stmtList)
 {
     CaseDefaultStmtNode* tmp = new CaseDefaultStmtNode();
     tmp->stmtList = stmtList;
@@ -17,7 +17,7 @@ CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromDefaultStmt(std::vector<Stmt
     return tmp;
 }
 
-CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromFinallyStmt(std::vector<StmtNode*>* stmtList)
+CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromFinallyStmt(StmtList* stmtList)
 {
     CaseDefaultStmtNode* tmp = new CaseDefaultStmtNode();
     tmp->stmtList = stmtList;

@@ -24,7 +24,7 @@ StmtNode* StmtNode::CreateFromSwitchStmt(SwitchStmtNode* switch_stmt)
     return tmp;
 }
 
-StmtNode* StmtNode::CreateFromStmtList(std::vector<StmtNode*>* stmtList)
+StmtNode* StmtNode::CreateFromStmtList(StmtList* stmtList)
 {
     StmtNode* tmp = new StmtNode();
     tmp->stmtList = stmtList;
@@ -32,7 +32,7 @@ StmtNode* StmtNode::CreateFromStmtList(std::vector<StmtNode*>* stmtList)
     return tmp;
 }
 
-StmtNode* StmtNode::CreateFromStaticVar(StaticVarNode* static_var)
+StmtNode* StmtNode::CreateFromStaticVar(StaticVarList* static_var)
 {
     StmtNode* tmp = new StmtNode();
     tmp->static_var = static_var;
@@ -40,7 +40,7 @@ StmtNode* StmtNode::CreateFromStaticVar(StaticVarNode* static_var)
     return tmp;
 }
 
-StmtNode* StmtNode::CreateFromGlobalVar(GlobalVarNode* global_var)
+StmtNode* StmtNode::CreateFromGlobalVar(GlobalVarList* global_var)
 {
     StmtNode* tmp = new StmtNode();
     tmp->global_var = global_var;
@@ -104,7 +104,7 @@ StmtNode* StmtNode::CreateFromMatchStmt(MatchStmtNode* match_stmt)
     return tmp;
 }
 
-StmtNode* StmtNode::CreateFromConstDecl(ConstDeclNode* const_decl)
+StmtNode* StmtNode::CreateFromConstDecl(ConstDeclList* const_decl)
 {
     StmtNode* tmp = new StmtNode();
     tmp->const_decl = const_decl;
@@ -149,6 +149,21 @@ StmtNode* StmtNode::CreateFromBreakStmt()
 {
     StmtNode* tmp = new StmtNode();
     tmp->type = StmtType::break_stmt;
+    return tmp;
+}
+
+StmtNode* StmtNode::CreateFromTEchoStmt(ExprNode* expr_left)
+{
+    StmtNode* tmp = new StmtNode();
+    tmp->expr_left = expr_left;
+    tmp->type = StmtType::t_echo_stmt;
+    return tmp;
+}
+
+StmtNode* StmtNode::CreateFromContinueStmt()
+{
+    StmtNode* tmp = new StmtNode();
+    tmp->type = StmtType::continue_stmt;
     return tmp;
 }
 

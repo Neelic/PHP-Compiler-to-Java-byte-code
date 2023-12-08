@@ -9,7 +9,7 @@ WhileStmtNode* WhileStmtNode::CreateFromWhileStmt(ExprNode* expr, StmtNode* stmt
     return tmp;
 }
 
-WhileStmtNode* WhileStmtNode::CreateFromEndWhileStmt(ExprNode* expr, std::vector<StmtNode*>* stmtList)
+WhileStmtNode* WhileStmtNode::CreateFromEndWhileStmt(ExprNode* expr, StmtList* stmtList)
 {
     WhileStmtNode* tmp = new WhileStmtNode();
     tmp->expr = expr;

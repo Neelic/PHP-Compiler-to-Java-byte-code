@@ -1,6 +1,6 @@
 #include "MatchArmNode.hpp"
 
-MatchArmNode* MatchArmNode::CreateFromMatchArmStmt(std::vector<ExprNode*>* exprList, ExprNode* expr)
+MatchArmNode* MatchArmNode::CreateFromMatchArmStmt(ExprList* exprList, ExprNode* expr)
 {
     MatchArmNode* tmp = new MatchArmNode();
     tmp->exprList = exprList;

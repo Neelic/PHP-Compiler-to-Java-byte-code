@@ -11,7 +11,7 @@ ForStmtNode* ForStmtNode::CreateFromForStmt(ExprNode* expr_left, ExprNode* expr_
     return tmp;
 }
 
-ForStmtNode* ForStmtNode::CreateFromForEndStmt(ExprNode* expr_left, ExprNode* expr_central, ExprNode* expr_right, std::vector<StmtNode*>* stmtList)
+ForStmtNode* ForStmtNode::CreateFromForEndStmt(ExprNode* expr_left, ExprNode* expr_central, ExprNode* expr_right, StmtList* stmtList)
 {
     ForStmtNode* tmp = new ForStmtNode();
     tmp->expr_left = expr_left;
