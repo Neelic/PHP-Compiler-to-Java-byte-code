@@ -342,8 +342,8 @@ int main(int argc, char *argv[]) {
 
   yyin = file;
 
-  while (yylex() != 0);
-  /* yyparse(); */
+  /* while (yylex() != 0); */
+  yyparse();
 
   fclose(file);
 
