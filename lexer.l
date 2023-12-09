@@ -51,7 +51,8 @@ SPACE [\t\r\t\f\v ]
     return tmp;
   }
 
-  BEGIN(NOT_IN_PHP_CODE);
+  if (!inCode)
+    BEGIN(NOT_IN_PHP_CODE);
 %}
 
 const		          {printf("Found keyword: %s\n", yytext); return CONST;}
@@ -194,8 +195,8 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                       printf("Found end php code section: %s\n", yytext); 
                       inCode = false; 
                       str = ""; 
-                      BEGIN(NOT_IN_PHP_CODE);
                       mis_symbols.push_back(END_CODE_PHP_TAG); /*! TODO Не факт, что работает */
+                      BEGIN(NOT_IN_PHP_CODE);
                       return ';';
                     }
 {IDENTIFIER}        { printf("Found identifier: %s\n", yytext);
@@ -217,7 +218,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 
 "`"                 {str = ""; BEGIN(EXECUTION_OPERATOR);}
 
-<<EOF>>             {printf("Found special character: ;\n"); return ';';}
+
 
 .                   {printf("Unknown character: %s\n", yytext);}
 
@@ -341,8 +342,8 @@ int main(int argc, char *argv[]) {
 
   yyin = file;
 
-  /* while (yylex() != 0); */
-  yyparse();
+  while (yylex() != 0);
+  /* yyparse(); */
 
   fclose(file);
 

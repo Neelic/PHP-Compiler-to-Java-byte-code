@@ -1,10 +1,4 @@
-class HtmlStmtNode
-{
-public:
-    std::string* html;
-
-    static HtmlStmtNode* CreateNode(std::string* html);
-};
+#include "HtmlStmtNode.hpp"
 
 HtmlStmtNode* HtmlStmtNode::CreateNode(std::string* html)
 {

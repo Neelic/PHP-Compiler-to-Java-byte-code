@@ -8,3 +8,4 @@ stack.hh
 parser.tab.h
 parser.tab.c
 .vscode
+graph.dot

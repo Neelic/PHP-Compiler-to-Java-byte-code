@@ -1,9 +1,10 @@
 %{
 #include <stdio.h>
-// #include "parser.tab.h"
+#include "parser.tab.h"
 
 void yyerror(char* str);
 extern int yylex(void);
+std::string GRAPH_STR("digraph Tree {\n");
 %}
 
 %code requires {

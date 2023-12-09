@@ -2,9 +2,9 @@
 #include <vector>
 
 #include "Vector_classes/ClassAccessModList/ClassAccessModList.hpp"
-#include "ClassAccessMod/ClassAccessModNode.cpp"
+#include "ClassAccessMod/ClassAccessModNode.hpp"
 
-#include "HtmlStmt/HtmlStmtNode.cpp"
+#include "HtmlStmt/HtmlStmtNode.hpp"
 
 #include "Vector_classes/IdList/IdListNode.hpp"
 
@@ -72,5 +72,3 @@
 #include "IfStmt/IfStmtNode.hpp"
 
 #include "Start/StartNode.hpp"
-
-std::string GRAPH_STR("digraph Tree {\n");

@@ -3,8 +3,7 @@
 #include "ExprType.cpp"
 // #include "../Vector classes/ExprList.hpp"
 
-// std::string GRAPH_STR;
-int GLOBAL_ID;
+extern std::string GRAPH_STR;
 
 class GetValueNode;
 class ExprList;
