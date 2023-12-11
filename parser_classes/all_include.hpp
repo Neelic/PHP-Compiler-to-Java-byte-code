@@ -72,3 +72,5 @@
 #include "IfStmt/IfStmtNode.hpp"
 
 #include "Start/StartNode.hpp"
+
+void printTreeGraph(StartNode* node);

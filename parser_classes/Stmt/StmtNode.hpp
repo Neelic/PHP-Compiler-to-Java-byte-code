@@ -40,6 +40,8 @@ public:
     ConstDeclList* const_decl;
     HtmlStmtNode* html_stmt;
     StmtType type;
+    int cur_id;
+    static int GLOBAL_ID;
 
     static StmtNode* CreateFromExpr(ExprNode* expr);
     static StmtNode* CreateFromIfStmt(IfStmtNode* if_stmt);
@@ -62,4 +64,6 @@ public:
     static StmtNode* CreateFromBreakStmt();
     static StmtNode* CreateFromTEchoStmt(ExprNode* expr_left);
     static StmtNode* CreateFromContinueStmt();
+
+    std::string IdTag();
 };

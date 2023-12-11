@@ -4,7 +4,6 @@
 
 void yyerror(char* str);
 extern int yylex(void);
-std::string GRAPH_STR("digraph Tree {\n");
 %}
 
 %code requires {
@@ -234,16 +233,16 @@ class StmtList;
 
 %%
 
-start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {$$=StartNode::CreateNode($2);}                     
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {$$=StartNode::CreateNode($2);}
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {$$=StartNode::CreateNode($2);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {$$=StartNode::CreateNode($3);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {$$=StartNode::CreateNode($3);}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {$$=StartNode::CreateNode($3);}
-        | START_CODE_PHP_TAG                                                          {}
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {}
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {}
-        | HTML                                                                        {}
+start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {StartNode*tmp=StartNode::CreateNode($2);printTreeGraph(tmp);$$=tmp;}                     
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {StartNode*tmp=StartNode::CreateNode($2);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {StartNode*tmp=StartNode::CreateNode($2);printTreeGraph(tmp);$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG                                                          {StartNode*tmp=StartNode::CreateNode(NULL);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {StartNode*tmp=StartNode::CreateNode(NULL);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {StartNode*tmp=StartNode::CreateNode(NULL);printTreeGraph(tmp);$$=tmp;}
+        | HTML                                                                        {StartNode*tmp=StartNode::CreateNode(NULL);printTreeGraph(tmp);$$=tmp;}
         ;
 
 top_stmt_list_not_e: top_stmt                                                         {vector<TopStmtNode*> tmp; tmp.push_back($1); $$=TopStmtList::CreateNode(&tmp);}                                                                                                           

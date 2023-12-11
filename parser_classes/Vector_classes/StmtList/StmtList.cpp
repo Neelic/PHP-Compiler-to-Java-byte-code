@@ -13,3 +13,8 @@ void StmtList::Insert(StmtNode* element)
 {
   this->vector->push_back(element);
 }
+
+std::string StmtList::IdTag()
+{
+  return std::string("StmtList") + std::to_string(this->cur_id);
+}

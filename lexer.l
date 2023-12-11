@@ -327,7 +327,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 
 %%
 
-/* std::string GRAPH_STR; */
+extern std::string GRAPH_STR;
 
 int main(int argc, char *argv[]) {
   FILE *file = NULL;

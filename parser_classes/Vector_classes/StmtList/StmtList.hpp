@@ -2,6 +2,10 @@
 
 class StmtNode;
 
+#ifndef STMT_LIST_H
+#define STMT_LIST_H
+#include <string>
+
 class StmtList
 {
 public:
@@ -11,4 +15,8 @@ public:
 
   static StmtList* CreateNode(std::vector<StmtNode*>* vector);
   void Insert(StmtNode* element);
+
+  std::string IdTag();
 };
+
+#endif
