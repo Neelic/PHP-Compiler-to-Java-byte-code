@@ -371,6 +371,7 @@ stmt_list_may_empty: stmt_list                                                  
                 ;
 
 html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG                  {$$=HtmlStmtNode::CreateNode($2);}
+        |  END_CODE_PHP_TAG START_CODE_PHP_TAG                       {}
         ;
 
 expr:     INT_NUMBER                                                 {$$=ExprNode::CreateFromIntValue($1);}
