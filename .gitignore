@@ -7,5 +7,4 @@ parser.tab.hh
 stack.hh
 parser.tab.h
 parser.tab.c
-.vscode
 graph.dot
