@@ -15,6 +15,8 @@ public:
     std::string* id;
     StmtList* stmtList;
     ForEachStmtType type;
+    int cur_id;
+    static int GLOBAL_ID;
 
     static ForEachStmtNode* CreateFromForeachStmt(ExprNode* expr_left, ExprNode* expr_right, StmtNode* stmt);
     static ForEachStmtNode* CreateFromForeachRightArrowStmt(ExprNode* expr_left, ExprNode* expr_right, std::string* id, StmtNode* stmt);
@@ -22,4 +24,6 @@ public:
     static ForEachStmtNode* CreateFromEndForeachStmt(ExprNode* expr_left, ExprNode* expr_right, StmtList* stmtList);
     static ForEachStmtNode* CreateFromEndForeachRightArrowStmt(ExprNode* expr_left, ExprNode* expr_right, std::string* id, StmtList* stmtList);
     static ForEachStmtNode* CreateFromEndForeachRightArrowPointerStmt(ExprNode* expr_left, ExprNode* expr_right, std::string* id, StmtList* stmtList);
+
+    std::string IdTag();
 };

@@ -1,10 +1,17 @@
 #include "ClassStmtNode.hpp"
 
+int ClassStmtNode::GLOBAL_ID = 0;
+
+std::string ClassStmtNode::IdTag() {
+    return std::string("ClassStmt") + std::to_string(this->cur_id);
+}
+
 ClassStmtNode* ClassStmtNode::CreateFromClassExpr(ClassExprNode* class_expr)
 {
     ClassStmtNode* tmp = new ClassStmtNode();
     tmp->class_expr = class_expr;
     tmp->type = ClassStmtType::class_expr_stmt_type;
+    tmp->cur_id = ClassStmtNode::GLOBAL_ID++;
     return tmp;
 }
 
@@ -14,6 +21,7 @@ ClassStmtNode* ClassStmtNode::CreateFromFunctionStmtDecl(ClassAccessModList* acc
     tmp->access_mod = access_mod;
     tmp->function_stmt_decl = function_stmt_decl;
     tmp->type = ClassStmtType::function_decl_type;
+    tmp->cur_id = ClassStmtNode::GLOBAL_ID++;
     return tmp;
 }
 
@@ -22,6 +30,7 @@ ClassStmtNode* ClassStmtNode::CreateFromIdList(IdListNode* id_list)
     ClassStmtNode* tmp = new ClassStmtNode();
     tmp->id_list = id_list;
     tmp->type = ClassStmtType::id_list_type;
+    tmp->cur_id = ClassStmtNode::GLOBAL_ID++;
     return tmp;
 }
 
@@ -30,5 +39,6 @@ ClassStmtNode* ClassStmtNode::CreateFromClassStmtDecl(ClassStmtDeclNode* class_s
     ClassStmtNode* tmp = new ClassStmtNode();
     tmp->class_stmt_decl = class_stmt_decl;
     tmp->type = ClassStmtType::class_stmt_decl_type;
+    tmp->cur_id = ClassStmtNode::GLOBAL_ID++;
     return tmp;
 }
