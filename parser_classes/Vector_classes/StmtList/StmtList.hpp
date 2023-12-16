@@ -4,19 +4,18 @@ class StmtNode;
 
 #ifndef STMT_LIST_H
 #define STMT_LIST_H
+
 #include <string>
 
-class StmtList
-{
+class StmtList {
 public:
-  static int GLOBAL_ID;
-  int cur_id;
-  std::vector<StmtNode*>* vector;
+    static int GLOBAL_ID;
+    int cur_id;
+    std::vector<StmtNode *> vector;
 
-  static StmtList* CreateNode(std::vector<StmtNode*>* vector);
-  void Insert(StmtNode* element);
+    static StmtList *CreateNode(StmtNode *node);
 
-  std::string IdTag();
+    std::string IdTag() const;
 };
 
 #endif

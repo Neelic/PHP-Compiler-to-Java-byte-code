@@ -1,4 +1,8 @@
+#include <vector>
 #include "TryCatchStmtType.cpp"
+
+class TryStmtNode;
+class CatchStmtNode;
 
 class TryCatchStmtNode 
 {

@@ -2,13 +2,11 @@
 
 class ExprFuncNode;
 
-class ExprFuncList
-{
+class ExprFuncList {
 public:
-  static int GLOBAL_ID;
-  int cur_id;
-  std::vector<ExprFuncNode*>* vector;
+    static int GLOBAL_ID;
+    int cur_id;
+    std::vector<ExprFuncNode *> vector;
 
-  static ExprFuncList* CreateNode(std::vector<ExprFuncNode*>* vector);
-  void Insert(ExprFuncNode* element);
+    static ExprFuncList *CreateNode(ExprFuncNode *node);
 };

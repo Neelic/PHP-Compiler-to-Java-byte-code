@@ -7,8 +7,7 @@ class GlobalVarList
 public:
   static int GLOBAL_ID;
   int cur_id;
-  std::vector<GlobalVarNode*>* vector;
+  std::vector<GlobalVarNode*> vector;
 
-  static GlobalVarList* CreateNode(std::vector<GlobalVarNode*>* vector);
-  void Insert(GlobalVarNode* element);
+  static GlobalVarList *CreateNode(GlobalVarNode *node);
 };

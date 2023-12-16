@@ -1,0 +1,179 @@
+cmake_minimum_required(VERSION 3.27)
+project(PHP_Compiler)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(.)
+include_directories(parser_classes)
+include_directories(parser_classes/AnonFunctionDef)
+include_directories(parser_classes/ClassAccessMod)
+include_directories(parser_classes/ClassDef)
+include_directories(parser_classes/ClassStmt)
+include_directories(parser_classes/ConstDecl)
+include_directories(parser_classes/DoWhileStmt)
+include_directories(parser_classes/Expr)
+include_directories(parser_classes/ExprFunc)
+include_directories(parser_classes/ForEachStmt)
+include_directories(parser_classes/ForStmt)
+include_directories(parser_classes/FunctionDef)
+include_directories(parser_classes/FunctionStmtDecl)
+include_directories(parser_classes/GetValue)
+include_directories(parser_classes/GetValueFunc)
+include_directories(parser_classes/GlobalVar)
+include_directories(parser_classes/HtmlStmt)
+include_directories(parser_classes/IfStmt)
+include_directories(parser_classes/InterfaceExprDef)
+include_directories(parser_classes/InterfaceStmt)
+include_directories(parser_classes/MatchStmt)
+include_directories(parser_classes/Start)
+include_directories(parser_classes/StaticVar)
+include_directories(parser_classes/Stmt)
+include_directories(parser_classes/SwitchCaseStmt)
+include_directories(parser_classes/TopStmt)
+include_directories(parser_classes/TraitStmtDecl)
+include_directories(parser_classes/TryCatchStmt)
+include_directories(parser_classes/Vector_classes)
+include_directories(parser_classes/Vector_classes/CaseDefaultStmtList)
+include_directories(parser_classes/Vector_classes/ClassAccessModList)
+include_directories(parser_classes/Vector_classes/ClassStmtList)
+include_directories(parser_classes/Vector_classes/ConstDeclList)
+include_directories(parser_classes/Vector_classes/ExprFuncList)
+include_directories(parser_classes/Vector_classes/GetValueFuncList)
+include_directories(parser_classes/Vector_classes/GlobalVarList)
+include_directories(parser_classes/Vector_classes/IdList)
+include_directories(parser_classes/Vector_classes/InterfaceStmtList)
+include_directories(parser_classes/Vector_classes/MatchArmList)
+include_directories(parser_classes/Vector_classes/StaticVarList)
+include_directories(parser_classes/Vector_classes/StmtList)
+include_directories(parser_classes/Vector_classes/TopStmtList)
+include_directories(parser_classes/WhileStmt)
+
+add_executable(PHP_Compiler
+        parser_classes/AnonFunctionDef/AnonFunctionDefNode.cpp
+        parser_classes/AnonFunctionDef/AnonFunctionDefNode.hpp
+        parser_classes/AnonFunctionDef/AnonFunctionDefType.cpp
+        parser_classes/ClassAccessMod/ClassAccessMod.cpp
+        parser_classes/ClassAccessMod/ClassAccessModNode.cpp
+        parser_classes/ClassAccessMod/ClassAccessModNode.hpp
+        parser_classes/ClassDef/ClassDefNode.cpp
+        parser_classes/ClassDef/ClassDefNode.hpp
+        parser_classes/ClassDef/ClassDefType.cpp
+        parser_classes/ClassStmt/ClassExprNode.cpp
+        parser_classes/ClassStmt/ClassExprNode.hpp
+        parser_classes/ClassStmt/ClassExprType.cpp
+        parser_classes/ClassStmt/ClassStmtDeclNode.cpp
+        parser_classes/ClassStmt/ClassStmtDeclNode.hpp
+        parser_classes/ClassStmt/ClassStmtDeclType.cpp
+        parser_classes/ClassStmt/ClassStmtNode.cpp
+        parser_classes/ClassStmt/ClassStmtNode.hpp
+        parser_classes/ClassStmt/ClassStmtType.cpp
+        parser_classes/ConstDecl/ConstDeclNode.cpp
+        parser_classes/ConstDecl/ConstDeclNode.hpp
+        parser_classes/DoWhileStmt/DoWhileStmtNode.cpp
+        parser_classes/DoWhileStmt/DoWhileStmtNode.hpp
+        parser_classes/Expr/ExprNode.cpp
+        parser_classes/Expr/ExprNode.hpp
+        parser_classes/Expr/ExprType.cpp
+        parser_classes/ExprFunc/ExprFuncNode.cpp
+        parser_classes/ExprFunc/ExprFuncNode.hpp
+        parser_classes/ExprFunc/ExprFuncType.cpp
+        parser_classes/ForEachStmt/ForEachStmtNode.cpp
+        parser_classes/ForEachStmt/ForEachStmtNode.hpp
+        parser_classes/ForEachStmt/ForEachStmtType.cpp
+        parser_classes/ForStmt/ForStmtNode.cpp
+        parser_classes/ForStmt/ForStmtNode.hpp
+        parser_classes/ForStmt/ForStmtType.cpp
+        parser_classes/FunctionDef/FunctionDefNode.cpp
+        parser_classes/FunctionDef/FunctionDefNode.hpp
+        parser_classes/FunctionDef/FunctionDefType.cpp
+        parser_classes/FunctionStmtDecl/FunctionStmtDeclNode.cpp
+        parser_classes/FunctionStmtDecl/FunctionStmtDeclNode.hpp
+        parser_classes/GetValue/GetValueNode.cpp
+        parser_classes/GetValue/GetValueNode.hpp
+        parser_classes/GetValueFunc/GetValueFuncNode.cpp
+        parser_classes/GetValueFunc/GetValueFuncNode.hpp
+        parser_classes/GetValueFunc/GetValueFuncType.cpp
+        parser_classes/GlobalVar/GlobalVarNode.cpp
+        parser_classes/GlobalVar/GlobalVarNode.hpp
+        parser_classes/HtmlStmt/HtmlStmtNode.cpp
+        parser_classes/HtmlStmt/HtmlStmtNode.hpp
+        parser_classes/IfStmt/IfStmtNode.cpp
+        parser_classes/IfStmt/IfStmtNode.hpp
+        parser_classes/IfStmt/IfStmtType.cpp
+        parser_classes/InterfaceExprDef/InterfaceExprDefNode.cpp
+        parser_classes/InterfaceExprDef/InterfaceExprDefNode.hpp
+        parser_classes/InterfaceExprDef/InterfaceExprDefType.cpp
+        parser_classes/InterfaceStmt/InterfaceStmtDeclNode.cpp
+        parser_classes/InterfaceStmt/InterfaceStmtDeclNode.hpp
+        parser_classes/InterfaceStmt/InterfaceStmtNode.cpp
+        parser_classes/InterfaceStmt/InterfaceStmtNode.hpp
+        parser_classes/MatchStmt/MatchArmNode.cpp
+        parser_classes/MatchStmt/MatchArmNode.hpp
+        parser_classes/MatchStmt/MatchArmType.cpp
+        parser_classes/MatchStmt/MatchStmtNode.cpp
+        parser_classes/MatchStmt/MatchStmtNode.hpp
+        parser_classes/Start/StartNode.cpp
+        parser_classes/Start/StartNode.hpp
+        parser_classes/StaticVar/StaticVarNode.cpp
+        parser_classes/StaticVar/StaticVarNode.hpp
+        parser_classes/StaticVar/StaticVarType.cpp
+        parser_classes/Stmt/StmtNode.cpp
+        parser_classes/Stmt/StmtNode.hpp
+        parser_classes/Stmt/StmtType.cpp
+        parser_classes/SwitchCaseStmt/CaseDefaultStmtNode.cpp
+        parser_classes/SwitchCaseStmt/CaseDefaultStmtNode.hpp
+        parser_classes/SwitchCaseStmt/CaseDefaultType.cpp
+        parser_classes/SwitchCaseStmt/SwitchStmtNode.cpp
+        parser_classes/SwitchCaseStmt/SwitchStmtNode.hpp
+        parser_classes/SwitchCaseStmt/SwitchStmtType.cpp
+        parser_classes/TopStmt/TopStmtNode.cpp
+        parser_classes/TopStmt/TopStmtNode.hpp
+        parser_classes/TopStmt/TopStmtType.cpp
+        parser_classes/TraitStmtDecl/TraitStmtDeclNode.cpp
+        parser_classes/TraitStmtDecl/TraitStmtDeclNode.hpp
+        parser_classes/TryCatchStmt/CatchStmtNode.cpp
+        parser_classes/TryCatchStmt/CatchStmtNode.hpp
+        parser_classes/TryCatchStmt/CatchStmtType.cpp
+        parser_classes/TryCatchStmt/TryCatchStmtNode.cpp
+        parser_classes/TryCatchStmt/TryCatchStmtNode.hpp
+        parser_classes/TryCatchStmt/TryCatchStmtType.cpp
+        parser_classes/TryCatchStmt/TryStmtNode.cpp
+        parser_classes/TryCatchStmt/TryStmtNode.hpp
+        parser_classes/Vector_classes/CaseDefaultStmtList/CaseDefaultStmtList.cpp
+        parser_classes/Vector_classes/CaseDefaultStmtList/CaseDefaultStmtList.hpp
+        parser_classes/Vector_classes/ClassAccessModList/ClassAccessModList.cpp
+        parser_classes/Vector_classes/ClassAccessModList/ClassAccessModList.hpp
+        parser_classes/Vector_classes/ClassStmtList/ClassStmtList.cpp
+        parser_classes/Vector_classes/ClassStmtList/ClassStmtList.hpp
+        parser_classes/Vector_classes/ConstDeclList/ConstDeclList.cpp
+        parser_classes/Vector_classes/ConstDeclList/ConstDeclList.hpp
+        parser_classes/Vector_classes/ExprFuncList/ExprFuncList.cpp
+        parser_classes/Vector_classes/ExprFuncList/ExprFuncList.hpp
+        parser_classes/Vector_classes/GetValueFuncList/GetValueFuncList.cpp
+        parser_classes/Vector_classes/GetValueFuncList/GetValueFuncList.hpp
+        parser_classes/Vector_classes/GlobalVarList/GlobalVarList.cpp
+        parser_classes/Vector_classes/GlobalVarList/GlobalVarList.hpp
+        parser_classes/Vector_classes/IdList/IdListNode.cpp
+        parser_classes/Vector_classes/IdList/IdListNode.hpp
+        parser_classes/Vector_classes/InterfaceStmtList/InterfaceStmtList.cpp
+        parser_classes/Vector_classes/InterfaceStmtList/InterfaceStmtList.hpp
+        parser_classes/Vector_classes/MatchArmList/MatchArmList.cpp
+        parser_classes/Vector_classes/MatchArmList/MatchArmList.hpp
+        parser_classes/Vector_classes/StaticVarList/StaticVarList.cpp
+        parser_classes/Vector_classes/StaticVarList/StaticVarList.hpp
+        parser_classes/Vector_classes/StmtList/StmtList.cpp
+        parser_classes/Vector_classes/StmtList/StmtList.hpp
+        parser_classes/Vector_classes/TopStmtList/TopStmtList.cpp
+        parser_classes/Vector_classes/TopStmtList/TopStmtList.hpp
+        parser_classes/Vector_classes/ExprList.cpp
+        parser_classes/Vector_classes/ExprList.hpp
+        parser_classes/WhileStmt/WhileStmtNode.cpp
+        parser_classes/WhileStmt/WhileStmtNode.hpp
+        parser_classes/WhileStmt/WhileStmtType.cpp
+        parser_classes/all_include.cpp
+        parser_classes/all_include.hpp
+        FlexLexer.h
+        lex.yy.cpp
+        main.cpp
+        parser.tab.h
+        parser.tab.cpp)

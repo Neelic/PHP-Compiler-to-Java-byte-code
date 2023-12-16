@@ -1,3 +1,7 @@
+#include <vector>
+
+class StmtNode;
+
 class TryStmtNode
 {
 public:

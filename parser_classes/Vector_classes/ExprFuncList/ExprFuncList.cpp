@@ -2,14 +2,11 @@
 
 int ExprFuncList::GLOBAL_ID = 0;
 
-ExprFuncList* ExprFuncList::CreateNode(std::vector<ExprFuncNode*>* vector)
-{
-  ExprFuncList* tmp = new ExprFuncList();
-  tmp->cur_id = ExprFuncList::GLOBAL_ID++;
-  return tmp;
+ExprFuncList *ExprFuncList::CreateNode(ExprFuncNode *node) {
+    auto *tmp = new ExprFuncList();
+    if (node != nullptr)
+        tmp->vector.push_back(node);
+    tmp->cur_id = ExprFuncList::GLOBAL_ID++;
+    return tmp;
 }
 
-void ExprFuncList::Insert(ExprFuncNode* element)
-{
-  this->vector->push_back(element);
-}

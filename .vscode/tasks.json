@@ -7,8 +7,9 @@
       "args": [
         "-fdiagnostics-color=always",
         "-g",
-        "${workspaceFolder}\\lex.yy.cpp",
-        "${workspaceFolder}\\parser.tab.cpp",
+        "${workspaceFolder}\\main.cpp",
+        "${workspaceFolder}\\lex.yy.c",
+        "${workspaceFolder}\\parser.tab.c",
         "${workspaceFolder}\\parser_classes\\ClassAccessMod\\ClassAccessModNode.cpp",
         "${workspaceFolder}\\parser_classes\\ClassDef\\ClassDefNode.cpp",
         "${workspaceFolder}\\parser_classes\\ClassDef\\ClassDefType.cpp",

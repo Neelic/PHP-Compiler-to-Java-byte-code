@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include "parser.tab.h"
 
+#define YYDEBUG 1
+#ifdef YYDEBUG
+// extern int yydebug;
+// yydebug = 1;
+#endif
+
 void yyerror(char* str);
 extern int yylex(void);
 %}
@@ -239,14 +245,14 @@ start:    START_CODE_PHP_TAG top_stmt_list_not_e                                
         | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
         | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
         | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG                                                          {StartNode*tmp=StartNode::CreateNode(NULL);printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {StartNode*tmp=StartNode::CreateNode(NULL);printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {StartNode*tmp=StartNode::CreateNode(NULL);printTreeGraph(tmp);$$=tmp;}
-        | HTML                                                                        {StartNode*tmp=StartNode::CreateNode(NULL);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG                                                          {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
+        | HTML                                                                        {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
         ;
 
-top_stmt_list_not_e: top_stmt                                                         {vector<TopStmtNode*> tmp; tmp.push_back($1); $$=TopStmtList::CreateNode(&tmp);}                                                                                                           
-                |    top_stmt_list_not_e top_stmt                                     {$1->Insert($2);$$=$1;}
+top_stmt_list_not_e: top_stmt                                                         {$$=TopStmtList::CreateNode($1);}                                                                                                           
+                |    top_stmt_list_not_e top_stmt                                     {$1->vector.push_back($2);$$=$1;}
                 ;
 
 top_stmt: stmt                                                                        {$$=TopStmtNode::CreateFromStmt($1);}
@@ -271,8 +277,8 @@ switch_stmt: SWITCH '(' expr ')' '{' '}'                                        
         |    SWITCH '(' expr ')' ':' case_default_stmt_list END_SWITCH ';'            {$$=SwitchStmtNode::CreateFromSwitchDefaultEndswitchStmt($3, $6);}
         ;
 
-case_default_stmt_list: case_default_stmt                                             {vector<CaseDefaultStmtNode*>tmp;tmp.push_back($1);$$=CaseDefaultStmtList::CreateNode(&tmp);}                          
-                |       case_default_stmt_list case_default_stmt                      {$1->Insert($2);$$=$1;}
+case_default_stmt_list: case_default_stmt                                             {$$=CaseDefaultStmtList::CreateNode($1);}                          
+                |       case_default_stmt_list case_default_stmt                      {$1->vector.push_back($2);$$=$1;}
                 ;
 
 case_default_stmt: CASE expr ':' stmt_list_may_empty                                  {$$=CaseDefaultStmtNode::CreateFromCaseStmt($2, $4);}
@@ -306,8 +312,8 @@ match_stmt_list:  match_stmt_list_not_e                                         
                 | /* empty */                                                         {}
                 ;
 
-match_stmt_list_not_e:    match_arm                                                   {vector<MatchArmNode*>tmp;tmp.push_back($1);$$=MatchArmList::CreateNode(&tmp);}
-                        | match_stmt_list_not_e ',' match_arm                         {$1->Insert($3);$$=$1;}
+match_stmt_list_not_e:    match_arm                                                   {$$=MatchArmList::CreateNode($1);}
+                        | match_stmt_list_not_e ',' match_arm                         {$1->vector.push_back($3);$$=$1;}
                         ;
 
 match_arm: expr_list_not_e R_DOUBLE_ARROW expr                                        {$$=MatchArmNode::CreateFromMatchArmStmt($1, $3);}
@@ -351,18 +357,18 @@ stmt:     expr_may_empty ';'                                                    
         | CONTINUE ';'                                                                {$$=StmtNode::CreateFromContinueStmt();}
         ;
 
-static_var_list:  '$' ID                                                              {vector<StaticVarNode*>tmp; tmp.push_back(StaticVarNode::CreateFromId($2)); $$=StaticVarList::CreateNode(&tmp);}
-                | '$' ID '=' expr                                                     {vector<StaticVarNode*>tmp; tmp.push_back(StaticVarNode::CreateFromIdAssign($2, $4)); $$=StaticVarList::CreateNode(&tmp);}
-                | static_var_list ',' '$' ID                                          {$1->Insert(StaticVarNode::CreateFromId($4));$$=$1;}
-                | static_var_list ',' '$' ID '=' expr                                 {$1->Insert(StaticVarNode::CreateFromIdAssign($4, $6));$$=$1;}
+static_var_list:  '$' ID                                                              {$$=StaticVarList::CreateNode(StaticVarNode::CreateFromId($2));}
+                | '$' ID '=' expr                                                     {$$=StaticVarList::CreateNode(StaticVarNode::CreateFromIdAssign($2, $4));}
+                | static_var_list ',' '$' ID                                          {$1->vector.push_back(StaticVarNode::CreateFromId($4));$$=$1;}
+                | static_var_list ',' '$' ID '=' expr                                 {$1->vector.push_back(StaticVarNode::CreateFromIdAssign($4, $6));$$=$1;}
                 ;
 
-global_var_list:  get_value ID                                                        {vector<GlobalVarNode*>tmp; tmp.push_back(GlobalVarNode::CreateFromGlobalValue($1, $2)); $$=GlobalVarList::CreateNode(&tmp);}
-                | global_var_list ',' get_value ID                                    {$1->Insert(GlobalVarNode::CreateFromGlobalValue($3, $4));$$=$1;}                    
+global_var_list:  get_value ID                                                        {$$=GlobalVarList::CreateNode(GlobalVarNode::CreateFromGlobalValue($1, $2));}
+                | global_var_list ',' get_value ID                                    {$1->vector.push_back(GlobalVarNode::CreateFromGlobalValue($3, $4));$$=$1;}                    
                 ;
 
-stmt_list: stmt                                                                       {vector<StmtNode*>tmp;tmp.push_back($1);$$=StmtList::CreateNode(&tmp);}
-	|  stmt_list stmt                                                             {$1->Insert($2);$$=$1;}
+stmt_list: stmt                                                                       {$$=StmtList::CreateNode($1);}
+	|  stmt_list stmt                                                             {$1->vector.push_back($2);$$=$1;}
         ;
 
 stmt_list_may_empty: stmt_list                                                        {$$=$1;}
@@ -451,20 +457,20 @@ brackets: '(' expr_list ')'
         | brackets '(' expr_list ')'
         ;
 
-id_list:  ID                                                         {vector<string*>tmp;tmp.push_back($1);$$=IdListNode::CreateNode(&tmp);}
-        | id_list ',' ID                                             {$1->Insert($3);$$=$1;}
+id_list:  ID                                                         {$$=IdListNode::CreateNode($1);}
+        | id_list ',' ID                                             {$1->vector.push_back($3);$$=$1;}
         ;
 
-expr_list_not_e:  expr                                               {vector<ExprNode*> tmp; tmp.push_back($1); $$=ExprList::CreateNode(&tmp);}
-                | expr_list_not_e ',' expr                           {$1->Insert($3);$$=$1;}
+expr_list_not_e:  expr                                               {$$=ExprList::CreateNode($1);}
+                | expr_list_not_e ',' expr                           {$1->vector.push_back($3);$$=$1;}
                 ;
 
 expr_list: expr_list_not_e                                           {$$=$1;}
 	| /* empty */                                                {}
         ;
 
-const_decl_list_not_e:    ID '=' expr                                {vector<ConstDeclNode*>tmp;tmp.push_back(ConstDeclNode::CreateFromConstDeclaration($1, $3));$$=ConstDeclList::CreateNode(&tmp);}
-                        | const_decl_list_not_e ',' ID '=' expr      {$1->Insert(ConstDeclNode::CreateFromConstDeclaration($3, $5));$$=$1;}
+const_decl_list_not_e:    ID '=' expr                                {$$=ConstDeclList::CreateNode(ConstDeclNode::CreateFromConstDeclaration($1, $3));}
+                        | const_decl_list_not_e ',' ID '=' expr      {$1->vector.push_back(ConstDeclNode::CreateFromConstDeclaration($3, $5));$$=$1;}
                         ;
 
 class_def: CLASS ID                                                  {$$=ClassDefNode::CreateFromClassDef($2);}                     
@@ -491,12 +497,12 @@ class_access_mod: PUBLIC                                             {$$=ClassAc
                 | STATIC                                             {$$=ClassAccessModNode::CreateNode(ClassAccessMod::static_node);}
                 ;
 
-class_access_mod_list:    class_access_mod                           {vector<ClassAccessModNode*>tmp;tmp.push_back($1);$$=ClassAccessModList::CreateNode(&tmp);}
-                        | class_access_mod_list class_access_mod     {$1->Insert($2);$$=$1;}
+class_access_mod_list:    class_access_mod                           {$$=ClassAccessModList::CreateNode($1);}
+                        | class_access_mod_list class_access_mod     {$1->vector.push_back($2);$$=$1;}
                         ;
 
-class_stmt_list_not_e:    class_stmt                                 {vector<ClassStmtNode*>tmp;tmp.push_back($1);$$=ClassStmtList::CreateNode(&tmp);}
-                        | class_stmt_list_not_e class_stmt           {$1->Insert($2);$$=$1;}
+class_stmt_list_not_e:    class_stmt                                 {$$=ClassStmtList::CreateNode($1);}
+                        | class_stmt_list_not_e class_stmt           {$1->vector.push_back($2);$$=$1;}
                         ;
 
 class_stmt: class_expr ';'                                           {$$=ClassStmtNode::CreateFromClassExpr($1);}
@@ -521,8 +527,8 @@ interface_stmt_list: interface_stmt_list_not_e                       {$$=$1;}
                 |    /* empty */                                     {}
                 ;
 
-interface_stmt_list_not_e: interface_stmt                            {vector<InterfaceStmtNode*>tmp;tmp.push_back($1);$$=InterfaceStmtList::CreateNode(&tmp);}
-                        |  interface_stmt_list_not_e interface_stmt  {$1->Insert($2);$$=$1;}
+interface_stmt_list_not_e: interface_stmt                            {$$=InterfaceStmtList::CreateNode($1);}
+                        |  interface_stmt_list_not_e interface_stmt  {$1->vector.push_back($2);$$=$1;}
                         ;
 
 interface_stmt: class_access_mod_list function_def ';'               {$$=InterfaceStmtNode::CreateNode($1, $2);}
@@ -552,14 +558,14 @@ get_value_func:   '&' '$' ID                                          {$$=GetVal
                 | ID '$' ID                                           {$$=GetValueFuncNode::CreateFromGetValueWithType($3, $1);}
                 ;
 
-get_value_func_list_not_e: get_value_func                                       {vector<GetValueFuncNode*>tmp;tmp.push_back($1);$$=GetValueFuncList::CreateNode(&tmp);}
-                        |  get_value_func_list_not_e ',' get_value_func         {$1->Insert($3);$$=$1;}
+get_value_func_list_not_e: get_value_func                                       {$$=GetValueFuncList::CreateNode($1);}
+                        |  get_value_func_list_not_e ',' get_value_func         {$1->vector.push_back($3);$$=$1;}
                         ;
 
-expr_func_list_not_e: get_value_func                                            {vector<ExprFuncNode*>tmp;tmp.push_back(ExprFuncNode::CreateFromGetValueFunc($1));$$=ExprFuncList::CreateNode(&tmp);}
-                |     get_value_func '=' expr                                   {vector<ExprFuncNode*>tmp;tmp.push_back(ExprFuncNode::CreateFromGetValueFuncAssign($1, $3));$$=ExprFuncList::CreateNode(&tmp);}
-                |     expr_func_list_not_e ',' get_value_func                   {$1->Insert(ExprFuncNode::CreateFromGetValueFunc($3));$$=$1;}
-                |     expr_func_list_not_e ',' get_value_func '=' expr          {$1->Insert(ExprFuncNode::CreateFromGetValueFuncAssign($3, $5));$$=$1;}
+expr_func_list_not_e: get_value_func                                            {$$=ExprFuncList::CreateNode(ExprFuncNode::CreateFromGetValueFunc($1));}
+                |     get_value_func '=' expr                                   {$$=ExprFuncList::CreateNode(ExprFuncNode::CreateFromGetValueFuncAssign($1, $3));}
+                |     expr_func_list_not_e ',' get_value_func                   {$1->vector.push_back(ExprFuncNode::CreateFromGetValueFunc($3));$$=$1;}
+                |     expr_func_list_not_e ',' get_value_func '=' expr          {$1->vector.push_back(ExprFuncNode::CreateFromGetValueFuncAssign($3, $5));$$=$1;}
                 ;
 
 anon_function_def: FUNCTION '(' expr_func_list ')'                                                      {/*! not supported */}
