@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.27)
 project(PHP_Compiler)
 
 set(CMAKE_CXX_STANDARD 14)
+file(GLOB_RECURSE CFILES "${CMAKE_SOURCE_DIR}/*.c")
+SET_SOURCE_FILES_PROPERTIES(${CFILES} PROPERTIES LANGUAGE CXX )
 
 include_directories(.)
 include_directories(parser_classes)
@@ -173,7 +175,7 @@ add_executable(PHP_Compiler
         parser_classes/all_include.cpp
         parser_classes/all_include.hpp
         FlexLexer.h
-        lex.yy.cpp
+        lex.yy.c
         main.cpp
         parser.tab.h
-        parser.tab.cpp)
+        parser.tab.c)
