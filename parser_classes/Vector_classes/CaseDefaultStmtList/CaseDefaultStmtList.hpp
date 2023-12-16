@@ -2,13 +2,11 @@
 
 class CaseDefaultStmtNode;
 
-class CaseDefaultStmtList
-{
+class CaseDefaultStmtList {
 public:
-  static int GLOBAL_ID;
-  int cur_id;
-  std::vector<CaseDefaultStmtNode*>* vector;
+    static int GLOBAL_ID;
+    int cur_id;
+    std::vector<CaseDefaultStmtNode *> vector;
 
-  static CaseDefaultStmtList* CreateNode(std::vector<CaseDefaultStmtNode*>* vector);
-  void Insert(CaseDefaultStmtNode* element);
+    static CaseDefaultStmtList *CreateNode(CaseDefaultStmtNode *node);
 };

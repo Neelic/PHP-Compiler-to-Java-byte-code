@@ -2,13 +2,11 @@
 
 class MatchArmNode;
 
-class MatchArmList
-{
+class MatchArmList {
 public:
-  static int GLOBAL_ID;
-  int cur_id;
-  std::vector<MatchArmNode*>* vector;
+    static int GLOBAL_ID;
+    int cur_id;
+    std::vector<MatchArmNode *> vector;
 
-  static MatchArmList* CreateNode(std::vector<MatchArmNode*>* vector);
-  void Insert(MatchArmNode* element);
+    static MatchArmList *CreateNode(MatchArmNode *node);
 };

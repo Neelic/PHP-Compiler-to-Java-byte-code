@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{F275A762-EAD1-4DFE-9483-E656764D1642}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WarningLevel>Level3</WarningLevel>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="lex.yy.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="parser.tab.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="parser_classes\all_include.cpp" />
+    <ClCompile Include="parser_classes\anonfunctiondef\AnonFunctionDefNode.cpp" />
+    <ClCompile Include="parser_classes\anonfunctiondef\AnonFunctionDefType.cpp" />
+    <ClCompile Include="parser_classes\classaccessmod\ClassAccessMod.cpp" />
+    <ClCompile Include="parser_classes\classaccessmod\ClassAccessModNode.cpp" />
+    <ClCompile Include="parser_classes\classdef\ClassDefNode.cpp" />
+    <ClCompile Include="parser_classes\classdef\ClassDefType.cpp" />
+    <ClCompile Include="parser_classes\classstmt\ClassExprNode.cpp" />
+    <ClCompile Include="parser_classes\classstmt\ClassExprType.cpp" />
+    <ClCompile Include="parser_classes\classstmt\ClassStmtDeclNode.cpp" />
+    <ClCompile Include="parser_classes\classstmt\ClassStmtDeclType.cpp" />
+    <ClCompile Include="parser_classes\classstmt\ClassStmtNode.cpp" />
+    <ClCompile Include="parser_classes\classstmt\ClassStmtType.cpp" />
+    <ClCompile Include="parser_classes\constdecl\ConstDeclNode.cpp" />
+    <ClCompile Include="parser_classes\dowhilestmt\DoWhileStmtNode.cpp" />
+    <ClCompile Include="parser_classes\exprfunc\ExprFuncNode.cpp" />
+    <ClCompile Include="parser_classes\exprfunc\ExprFuncType.cpp" />
+    <ClCompile Include="parser_classes\expr\ExprNode.cpp" />
+    <ClCompile Include="parser_classes\expr\ExprType.cpp" />
+    <ClCompile Include="parser_classes\foreachstmt\ForEachStmtNode.cpp" />
+    <ClCompile Include="parser_classes\foreachstmt\ForEachStmtType.cpp" />
+    <ClCompile Include="parser_classes\forstmt\ForStmtNode.cpp" />
+    <ClCompile Include="parser_classes\forstmt\ForStmtType.cpp" />
+    <ClCompile Include="parser_classes\functiondef\FunctionDefNode.cpp" />
+    <ClCompile Include="parser_classes\functiondef\FunctionDefType.cpp" />
+    <ClCompile Include="parser_classes\functionstmtdecl\FunctionStmtDeclNode.cpp" />
+    <ClCompile Include="parser_classes\getvaluefunc\GetValueFuncNode.cpp" />
+    <ClCompile Include="parser_classes\getvaluefunc\GetValueFuncType.cpp" />
+    <ClCompile Include="parser_classes\getvalue\GetValueNode.cpp" />
+    <ClCompile Include="parser_classes\globalvar\GlobalVarNode.cpp" />
+    <ClCompile Include="parser_classes\htmlstmt\HtmlStmtNode.cpp" />
+    <ClCompile Include="parser_classes\ifstmt\IfStmtNode.cpp" />
+    <ClCompile Include="parser_classes\ifstmt\IfStmtType.cpp" />
+    <ClCompile Include="parser_classes\interfaceexprdef\InterfaceExprDefNode.cpp" />
+    <ClCompile Include="parser_classes\interfaceexprdef\InterfaceExprDefType.cpp" />
+    <ClCompile Include="parser_classes\interfacestmt\InterfaceStmtDeclNode.cpp" />
+    <ClCompile Include="parser_classes\interfacestmt\InterfaceStmtNode.cpp" />
+    <ClCompile Include="parser_classes\matchstmt\MatchArmNode.cpp" />
+    <ClCompile Include="parser_classes\matchstmt\MatchArmType.cpp" />
+    <ClCompile Include="parser_classes\matchstmt\MatchStmtNode.cpp" />
+    <ClCompile Include="parser_classes\start\StartNode.cpp" />
+    <ClCompile Include="parser_classes\staticvar\StaticVarNode.cpp" />
+    <ClCompile Include="parser_classes\staticvar\StaticVarType.cpp" />
+    <ClCompile Include="parser_classes\stmt\StmtNode.cpp" />
+    <ClCompile Include="parser_classes\stmt\StmtType.cpp" />
+    <ClCompile Include="parser_classes\switchcasestmt\CaseDefaultStmtNode.cpp" />
+    <ClCompile Include="parser_classes\switchcasestmt\CaseDefaultType.cpp" />
+    <ClCompile Include="parser_classes\switchcasestmt\SwitchStmtNode.cpp" />
+    <ClCompile Include="parser_classes\switchcasestmt\SwitchStmtType.cpp" />
+    <ClCompile Include="parser_classes\topstmt\TopStmtNode.cpp" />
+    <ClCompile Include="parser_classes\topstmt\TopStmtType.cpp" />
+    <ClCompile Include="parser_classes\traitstmtdecl\TraitStmtDeclNode.cpp" />
+    <ClCompile Include="parser_classes\trycatchstmt\CatchStmtNode.cpp" />
+    <ClCompile Include="parser_classes\trycatchstmt\CatchStmtType.cpp" />
+    <ClCompile Include="parser_classes\trycatchstmt\TryCatchStmtNode.cpp" />
+    <ClCompile Include="parser_classes\trycatchstmt\TryCatchStmtType.cpp" />
+    <ClCompile Include="parser_classes\trycatchstmt\TryStmtNode.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\casedefaultstmtlist\CaseDefaultStmtList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\classaccessmodlist\ClassAccessModList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\classstmtlist\ClassStmtList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\constdecllist\ConstDeclList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\exprfunclist\ExprFuncList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\ExprList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\getvaluefunclist\GetValueFuncList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\globalvarlist\GlobalVarList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\idlist\IdListNode.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\interfacestmtlist\InterfaceStmtList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\matcharmlist\MatchArmList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\staticvarlist\StaticVarList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\stmtlist\StmtList.cpp" />
+    <ClCompile Include="parser_classes\vector_classes\topstmtlist\TopStmtList.cpp" />
+    <ClCompile Include="parser_classes\whilestmt\WhileStmtNode.cpp" />
+    <ClCompile Include="parser_classes\whilestmt\WhileStmtType.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="data\skeletons\stack.hh" />
+    <ClInclude Include="data\skeletons\variant.hh" />
+    <ClInclude Include="FlexLexer.h" />
+    <ClInclude Include="parser.tab.hpp" />
+    <ClInclude Include="parser_classes\all_include.hpp" />
+    <ClInclude Include="parser_classes\anonfunctiondef\AnonFunctionDefNode.hpp" />
+    <ClInclude Include="parser_classes\classaccessmod\ClassAccessModNode.hpp" />
+    <ClInclude Include="parser_classes\classdef\ClassDefNode.hpp" />
+    <ClInclude Include="parser_classes\classstmt\ClassExprNode.hpp" />
+    <ClInclude Include="parser_classes\classstmt\ClassStmtDeclNode.hpp" />
+    <ClInclude Include="parser_classes\classstmt\ClassStmtNode.hpp" />
+    <ClInclude Include="parser_classes\constdecl\ConstDeclNode.hpp" />
+    <ClInclude Include="parser_classes\dowhilestmt\DoWhileStmtNode.hpp" />
+    <ClInclude Include="parser_classes\exprfunc\ExprFuncNode.hpp" />
+    <ClInclude Include="parser_classes\expr\ExprNode.hpp" />
+    <ClInclude Include="parser_classes\foreachstmt\ForEachStmtNode.hpp" />
+    <ClInclude Include="parser_classes\forstmt\ForStmtNode.hpp" />
+    <ClInclude Include="parser_classes\functiondef\FunctionDefNode.hpp" />
+    <ClInclude Include="parser_classes\functionstmtdecl\FunctionStmtDeclNode.hpp" />
+    <ClInclude Include="parser_classes\getvaluefunc\GetValueFuncNode.hpp" />
+    <ClInclude Include="parser_classes\getvalue\GetValueNode.hpp" />
+    <ClInclude Include="parser_classes\globalvar\GlobalVarNode.hpp" />
+    <ClInclude Include="parser_classes\htmlstmt\HtmlStmtNode.hpp" />
+    <ClInclude Include="parser_classes\ifstmt\IfStmtNode.hpp" />
+    <ClInclude Include="parser_classes\interfaceexprdef\InterfaceExprDefNode.hpp" />
+    <ClInclude Include="parser_classes\interfacestmt\InterfaceStmtDeclNode.hpp" />
+    <ClInclude Include="parser_classes\interfacestmt\InterfaceStmtNode.hpp" />
+    <ClInclude Include="parser_classes\matchstmt\MatchArmNode.hpp" />
+    <ClInclude Include="parser_classes\matchstmt\MatchStmtNode.hpp" />
+    <ClInclude Include="parser_classes\start\StartNode.hpp" />
+    <ClInclude Include="parser_classes\staticvar\StaticVarNode.hpp" />
+    <ClInclude Include="parser_classes\stmt\StmtNode.hpp" />
+    <ClInclude Include="parser_classes\switchcasestmt\CaseDefaultStmtNode.hpp" />
+    <ClInclude Include="parser_classes\switchcasestmt\SwitchStmtNode.hpp" />
+    <ClInclude Include="parser_classes\topstmt\TopStmtNode.hpp" />
+    <ClInclude Include="parser_classes\traitstmtdecl\TraitStmtDeclNode.hpp" />
+    <ClInclude Include="parser_classes\trycatchstmt\CatchStmtNode.hpp" />
+    <ClInclude Include="parser_classes\trycatchstmt\TryCatchStmtNode.hpp" />
+    <ClInclude Include="parser_classes\trycatchstmt\TryStmtNode.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\casedefaultstmtlist\CaseDefaultStmtList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\classaccessmodlist\ClassAccessModList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\classstmtlist\ClassStmtList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\constdecllist\ConstDeclList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\exprfunclist\ExprFuncList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\ExprList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\getvaluefunclist\GetValueFuncList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\globalvarlist\GlobalVarList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\idlist\IdListNode.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\interfacestmtlist\InterfaceStmtList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\matcharmlist\MatchArmList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\staticvarlist\StaticVarList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\stmtlist\StmtList.hpp" />
+    <ClInclude Include="parser_classes\vector_classes\topstmtlist\TopStmtList.hpp" />
+    <ClInclude Include="parser_classes\whilestmt\WhileStmtNode.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

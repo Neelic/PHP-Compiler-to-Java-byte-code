@@ -2,14 +2,10 @@
 
 int InterfaceStmtList::GLOBAL_ID = 0;
 
-InterfaceStmtList* InterfaceStmtList::CreateNode(std::vector<InterfaceStmtNode*>* vector)
-{
-  InterfaceStmtList* tmp = new InterfaceStmtList();
-  tmp->cur_id = InterfaceStmtList::GLOBAL_ID++;
-  return tmp;
-}
-
-void InterfaceStmtList::Insert(InterfaceStmtNode* element)
-{
-  this->vector->push_back(element);
+InterfaceStmtList *InterfaceStmtList::CreateNode(InterfaceStmtNode *node) {
+    auto *tmp = new InterfaceStmtList();
+    if (node != nullptr)
+        tmp->vector.push_back(node);
+    tmp->cur_id = InterfaceStmtList::GLOBAL_ID++;
+    return tmp;
 }

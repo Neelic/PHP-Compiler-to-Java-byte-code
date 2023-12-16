@@ -2,14 +2,11 @@
 
 int MatchArmList::GLOBAL_ID = 0;
 
-MatchArmList* MatchArmList::CreateNode(std::vector<MatchArmNode*>* vector)
-{
-  MatchArmList* tmp = new MatchArmList();
-  tmp->cur_id = MatchArmList::GLOBAL_ID++;
-  return tmp;
+MatchArmList *MatchArmList::CreateNode(MatchArmNode *node) {
+    auto *tmp = new MatchArmList();
+    if (node != nullptr)
+        tmp->vector.push_back(node);
+    tmp->cur_id = MatchArmList::GLOBAL_ID++;
+    return tmp;
 }
 
-void MatchArmList::Insert(MatchArmNode* element)
-{
-  this->vector->push_back(element);
-}

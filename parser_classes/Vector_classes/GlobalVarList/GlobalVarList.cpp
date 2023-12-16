@@ -2,14 +2,11 @@
 
 int GlobalVarList::GLOBAL_ID = 0;
 
-GlobalVarList* GlobalVarList::CreateNode(std::vector<GlobalVarNode*>* vector)
-{
-  GlobalVarList* tmp = new GlobalVarList();
-  tmp->cur_id = GlobalVarList::GLOBAL_ID++;
-  return tmp;
+GlobalVarList *GlobalVarList::CreateNode(GlobalVarNode *node) {
+    auto *tmp = new GlobalVarList();
+    if (node != nullptr)
+        tmp->vector.push_back(node);
+    tmp->cur_id = GlobalVarList::GLOBAL_ID++;
+    return tmp;
 }
 
-void GlobalVarList::Insert(GlobalVarNode* element)
-{
-  this->vector->push_back(element);
-}

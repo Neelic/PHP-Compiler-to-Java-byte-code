@@ -14,7 +14,7 @@
                     cbd";?>
         <!-- <\?php -->
         <?php endif;?>
-        <?php for ($i = 0; $i <= 1; $i++):?>
+        <?php for ($i = 0; $i <= 1; $i = $i+1):?>
         <?php endfor;?>
         <?php while (1): ?>
             <?php break; endwhile;?>

@@ -2,14 +2,13 @@
 %option never-interactive
 
 %{
-  #include <stdio.h>
-  #include <stdlib.h>
+  #include <cstdio>
   #include <iostream>
   #include <iomanip>
   #include <sstream>
   #include <vector>
   // #include "FlexLexer.h"
-  #include "parser.tab.h"
+  #include "parser.tab."
 
   extern int yyparse(void);
   void error_print(char* errormsg, int lineCount, bool isWarning);
@@ -37,8 +36,8 @@ SPACE [\t\r\t\f\v ]
 %%
 
 %{
-  std::string str = "";
-  static std::vector<int> mis_symbols;
+  std::string str;
+  static std::vector<yytokentype> mis_symbols;
   int tmp;
   float test = .0;
   int nestingCount = 0;
@@ -46,9 +45,10 @@ SPACE [\t\r\t\f\v ]
   static bool inCode = false;
 
   if (!mis_symbols.empty()) {
-    int tmp = mis_symbols[mis_symbols.size() - 1];
+    yytokentype tmp_s = mis_symbols[mis_symbols.size() - 1];
     mis_symbols.pop_back();
-    return tmp;
+    std::cout << std::to_string(tmp_s);
+    return tmp_s;
   }
 
   if (!inCode)
@@ -329,14 +329,9 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 
 extern std::string GRAPH_STR;
 
-int main(int argc, char *argv[]) {
-  FILE *file = NULL;
-  if (argc > 1) {
-      file = fopen(argv[1], "r");
-  }
-
-  if (file == NULL) {
-      printf("File opening error");
+int lexer_main(FILE* file) {
+  if (file == nullptr) {
+      printf("file is null");
       return 1;
   }
 

@@ -10,17 +10,15 @@ class TopStmtNode;
 
 extern std::string GRAPH_STR;
 
-class TopStmtList
-{
+class TopStmtList {
 public:
-  static int GLOBAL_ID;
-  int cur_id;
-  std::vector<TopStmtNode*>* vector;
+    static int GLOBAL_ID;
+    int cur_id;
+    std::vector<TopStmtNode *> vector;
 
-  static TopStmtList* CreateNode(std::vector<TopStmtNode*>* vector);
-  void Insert(TopStmtNode* element);
-  
-  std::string IdTag();
+    static TopStmtList *CreateNode(TopStmtNode *node);
+
+    std::string IdTag() const;
 };
 
 #endif

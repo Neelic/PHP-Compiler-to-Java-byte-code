@@ -1,4 +1,9 @@
 #include "AnonFunctionDefType.cpp"
+#include <vector>
+#include <string>
+
+class ExprNode;
+class GetValueFunc;
 
 class AnonFunctionDefNode
 {

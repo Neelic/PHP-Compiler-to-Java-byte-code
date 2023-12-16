@@ -1,3 +1,4 @@
+lex.yy.cpp
 lex.yy.c
 result.exe
 result.txt
@@ -6,5 +7,9 @@ parser.tab.cc
 parser.tab.hh
 stack.hh
 parser.tab.h
+parser.tab.cpp
 parser.tab.c
 graph.dot
+x64
+.vs
+cmake-build-debug
