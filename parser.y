@@ -388,7 +388,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, $2);}
         | ID                                                         {$$=ExprNode::CreateFromId($1);}
         | expr '=' expr                                              {$$=ExprNode::CreateFromAssignOp($1, $3);}
-        | expr '=' '&' expr                                          {$$=ExprNode::CreateFromAssignRefOp($1, $4);}
+        | expr '=' '&' expr %prec '='                                {$$=ExprNode::CreateFromAssignRefOp($1, $4);}
         | INT_CAST expr                                              {$$=ExprNode::CreateFromIntCast($2);}
         | FLOAT_CAST expr                                            {$$=ExprNode::CreateFromFloatCast($2);}
         | STRING_CAST expr                                           {$$=ExprNode::CreateFromStringCast($2);}
