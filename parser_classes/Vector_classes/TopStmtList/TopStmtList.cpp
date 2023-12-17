@@ -10,6 +10,7 @@ TopStmtList *TopStmtList::CreateNode(TopStmtNode *node) {
     return tmp;
 }
 
-std::string TopStmtList::IdTag() const {
-    return std::string("TopStmtList") + std::to_string(this->cur_id);
+std::string* TopStmtList::idTag() const {
+    auto* tmp = new std::string(std::string("TopStmtList") + std::to_string(this->cur_id));
+    return tmp;
 }

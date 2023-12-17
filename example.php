@@ -57,12 +57,15 @@ class Person
     }
 }
 
-abstract class Example {
+abstract class Example extends Person {
     use property, ai;
     abstract public $c = 1;
     const NAME = 1, abc = '123';
+    function b() {
+        parent::greet();
+        self::${$_COOKIE};
+    }
     public abstract static function a();
-    abstract private $b = function() {};
 }
 
 interface objectO {}
@@ -75,18 +78,7 @@ trait TraitName {
     public abstract static $a = 1;
     protected abstract function r();
 }
-
-$a = static function() {};
 $b = ( fLoat ) 100;
-
-try {
-    static $a = null, $b = function() use ($_COOKIE, $_ENV) {}, $c = fn() => 1 + 2, $d;
-    global $a, $$b;
-} catch (Error $a) {
-    
-} finally {
-
-}
 
 function b () {}
 

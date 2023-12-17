@@ -2,18 +2,16 @@
 
 int ExprNode::GLOBAL_ID = 0;
 
-ExprNode *ExprNode::CreateFromId(std::string *id)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromId(std::string *id) {
+    auto *tmp = new ExprNode();
     tmp->id = id;
     tmp->exprType = constant;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromFunctionCall(std::string *id, ExprList *listParams)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromFunctionCall(std::string *id, ExprList *listParams) {
+    auto *tmp = new ExprNode();
     tmp->id = id;
     tmp->listParams = listParams;
     tmp->exprType = ExprType::call_func;
@@ -22,61 +20,61 @@ ExprNode *ExprNode::CreateFromFunctionCall(std::string *id, ExprList *listParams
 }
 
 // From values
-ExprNode *ExprNode::CreateFromIntValue(int value)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromIntValue(int value) {
+    auto *tmp = new ExprNode();
     tmp->int_val = value;
     tmp->exprType = ExprType::int_val;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromFloatValue(float value)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromFloatValue(float value) {
+    auto *tmp = new ExprNode();
     tmp->float_val = value;
     tmp->exprType = ExprType::float_val;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromStringValue(std::string *value)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromStringValue(std::string *value) {
+    auto *tmp = new ExprNode();
     tmp->string_val = value;
     tmp->exprType = ExprType::string_val;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromComStringValue(std::string *value)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromComStringValue(std::string *value) {
+    auto *tmp = new ExprNode();
     tmp->com_string_val = value;
     tmp->exprType = ExprType::string_val;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromThisKeyword()
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromThisKeyword() {
+    auto *tmp = new ExprNode();
     tmp->exprType = ExprType::this_keyword;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromSelfKeyword()
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromSelfKeyword() {
+    auto *tmp = new ExprNode();
     tmp->exprType = ExprType::self_keyword;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueId(GetValueNode *get_value, std::string *id)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromParentKeyword() {
+    auto *tmp = new ExprNode();
+    tmp->exprType = ExprType::parent_keyword;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
+    return tmp;
+}
+
+ExprNode *ExprNode::CreateFromGetValueId(GetValueNode *get_value, std::string *id) {
+    auto *tmp = new ExprNode();
     tmp->get_value = get_value;
     tmp->id = id;
     tmp->exprType = ExprType::variable;
@@ -85,9 +83,8 @@ ExprNode *ExprNode::CreateFromGetValueId(GetValueNode *get_value, std::string *i
 }
 
 // Assign
-ExprNode *ExprNode::CreateFromAssignOp(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromAssignOp(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::assign_op;
@@ -95,9 +92,8 @@ ExprNode *ExprNode::CreateFromAssignOp(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromAssignRefOp(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromAssignRefOp(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::assign_ref_op;
@@ -106,54 +102,48 @@ ExprNode *ExprNode::CreateFromAssignRefOp(ExprNode *left, ExprNode *right)
 }
 
 // Casts
-ExprNode *ExprNode::CreateFromIntCast(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromIntCast(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::int_cast;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromFloatCast(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromFloatCast(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::float_cast;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromStringCast(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromStringCast(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::string_cast;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromArrayCast(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromArrayCast(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::array_cast;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromObjectCast(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromObjectCast(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::object_cast;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBoolCast(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBoolCast(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::bool_cast;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
@@ -161,9 +151,8 @@ ExprNode *ExprNode::CreateFromBoolCast(ExprNode *left)
 }
 
 // Right arrow
-ExprNode *ExprNode::CreateFromFieldReference(ExprNode *left, std::string *id)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromFieldReference(ExprNode *left, std::string *id) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->id = id;
     tmp->exprType = ExprType::class_inst_field_ref_op;
@@ -171,9 +160,8 @@ ExprNode *ExprNode::CreateFromFieldReference(ExprNode *left, std::string *id)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueFieldReference(ExprNode *left, GetValueNode *get_value, std::string *id)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromGetValueFieldReference(ExprNode *left, GetValueNode *get_value, std::string *id) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->id = id;
@@ -182,9 +170,9 @@ ExprNode *ExprNode::CreateFromGetValueFieldReference(ExprNode *left, GetValueNod
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValueNode *get_value, ExprNode *get_value_expr)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *
+ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValueNode *get_value, ExprNode *get_value_expr) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->right = get_value_expr;
@@ -193,9 +181,8 @@ ExprNode *ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValue
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromMethodReference(ExprNode *left, std::string *id, ExprList *listParams)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromMethodReference(ExprNode *left, std::string *id, ExprList *listParams) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->id = id;
     tmp->listParams = listParams;
@@ -204,9 +191,9 @@ ExprNode *ExprNode::CreateFromMethodReference(ExprNode *left, std::string *id, E
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id, ExprList *listParams)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromGetValueMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id,
+                                                      ExprList *listParams) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->id = id;
     tmp->get_value = get_value;
@@ -216,9 +203,9 @@ ExprNode *ExprNode::CreateFromGetValueMethodReference(ExprNode *left, GetValueNo
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id, ExprNode *get_value_expr, ExprList *listParams)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id,
+                                                              ExprNode *get_value_expr, ExprList *listParams) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->id = id;
     tmp->get_value = get_value;
@@ -230,9 +217,8 @@ ExprNode *ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode *left, Ge
 }
 
 // Quarter Dot
-ExprNode *ExprNode::CreateFromFieldReferenceDots(ExprNode *left, std::string *id)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromFieldReferenceDots(ExprNode *left, std::string *id) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->id = id;
     tmp->exprType = ExprType::class_inst_field_ref_op;
@@ -240,9 +226,8 @@ ExprNode *ExprNode::CreateFromFieldReferenceDots(ExprNode *left, std::string *id
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode *left, GetValueNode *get_value, std::string *id)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode *left, GetValueNode *get_value, std::string *id) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->id = id;
@@ -251,9 +236,9 @@ ExprNode *ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode *left, GetValu
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode *left, GetValueNode *get_value, ExprNode *get_value_expr)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *
+ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode *left, GetValueNode *get_value, ExprNode *get_value_expr) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->right = get_value_expr;
@@ -262,10 +247,31 @@ ExprNode *ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode *left, GetV
     return tmp;
 }
 
+ExprNode *ExprNode::CreateFromMethodReferenceDots(ExprNode *left, std::string *id, ExprList *list) {
+    auto *tmp = new ExprNode();
+    tmp->left = left;
+    tmp->id = id;
+    tmp->listParams = list;
+    tmp->exprType = ExprType::class_inst_method_by_ref_op;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
+    return tmp;
+}
+
+ExprNode *ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode *left, GetValueNode *get_value, std::string *id,
+                                                          ExprList *listParams) {
+    auto *tmp = new ExprNode();
+    tmp->left = left;
+    tmp->get_value = get_value;
+    tmp->id = id;
+    tmp->listParams = listParams;
+    tmp->exprType = ExprType::class_inst_get_value_method_by_ref_op;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
+    return tmp;
+}
+
 // Math signs
-ExprNode *ExprNode::CreateFromAddition(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromAddition(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::plus_op;
@@ -273,9 +279,8 @@ ExprNode *ExprNode::CreateFromAddition(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromSubtraction(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromSubtraction(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::minus_op;
@@ -283,9 +288,8 @@ ExprNode *ExprNode::CreateFromSubtraction(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromMultiplication(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromMultiplication(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::mult_op;
@@ -293,9 +297,8 @@ ExprNode *ExprNode::CreateFromMultiplication(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromDivision(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromDivision(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::div_op;
@@ -303,9 +306,8 @@ ExprNode *ExprNode::CreateFromDivision(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromMod(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromMod(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::mod_op;
@@ -313,9 +315,8 @@ ExprNode *ExprNode::CreateFromMod(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromPower(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromPower(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::pow_op;
@@ -324,9 +325,8 @@ ExprNode *ExprNode::CreateFromPower(ExprNode *left, ExprNode *right)
 }
 
 // Concatenation
-ExprNode *ExprNode::CreateFromConcatenation(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromConcatenation(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::concat_op;
@@ -335,9 +335,8 @@ ExprNode *ExprNode::CreateFromConcatenation(ExprNode *left, ExprNode *right)
 }
 
 // Boolean operations
-ExprNode *ExprNode::CreateFromBooleanOpMore(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpMore(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bool_more;
@@ -345,9 +344,8 @@ ExprNode *ExprNode::CreateFromBooleanOpMore(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBooleanOpLess(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpLess(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bool_less;
@@ -355,9 +353,8 @@ ExprNode *ExprNode::CreateFromBooleanOpLess(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBooleanOpOr(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpOr(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bool_or;
@@ -365,9 +362,8 @@ ExprNode *ExprNode::CreateFromBooleanOpOr(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBooleanOpAnd(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpAnd(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bool_and;
@@ -375,9 +371,8 @@ ExprNode *ExprNode::CreateFromBooleanOpAnd(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBooleanOpEqual(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpEqual(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bool_equal;
@@ -385,9 +380,8 @@ ExprNode *ExprNode::CreateFromBooleanOpEqual(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBooleanOpEqualStrict(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpEqualStrict(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bool_equal_strict;
@@ -395,9 +389,8 @@ ExprNode *ExprNode::CreateFromBooleanOpEqualStrict(ExprNode *left, ExprNode *rig
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBooleanOpEqualMore(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpEqualMore(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bool_equal_more;
@@ -405,9 +398,8 @@ ExprNode *ExprNode::CreateFromBooleanOpEqualMore(ExprNode *left, ExprNode *right
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBooleanOpEqualLess(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpEqualLess(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bool_equal_less;
@@ -415,9 +407,8 @@ ExprNode *ExprNode::CreateFromBooleanOpEqualLess(ExprNode *left, ExprNode *right
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBooleanOpNot(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBooleanOpNot(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::bool_not;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
@@ -426,9 +417,8 @@ ExprNode *ExprNode::CreateFromBooleanOpNot(ExprNode *left)
 
 // Logical
 
-ExprNode *ExprNode::CreateFromLogicOpAnd(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromLogicOpAnd(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::logic_and;
@@ -436,9 +426,8 @@ ExprNode *ExprNode::CreateFromLogicOpAnd(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromLogicOpOr(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromLogicOpOr(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::logic_or;
@@ -446,9 +435,8 @@ ExprNode *ExprNode::CreateFromLogicOpOr(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromLogicOpXor(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromLogicOpXor(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::logic_xor;
@@ -457,9 +445,8 @@ ExprNode *ExprNode::CreateFromLogicOpXor(ExprNode *left, ExprNode *right)
 }
 
 // Bitwise
-ExprNode *ExprNode::CreateFromShiftLeft(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromShiftLeft(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bitwise_shift_l;
@@ -467,9 +454,8 @@ ExprNode *ExprNode::CreateFromShiftLeft(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromShiftRight(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromShiftRight(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bitwise_shift_r;
@@ -477,9 +463,8 @@ ExprNode *ExprNode::CreateFromShiftRight(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBitwiseXor(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBitwiseXor(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bitwise_xor;
@@ -487,9 +472,8 @@ ExprNode *ExprNode::CreateFromBitwiseXor(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBitwiseAnd(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBitwiseAnd(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bitwise_and;
@@ -497,9 +481,8 @@ ExprNode *ExprNode::CreateFromBitwiseAnd(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBitwiseOr(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBitwiseOr(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::bitwise_or;
@@ -507,9 +490,8 @@ ExprNode *ExprNode::CreateFromBitwiseOr(ExprNode *left, ExprNode *right)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromBitwiseNot(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromBitwiseNot(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::bitwise_not;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
@@ -517,18 +499,16 @@ ExprNode *ExprNode::CreateFromBitwiseNot(ExprNode *left)
 }
 
 // Unary
-ExprNode *ExprNode::CreateFromUnaryPlus(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromUnaryPlus(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::u_plus_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromUnaryMinus(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromUnaryMinus(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::u_minus_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
@@ -536,9 +516,8 @@ ExprNode *ExprNode::CreateFromUnaryMinus(ExprNode *left)
 }
 
 // Clone
-ExprNode *ExprNode::CreateFromCloneOp(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromCloneOp(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::clone_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
@@ -546,9 +525,8 @@ ExprNode *ExprNode::CreateFromCloneOp(ExprNode *left)
 }
 
 // Ternary
-ExprNode *ExprNode::CreateFromTernaryOp(ExprNode *left, ExprNode *right, ExprNode *central)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromTernaryOp(ExprNode *left, ExprNode *right, ExprNode *central) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->central = central;
@@ -558,9 +536,8 @@ ExprNode *ExprNode::CreateFromTernaryOp(ExprNode *left, ExprNode *right, ExprNod
 }
 
 // Ref op
-ExprNode *ExprNode::CreateFromRefOp(GetValueNode *get_value, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromRefOp(GetValueNode *get_value, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->get_value = get_value;
     tmp->right = right;
     tmp->exprType = ExprType::ref_op;
@@ -569,28 +546,27 @@ ExprNode *ExprNode::CreateFromRefOp(GetValueNode *get_value, ExprNode *right)
 }
 
 // Array
-ExprNode *ExprNode::CreateFromGetArrayVal(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromGetArrayVal(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::get_value_array;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
-ExprNode *ExprNode::CreateFromAssignArrayValByExpr(ExprNode *left, ExprNode *right)
-{
-    ExprNode *tmp = new ExprNode();
+
+ExprNode *ExprNode::CreateFromAssignArrayValByExpr(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
     tmp->exprType = ExprType::add_array_val;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
+
 // Functions
-ExprNode *ExprNode::CreateFromGetValueFunction(std::string *id, ExprList *listParams)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromGetValueFunction(std::string *id, ExprList *listParams) {
+    auto *tmp = new ExprNode();
     tmp->id = id;
     tmp->listParams = listParams;
     tmp->exprType = ExprType::call_get_value_func;
@@ -599,9 +575,8 @@ ExprNode *ExprNode::CreateFromGetValueFunction(std::string *id, ExprList *listPa
 }
 
 // Declarations
-ExprNode *ExprNode::CreateFromNewDecl(std::string *id, ExprList *listParams)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromNewDecl(std::string *id, ExprList *listParams) {
+    auto *tmp = new ExprNode();
     tmp->id = id;
     tmp->listParams = listParams;
     tmp->exprType = ExprType::new_decl;
@@ -609,27 +584,24 @@ ExprNode *ExprNode::CreateFromNewDecl(std::string *id, ExprList *listParams)
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromNewDeclNoParams(std::string *id)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromNewDeclNoParams(std::string *id) {
+    auto *tmp = new ExprNode();
     tmp->id = id;
     tmp->exprType = ExprType::new_decl_no_params;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromNewDeclNoId(ExprNode *left)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromNewDeclNoId(ExprNode *left) {
+    auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->exprType = ExprType::new_decl_no_id;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueDecl(GetValueNode *get_value, std::string *id, ExprList *listParams)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromGetValueDecl(GetValueNode *get_value, std::string *id, ExprList *listParams) {
+    auto *tmp = new ExprNode();
     tmp->get_value = get_value;
     tmp->id = id;
     tmp->listParams = listParams;
@@ -638,9 +610,8 @@ ExprNode *ExprNode::CreateFromGetValueDecl(GetValueNode *get_value, std::string 
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueDeclNoParams(GetValueNode *get_value, std::string *id)
-{
-    ExprNode *tmp = new ExprNode();
+ExprNode *ExprNode::CreateFromGetValueDeclNoParams(GetValueNode *get_value, std::string *id) {
+    auto *tmp = new ExprNode();
     tmp->get_value = get_value;
     tmp->id = id;
     tmp->exprType = ExprType::new_get_value_decl_no_params;
@@ -648,7 +619,7 @@ ExprNode *ExprNode::CreateFromGetValueDeclNoParams(GetValueNode *get_value, std:
     return tmp;
 }
 
-std::string ExprNode::IdTag()
-{
-    return std::string("Expr") + std::to_string(this->cur_id);
+std::string * ExprNode::idTag() const {
+    auto *tmp = new std::string(std::string("Expr") + std::to_string(this->cur_id));
+    return tmp;
 }
