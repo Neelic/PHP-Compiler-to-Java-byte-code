@@ -619,7 +619,7 @@ ExprNode *ExprNode::CreateFromGetValueDeclNoParams(GetValueNode *get_value, std:
     return tmp;
 }
 
-std::string ExprNode::IdTag() {
+std::string * ExprNode::idTag() const {
     auto *tmp = new std::string(std::string("Expr") + std::to_string(this->cur_id));
     return tmp;
 }

@@ -38,33 +38,31 @@ void printTopStmt(TopStmtNode *node, std::string *parentId) {
 
     if (node->stmt != nullptr)
         printStmt(node->stmt, node->idTag());
-    else if (node->class_stmt_decl != nullptr)
+    if (node->class_stmt_decl != nullptr)
         printClassStmtDecl(node->class_stmt_decl, node->idTag());
-    else if (node->trait_stmt_decl != nullptr)
+    if (node->trait_stmt_decl != nullptr)
         printTraitStmtDecl(node->trait_stmt_decl, node->idTag());
-    else if (node->interface_stmt_decl != nullptr)
+    if (node->interface_stmt_decl != nullptr)
         printInterfaceStmtDecl(node->trait_stmt_decl, node->idTag());
-    else if (node->func_stmt_decl != nullptr)
+    if (node->func_stmt_decl != nullptr)
         printFuncStmtDecl(node->func_stmt_decl, node->idTag());
 }
 
 void printStmt(StmtNode *node, std::string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+    if (node->const_decl != nullptr) {}
 }
 
 void printFuncStmtDecl(FunctionStmtDeclNode *node, std::string *parentId) {
-
 }
 
 void printInterfaceStmtDecl(TraitStmtDeclNode *node, std::string *parentId) {
-
 }
 
 void printTraitStmtDecl(TraitStmtDeclNode *node, std::string *basicString) {
-
 }
 
 void printClassStmtDecl(ClassStmtDeclNode *node, std::string *basicString) {
-
 }
