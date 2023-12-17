@@ -13,6 +13,7 @@ extern int yylex(void);
 %}
 
 %code requires {
+#include <iostream>
 #include <string>
 #include <vector>
 #include "parser_classes/all_include.hpp"
@@ -235,7 +236,6 @@ class StmtList;
 %type <function_def_union> function_def
 %type <expr_func_list_union> expr_func_list
 %type <get_value_func_union> get_value_func
-%type <get_value_func_list_union> get_value_func_list_not_e
 %type <expr_func_list_union> expr_func_list_not_e 
 
 %%
@@ -256,7 +256,7 @@ top_stmt_list_not_e: top_stmt                                                   
                 |    top_stmt_list_not_e top_stmt                                     {$1->vector.push_back($2);$$=$1;}
                 ;
 
-top_stmt: stmt                                                                        {$$=TopStmtNode::CreateFromStmt($1);}
+top_stmt: stmt                                                                        {std::cout<<"Reduce to TOP STMT from stmt\n";$$=TopStmtNode::CreateFromStmt($1);}
         | function_stmt_decl                                                          {$$=TopStmtNode::CreateFromFunctionDecl($1);}
         | class_stmt_decl                                                             {$$=TopStmtNode::CreateFromClassDecl($1);}
         | interface_stmt_decl                                                         {$$=TopStmtNode::CreateFromInterfaceDecl($1);}
@@ -322,25 +322,10 @@ match_arm: expr_list_not_e R_DOUBLE_ARROW expr                                  
         |  DEFAULT ',' R_DOUBLE_ARROW expr                                            {$$=MatchArmNode::CreateFromDefaultArmWithCommaStmt($4);}
         ;
 
-try_stmt: TRY '{' stmt_list_may_empty '}'                                             {/*! not supported */}
-        ;
-
-catch_stmt: CATCH'(' ID '$' ID ')' '{' stmt_list_may_empty '}'                        {/*! not supported */}
-        |   CATCH'(' ID ')' '{' stmt_list_may_empty '}'                               {/*! not supported */}
-        ;
-
-catch_stmt_list:  catch_stmt                                                          {/*! not supported */}
-                | catch_stmt_list catch_stmt                                          {/*! not supported */}
-                ;
-
-try_catch_stmt:   try_stmt catch_stmt_list                                            {/*! not supported */}
-                | try_stmt                                                            {/*! not supported */}
-                ;
-
 stmt:     expr_may_empty ';'                                                          {$$=StmtNode::CreateFromExpr($1);}
         | if_stmt                                                                     {$$=StmtNode::CreateFromIfStmt($1);}
         | switch_stmt                                                                 {$$=StmtNode::CreateFromSwitchStmt($1);}
-        | '{'stmt_list'}'                                                             {$$=StmtNode::CreateFromStmtList($2);}
+        | '{'stmt_list_may_empty'}'                                                   {std::cout<<"Reduce to stmt from stmt list\n";$$=StmtNode::CreateFromStmtList($2);}
         | STATIC static_var_list ';'                                                  {$$=StmtNode::CreateFromStaticVar($2);}
         | GLOBAL global_var_list ';'                                                  {$$=StmtNode::CreateFromGlobalVar($2);}
         | while_stmt                                                                  {$$=StmtNode::CreateFromWhileStmt($1);}
@@ -348,11 +333,10 @@ stmt:     expr_may_empty ';'                                                    
         | for_stmt                                                                    {$$=StmtNode::CreateFromForStmt($1);}
         | foreach_stmt                                                                {$$=StmtNode::CreateFromForEachStmt($1);}
         | THROW expr ';'                                                              {$$=StmtNode::CreateFromThrowStmt($2);}
-        | try_catch_stmt                                                              {/*! not supported?*/}
         | match_stmt                                                                  {$$=StmtNode::CreateFromMatchStmt($1);}
         | CONST const_decl_list_not_e ';'                                             {$$=StmtNode::CreateFromConstDecl($2);}
         | RETURN expr_may_empty ';'                                                   {$$=StmtNode::CreateFromReturnStmt($2);}
-        | html_stmt                                                                   {$$=StmtNode::CreateFromHtmlStmt($1);}
+        | html_stmt                                                                   {std::cout<<"Reduce to stmt from html stmt\n";$$=StmtNode::CreateFromHtmlStmt($1);}
         | BREAK ';'                                                                   {$$=StmtNode::CreateFromBreakStmt();}
         | T_ECHO expr ';'                                                             {$$=StmtNode::CreateFromTEchoStmt($2);}
         | CONTINUE ';'                                                                {$$=StmtNode::CreateFromContinueStmt();}
@@ -369,15 +353,15 @@ global_var_list:  get_value ID                                                  
                 ;
 
 stmt_list: stmt                                                                       {$$=StmtList::CreateNode($1);}
-	|  stmt_list stmt                                                             {$1->vector.push_back($2);$$=$1;}
+	|  stmt_list stmt                                                             {$1->vector.push_back($2);std::cout<<"add to stmt list\n";$$=$1;}
         ;
 
-stmt_list_may_empty: stmt_list                                                        {$$=$1;}
+stmt_list_may_empty: stmt_list                                                        {std::cout<<"Reduce to stmt list me\n";$$=$1;}
                 |    /* empty */                                                      {}
                 ;
 
 html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG                  {$$=HtmlStmtNode::CreateNode($2);}
-        |  END_CODE_PHP_TAG START_CODE_PHP_TAG                       {}
+        |  END_CODE_PHP_TAG START_CODE_PHP_TAG                       {auto*tmp=new std::string;$$=HtmlStmtNode::CreateNode(tmp);}
         ;
 
 expr:     INT_NUMBER                                                 {$$=ExprNode::CreateFromIntValue($1);}
@@ -451,8 +435,6 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr '[' expr ']'                                          {$$=ExprNode::CreateFromGetArrayVal($1, $3);}
         | expr '[' ']' '=' expr                                      {$$=ExprNode::CreateFromAssignArrayValByExpr($1, $5);}
         | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromGetValueFunction($1, $3);}
-        | get_value ID brackets                                      {/*! not supported */}
-        | anon_function_expr                                         {/*! not supported */}
         | NEW ID '(' expr_list ')'                                   {$$=ExprNode::CreateFromNewDecl($2, $4);}
         | NEW ID                                                     {$$=ExprNode::CreateFromNewDeclNoParams($2);}
         | NEW get_value ID                                           {$$=ExprNode::CreateFromGetValueDeclNoParams($2, $3);}
@@ -463,10 +445,6 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
 expr_may_empty: expr                                                 {$$=$1;}
                 | /* empty */                                        {}
                 ;
-
-brackets: '(' expr_list ')'
-        | brackets '(' expr_list ')'
-        ;
 
 id_list:  ID                                                         {$$=IdListNode::CreateNode($1);}
         | id_list ',' ID                                             {$1->vector.push_back($3);$$=$1;}
@@ -555,10 +533,6 @@ function_def: FUNCTION ID '(' expr_func_list ')'                     {$$=Functio
 function_stmt_decl: function_def '{' stmt_list '}'                   {$$=FunctionStmtDeclNode::CreateNode($1, $3);}
                 ;
 
-anon_function_expr: anon_function_stmt_decl                           {/*! not supported */}
-                |   anon_function_short_stmt_decl                     {/*! not supported */}
-                ;
-
 expr_func_list:   expr_func_list_not_e                                {$$=$1;}
                 | /* empty */                                         {}
                 ;
@@ -569,37 +543,11 @@ get_value_func:   '&' '$' ID                                          {$$=GetVal
                 | ID '$' ID                                           {$$=GetValueFuncNode::CreateFromGetValueWithType($3, $1);}
                 ;
 
-get_value_func_list_not_e: get_value_func                                       {$$=GetValueFuncList::CreateNode($1);}
-                        |  get_value_func_list_not_e ',' get_value_func         {$1->vector.push_back($3);$$=$1;}
-                        ;
-
 expr_func_list_not_e: get_value_func                                            {$$=ExprFuncList::CreateNode(ExprFuncNode::CreateFromGetValueFunc($1));}
                 |     get_value_func '=' expr                                   {$$=ExprFuncList::CreateNode(ExprFuncNode::CreateFromGetValueFuncAssign($1, $3));}
                 |     expr_func_list_not_e ',' get_value_func                   {$1->vector.push_back(ExprFuncNode::CreateFromGetValueFunc($3));$$=$1;}
                 |     expr_func_list_not_e ',' get_value_func '=' expr          {$1->vector.push_back(ExprFuncNode::CreateFromGetValueFuncAssign($3, $5));$$=$1;}
                 ;
-
-anon_function_def: FUNCTION '(' expr_func_list ')'                                                      {/*! not supported */}
-                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'                {/*! not supported */}
-                |  STATIC FUNCTION '(' expr_func_list ')'                                               {/*! not supported */}
-                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')'         {/*! not supported */}
-                |  FUNCTION '(' expr_func_list ')' ':' ID                                               {/*! not supported */}
-                |  FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID         {/*! not supported */}
-                |  STATIC FUNCTION '(' expr_func_list ')' ':' ID                                        {/*! not supported */}
-                |  STATIC FUNCTION '(' expr_func_list ')' USE '(' get_value_func_list_not_e ')' ':' ID  {/*! not supported */}
-                ;
-
-anon_function_stmt_decl: anon_function_def '{' stmt_list '}'                                            {/*! not supported */}
-                        ;
-
-anon_function_short_def:  FN '(' expr_func_list ')'                                                     {/*! not supported */}
-                        | FN '(' expr_func_list ')' ':' ID                                              {/*! not supported */}
-                        | STATIC FN '(' expr_func_list ')'                                              {/*! not supported */}
-                        | STATIC FN '(' expr_func_list ')' ':' ID                                       {/*! not supported */}
-                        ;
-
-anon_function_short_stmt_decl: anon_function_short_def R_DOUBLE_ARROW expr                              {/*! not supported */}
-                        ;
 
 %%
 
