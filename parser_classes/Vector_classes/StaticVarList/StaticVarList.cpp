@@ -10,6 +10,7 @@ StaticVarList *StaticVarList::CreateNode(StaticVarNode *node) {
     return tmp;
 }
 
-std::string StaticVarList::IdTag() const {
-    return std::string("StaticVarList") + std::to_string(this->cur_id);
+std::string *StaticVarList::idTag() const {
+    auto* tmp = new std::string(std::string("StaticVarList") + std::to_string(this->cur_id));
+    return tmp;
 }

@@ -10,7 +10,8 @@ GlobalVarList *GlobalVarList::CreateNode(GlobalVarNode *node) {
     return tmp;
 }
 
-std::string GlobalVarList::IdTag() const {
-    return std::string("GlobalVarList") + std::to_string(this->cur_id);
+std::string *GlobalVarList::idTag() const {
+    auto* tmp = new std::string(std::string("GlobalVarList") + std::to_string(this->cur_id));
+    return tmp;
 }
 

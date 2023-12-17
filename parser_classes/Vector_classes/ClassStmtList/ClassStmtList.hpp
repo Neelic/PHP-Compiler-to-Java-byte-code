@@ -8,7 +8,7 @@ public:
     static int GLOBAL_ID;
     int cur_id;
     std::vector<ClassStmtNode *> vector;
-    std::string IdTag() const;
+    std::string* idTag() const;
 
     static ClassStmtList *CreateNode(ClassStmtNode *node);
 };

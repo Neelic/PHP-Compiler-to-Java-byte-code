@@ -9,5 +9,5 @@ public:
 
     static IdListNode *CreateNode(std::string *id);
     
-    std::string IdTag() const;
+    std::string* idTag() const;
 };

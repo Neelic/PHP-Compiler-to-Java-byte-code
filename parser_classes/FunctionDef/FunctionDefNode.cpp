@@ -2,8 +2,9 @@
 
 int FunctionDefNode::GLOBAL_ID = 0;
 
-std::string FunctionDefNode::IdTag() {
-    return std::string("FunctionDef") + std::to_string(this->cur_id);
+std::string *FunctionDefNode::idTag() const {
+    auto* tmp = new std::string(std::string("FunctionDef") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 FunctionDefNode* FunctionDefNode::CreateFromDefWithNoType(std::string* func_id, ExprFuncList* expr_func_list)

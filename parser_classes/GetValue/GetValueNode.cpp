@@ -2,8 +2,9 @@
 
 int GetValueNode::GLOBAL_ID = 0;
 
-std::string GetValueNode::IdTag() {
-    return std::string("GetValue") + std::to_string(this->cur_id);
+std::string *GetValueNode::idTag() const {
+    auto* tmp = new std::string(std::string("GetValue") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 GetValueNode *GetValueNode::CreateNode()

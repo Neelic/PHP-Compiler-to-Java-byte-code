@@ -15,5 +15,5 @@ public:
     static InterfaceExprDefNode* CreateFromNoExtendedDefinition(std::string* id);
     static InterfaceExprDefNode* CreatedFromDefinitionWithExtended(std::string* id, IdListNode* id_extended_list);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

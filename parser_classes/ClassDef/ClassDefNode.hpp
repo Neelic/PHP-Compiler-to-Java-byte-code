@@ -19,5 +19,5 @@ public:
     static ClassDefNode* CreateFromImplementDef(std::string* class_id, IdListNode* id_list);
     static ClassDefNode* CreateFromExtendedImplementedDef(std::string* class_id, std::string* extend_id, IdListNode* id_list);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

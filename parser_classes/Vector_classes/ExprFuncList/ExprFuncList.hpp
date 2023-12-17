@@ -11,5 +11,5 @@ public:
 
     static ExprFuncList *CreateNode(ExprFuncNode *node);
     
-    std::string IdTag() const;
+    std::string* idTag() const;
 };

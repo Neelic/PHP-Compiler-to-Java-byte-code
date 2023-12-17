@@ -11,5 +11,5 @@ public:
 
     static GetValueFuncList *CreateNode(GetValueFuncNode *node);
     
-    std::string IdTag() const;
+    std::string* idTag() const;
 };

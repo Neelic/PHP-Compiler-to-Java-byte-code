@@ -23,5 +23,5 @@ public:
     static IfStmtNode* CreateFromIfEndIfStmt(ExprNode* expr, StmtList* stmtListMain);
     static IfStmtNode* CreateFromIfElseEndIfStmt(ExprNode* expr, StmtList* stmtListMain, StmtList* stmtListElse);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

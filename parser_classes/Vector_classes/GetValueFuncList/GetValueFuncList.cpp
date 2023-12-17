@@ -10,7 +10,8 @@ GetValueFuncList *GetValueFuncList::CreateNode(GetValueFuncNode *node) {
     return tmp;
 }
 
-std::string GetValueFuncList::IdTag() const {
-    return std::string("GetValueFuncList") + std::to_string(this->cur_id);
+std::string *GetValueFuncList::idTag() const {
+    auto* tmp = new std::string(std::string("GetValueFuncList") + std::to_string(this->cur_id));
+    return tmp;
 }
 

@@ -2,8 +2,9 @@
 
 int DoWhileStmtNode::GLOBAL_ID = 0;
 
-std::string DoWhileStmtNode::IdTag() {
-    return std::string("DoWhileStmt") + std::to_string(this->cur_id);
+std::string *DoWhileStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("DoWhileStmt") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 DoWhileStmtNode* DoWhileStmtNode::CreateFromDoWhileStmt(StmtNode* stmt, ExprNode* expr)

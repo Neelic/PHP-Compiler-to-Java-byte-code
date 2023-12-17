@@ -2,8 +2,9 @@
 
 int InterfaceStmtNode::GLOBAL_ID = 0;
 
-std::string InterfaceStmtNode::IdTag() {
-    return std::string("InterfaceStmt") + std::to_string(this->cur_id);
+std::string *InterfaceStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("InterfaceStmt") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 InterfaceStmtNode* InterfaceStmtNode::CreateNode(ClassAccessModList* access_mod, FunctionDefNode* function_def)

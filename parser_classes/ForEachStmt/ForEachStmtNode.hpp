@@ -25,5 +25,5 @@ public:
     static ForEachStmtNode* CreateFromEndForeachRightArrowStmt(ExprNode* expr_left, ExprNode* expr_right, std::string* id, StmtList* stmtList);
     static ForEachStmtNode* CreateFromEndForeachRightArrowPointerStmt(ExprNode* expr_left, ExprNode* expr_right, std::string* id, StmtList* stmtList);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

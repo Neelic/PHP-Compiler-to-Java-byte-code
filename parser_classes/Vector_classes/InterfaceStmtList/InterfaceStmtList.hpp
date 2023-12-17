@@ -12,5 +12,5 @@ public:
 
   static InterfaceStmtList *CreateNode(InterfaceStmtNode *node);
     
-    std::string IdTag() const;
+    std::string* idTag() const;
 };

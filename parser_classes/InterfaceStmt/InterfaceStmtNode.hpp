@@ -13,5 +13,5 @@ public:
 
     static InterfaceStmtNode* CreateNode(ClassAccessModList* access_mod, FunctionDefNode* function_def);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

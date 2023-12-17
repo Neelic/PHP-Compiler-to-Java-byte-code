@@ -2,8 +2,9 @@
 
 int ClassStmtNode::GLOBAL_ID = 0;
 
-std::string ClassStmtNode::IdTag() {
-    return std::string("ClassStmt") + std::to_string(this->cur_id);
+std::string *ClassStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("ClassStmt") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 ClassStmtNode* ClassStmtNode::CreateFromClassExpr(ClassExprNode* class_expr)

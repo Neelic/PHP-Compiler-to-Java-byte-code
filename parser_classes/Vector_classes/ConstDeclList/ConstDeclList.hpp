@@ -11,5 +11,5 @@ public:
 
     static ConstDeclList *CreateNode(ConstDeclNode *node);
     
-    std::string IdTag() const;
+    std::string* idTag() const;
 };

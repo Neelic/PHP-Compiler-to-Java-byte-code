@@ -2,8 +2,9 @@
 
 int ForEachStmtNode::GLOBAL_ID = 0;
 
-std::string ForEachStmtNode::IdTag() {
-    return std::string("ForEachStmt") + std::to_string(this->cur_id);
+std::string *ForEachStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("ForEachStmt") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 ForEachStmtNode* ForEachStmtNode::CreateFromForeachStmt(ExprNode* expr_left, ExprNode* expr_right, StmtNode* stmt)

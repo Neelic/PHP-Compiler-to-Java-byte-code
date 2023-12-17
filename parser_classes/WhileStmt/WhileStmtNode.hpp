@@ -18,5 +18,5 @@ public:
     static WhileStmtNode* CreateFromWhileStmt(ExprNode* expr, StmtNode* stmt);
     static WhileStmtNode* CreateFromEndWhileStmt(ExprNode* expr, StmtList* stmtList);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

@@ -13,5 +13,5 @@ public:
 
     static FunctionStmtDeclNode* CreateNode(FunctionDefNode* function_def, StmtList* stmt_list);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

@@ -18,5 +18,5 @@ public:
     static CaseDefaultStmtNode* CreateFromCaseStmt(ExprNode* expr, StmtList* stmtList);
     static CaseDefaultStmtNode* CreateFromDefaultStmt(StmtList* stmtList);
     static CaseDefaultStmtNode* CreateFromFinallyStmt(StmtList* stmtList);
-    std::string IdTag();
+    std::string* idTag() const;
 };

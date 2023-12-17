@@ -2,8 +2,9 @@
 
 int ClassExprNode::GLOBAL_ID = 0;
 
-std::string ClassExprNode::IdTag() {
-    return std::string("ClassExpr") + std::to_string(this->cur_id);
+std::string *ClassExprNode::idTag() const {
+    auto* tmp = new std::string(std::string("ClassExpr") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 ClassExprNode* ClassExprNode::CreateFromGetValueAssign(ClassAccessModList* access_mod_list, GetValueNode* get_value, std::string* id, ExprNode* expr)

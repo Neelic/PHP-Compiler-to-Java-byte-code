@@ -10,7 +10,8 @@ MatchArmList *MatchArmList::CreateNode(MatchArmNode *node) {
     return tmp;
 }
 
-std::string MatchArmList::IdTag() const {
-    return std::string("MatchArmList") + std::to_string(this->cur_id);
+std::string *MatchArmList::idTag() const {
+    auto* tmp = new std::string(std::string("MatchArmList") + std::to_string(this->cur_id));
+    return tmp;
 }
 

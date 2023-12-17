@@ -15,5 +15,5 @@ public:
     static StaticVarNode* CreateFromId(std::string* id);
     static StaticVarNode* CreateFromIdAssign(std::string* id, ExprNode* expr);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

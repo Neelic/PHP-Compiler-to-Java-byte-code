@@ -2,8 +2,9 @@
 
 int InterfaceStmtDeclNode::GLOBAL_ID = 0;
 
-std::string InterfaceStmtDeclNode::IdTag() {
-    return std::string("InterfaceStmtDecl") + std::to_string(this->cur_id);
+std::string *InterfaceStmtDeclNode::idTag() const {
+    auto* tmp = new std::string(std::string("InterfaceStmtDecl") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 InterfaceStmtDeclNode* InterfaceStmtDeclNode::CreateNode(InterfaceExprDefNode* expr_definition, InterfaceStmtList* stmt_list)

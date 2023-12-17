@@ -19,5 +19,5 @@ public:
     static SwitchStmtNode* CreateFromSwitchDefaultStmt(ExprNode* expr, CaseDefaultStmtList* defaultStmtList);
     static SwitchStmtNode* CreateFromSwitchDefaultEndswitchStmt(ExprNode* expr, CaseDefaultStmtList* defaultStmtList);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

@@ -10,7 +10,8 @@ ClassAccessModList *ClassAccessModList::CreateNode(ClassAccessModNode *node) {
     return tmp;
 }
 
-std::string ClassAccessModList::IdTag() const {
-    return std::string("ClassAccessModList") + std::to_string(this->cur_id);
+std::string *ClassAccessModList::idTag() const {
+    auto* tmp = new std::string(std::string("ClassAccessModList") + std::to_string(this->cur_id));
+    return tmp;
 }
 

@@ -16,5 +16,5 @@ public:
     static ExprFuncNode* CreateFromGetValueFunc(GetValueFuncNode* get_value_func);
     static ExprFuncNode* CreateFromGetValueFuncAssign(GetValueFuncNode* get_value_func, ExprNode* expr);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

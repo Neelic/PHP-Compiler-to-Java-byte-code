@@ -21,5 +21,5 @@ public:
     static ForStmtNode* CreateFromForStmt(ExprNode* expr_left, ExprNode* expr_central, ExprNode* expr_right, StmtNode* stmt);
     static ForStmtNode* CreateFromForEndStmt(ExprNode* expr_left, ExprNode* expr_central, ExprNode* expr_right, StmtList* stmtList);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

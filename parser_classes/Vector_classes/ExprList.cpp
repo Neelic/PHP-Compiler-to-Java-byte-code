@@ -10,6 +10,7 @@ ExprList *ExprList::CreateNode(ExprNode *node) {
     return tmp;
 }
 
-std::string ExprList::IdTag() const {
-    return std::string("ExprList") + std::to_string(this->cur_id);
+std::string* ExprList::idTag() const {
+    auto* tmp = new std::string(std::string("ExprList") + std::to_string(this->cur_id));
+    return tmp;
 }

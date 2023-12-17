@@ -9,5 +9,5 @@ public:
 
     static GetValueNode* CreateNode();
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

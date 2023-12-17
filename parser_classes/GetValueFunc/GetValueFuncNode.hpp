@@ -16,5 +16,5 @@ public:
     static GetValueFuncNode* CreateFromRefValueWithType(std::string* id_value, std::string* id_type);
     static GetValueFuncNode* CreateFromGetValueWithType(std::string* id_value, std::string* id_type);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

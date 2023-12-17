@@ -2,8 +2,9 @@
 
 int SwitchStmtNode::GLOBAL_ID = 0;
 
-std::string SwitchStmtNode::IdTag() {
-    return std::string("SwitchStmt") + std::to_string(this->cur_id);
+std::string *SwitchStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("SwitchStmt") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 SwitchStmtNode* SwitchStmtNode::CreateFromSwitchStmt(ExprNode* expr)

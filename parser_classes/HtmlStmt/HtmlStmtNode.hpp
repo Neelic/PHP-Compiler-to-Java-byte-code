@@ -9,5 +9,5 @@ public:
 
     static HtmlStmtNode* CreateNode(std::string* html);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

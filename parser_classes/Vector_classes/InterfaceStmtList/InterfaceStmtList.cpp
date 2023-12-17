@@ -10,6 +10,7 @@ InterfaceStmtList *InterfaceStmtList::CreateNode(InterfaceStmtNode *node) {
     return tmp;
 }
 
-std::string InterfaceStmtList::IdTag() const {
-    return std::string("InterfaceStmtList") + std::to_string(this->cur_id);
+std::string *InterfaceStmtList::idTag() const {
+    auto* tmp = new std::string(std::string("InterfaceStmtList") + std::to_string(this->cur_id));
+    return tmp;
 }

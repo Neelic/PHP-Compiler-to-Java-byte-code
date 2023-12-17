@@ -11,5 +11,5 @@ public:
 
     static ClassAccessModNode* CreateNode(ClassAccessMod access_mod);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

@@ -2,8 +2,9 @@
 
 int ClassAccessModNode::GLOBAL_ID = 0;
 
-std::string ClassAccessModNode::IdTag() {
-    return std::string("ClassAccessMod") + std::to_string(this->cur_id);
+std::string *ClassAccessModNode::idTag() const {
+    auto* tmp = new std::string(std::string("ClassAccessMod") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 ClassAccessModNode* ClassAccessModNode::CreateNode(ClassAccessMod access_mod)

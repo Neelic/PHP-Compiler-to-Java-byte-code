@@ -13,5 +13,5 @@ public:
 
     static MatchStmtNode* CreateFromMatchStmtNode(ExprNode* expr, MatchArmList* matchList);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

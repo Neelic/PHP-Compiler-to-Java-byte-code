@@ -2,8 +2,9 @@
 
 int IfStmtNode::GLOBAL_ID = 0;
 
-std::string IfStmtNode::IdTag() {
-    return std::string("IfStmt") + std::to_string(this->cur_id);
+std::string *IfStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("IfStmt") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 IfStmtNode* IfStmtNode::CreateFromIfStmt(ExprNode* expr, StmtNode* stmt_main)

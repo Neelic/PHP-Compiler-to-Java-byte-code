@@ -10,5 +10,5 @@ public:
 
     static CaseDefaultStmtList *CreateNode(CaseDefaultStmtNode *node);
 
-    std::string IdTag() const;
+    std::string* idTag() const;
 };

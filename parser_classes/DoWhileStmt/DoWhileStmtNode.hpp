@@ -13,5 +13,5 @@ public:
 
     static DoWhileStmtNode* CreateFromDoWhileStmt(StmtNode* stmt, ExprNode* expr);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

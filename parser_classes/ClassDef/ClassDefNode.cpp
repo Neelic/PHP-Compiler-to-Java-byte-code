@@ -2,8 +2,9 @@
 
 int ClassDefNode::GLOBAL_ID = 0;
 
-std::string ClassDefNode::IdTag() {
-    return std::string("ClassDef") + std::to_string(this->cur_id);
+std::string *ClassDefNode::idTag() const {
+    auto* tmp = new std::string(std::string("ClassDefNode") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 ClassDefNode* ClassDefNode::CreateFromClassDef(std::string* id)

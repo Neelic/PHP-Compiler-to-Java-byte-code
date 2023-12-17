@@ -25,5 +25,5 @@ public:
     static ClassStmtNode* CreateFromIdList(IdListNode* id_list);
     static ClassStmtNode* CreateFromClassStmtDecl(ClassStmtDeclNode* class_stmt_decl);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

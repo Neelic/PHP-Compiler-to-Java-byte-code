@@ -12,5 +12,5 @@ public:
 
     static ConstDeclNode* CreateFromConstDeclaration(std::string* id, ExprNode* expr);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

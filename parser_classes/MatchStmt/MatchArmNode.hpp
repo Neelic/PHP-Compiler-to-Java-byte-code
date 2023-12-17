@@ -17,5 +17,5 @@ public:
     static MatchArmNode* CreateFromDefaultArmStmt(ExprNode* expr);
     static MatchArmNode* CreateFromDefaultArmWithCommaStmt(ExprNode* expr);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

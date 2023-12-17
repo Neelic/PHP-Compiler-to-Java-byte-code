@@ -2,8 +2,9 @@
 
 int GlobalVarNode::GLOBAL_ID = 0;
 
-std::string GlobalVarNode::IdTag() {
-    return std::string("GlobalVar") + std::to_string(this->cur_id);
+std::string *GlobalVarNode::idTag() const {
+    auto* tmp = new std::string(std::string("GlobalVar") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 GlobalVarNode* GlobalVarNode::CreateFromGlobalValue(GetValueNode* get_value, std::string* id)

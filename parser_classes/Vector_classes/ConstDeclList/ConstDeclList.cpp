@@ -10,6 +10,7 @@ ConstDeclList *ConstDeclList::CreateNode(ConstDeclNode *node) {
     return tmp;
 }
 
-std::string ConstDeclList::IdTag() const {
-    return std::string("ConstDeclList") + std::to_string(this->cur_id);
+std::string *ConstDeclList::idTag() const {
+    auto* tmp = new std::string(std::string("ConstDeclList") + std::to_string(this->cur_id));
+    return tmp;
 }

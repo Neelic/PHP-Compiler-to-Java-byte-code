@@ -13,5 +13,5 @@ public:
 
     static InterfaceStmtDeclNode* CreateNode(InterfaceExprDefNode* expr_definition, InterfaceStmtList* stmt_list);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

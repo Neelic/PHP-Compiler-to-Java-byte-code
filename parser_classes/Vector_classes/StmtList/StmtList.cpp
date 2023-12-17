@@ -10,6 +10,7 @@ StmtList *StmtList::CreateNode(StmtNode *node) {
     return tmp;
 }
 
-std::string StmtList::IdTag() const {
-    return std::string("StmtList") + std::to_string(this->cur_id);
+std::string *StmtList::idTag() const {
+    auto* tmp = new std::string(std::string("StmtList") + std::to_string(this->cur_id));
+    return tmp;
 }

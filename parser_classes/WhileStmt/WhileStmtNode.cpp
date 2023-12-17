@@ -2,8 +2,9 @@
 
 int WhileStmtNode::GLOBAL_ID = 0;
 
-std::string WhileStmtNode::IdTag() {
-    return std::string("WhileStmt") + std::to_string(this->cur_id);
+std::string* WhileStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("WhileStmtNode") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 WhileStmtNode* WhileStmtNode::CreateFromWhileStmt(ExprNode* expr, StmtNode* stmt)

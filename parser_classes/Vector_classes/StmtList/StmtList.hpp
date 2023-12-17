@@ -15,7 +15,7 @@ public:
 
     static StmtList *CreateNode(StmtNode *node);
 
-    std::string IdTag() const;
+    std::string* idTag() const;
 };
 
 #endif

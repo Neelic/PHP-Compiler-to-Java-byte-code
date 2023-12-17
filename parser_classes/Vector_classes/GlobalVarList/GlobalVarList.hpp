@@ -12,5 +12,5 @@ public:
 
   static GlobalVarList *CreateNode(GlobalVarNode *node);
     
-    std::string IdTag() const;
+    std::string* idTag() const;
 };

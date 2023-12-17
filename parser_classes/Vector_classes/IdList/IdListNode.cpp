@@ -10,6 +10,7 @@ IdListNode *IdListNode::CreateNode(std::string *id) {
     return tmp;
 }
 
-std::string IdListNode::IdTag() const {
-    return std::string("IdListNode") + std::to_string(this->cur_id);
+std::string *IdListNode::idTag() const {
+    auto* tmp = new std::string(std::string("IdListNode") + std::to_string(this->cur_id));
+    return tmp;
 }

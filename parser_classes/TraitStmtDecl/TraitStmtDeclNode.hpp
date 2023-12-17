@@ -12,5 +12,5 @@ public:
 
     static TraitStmtDeclNode* CreateNode(std::string* id, ClassStmtList* stmt_list);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

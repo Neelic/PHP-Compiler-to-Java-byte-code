@@ -13,5 +13,5 @@ public:
 
     static GlobalVarNode* CreateFromGlobalValue(GetValueNode* get_value, std::string* id);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };

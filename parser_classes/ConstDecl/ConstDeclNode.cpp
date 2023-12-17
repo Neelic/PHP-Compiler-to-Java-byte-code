@@ -2,8 +2,9 @@
 
 int ConstDeclNode::GLOBAL_ID = 0;
 
-std::string ConstDeclNode::IdTag() {
-    return std::string("ConstDecl") + std::to_string(this->cur_id);
+std::string *ConstDeclNode::idTag() const {
+    auto* tmp = new std::string(std::string("ConstDecl") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 ConstDeclNode* ConstDeclNode::CreateFromConstDeclaration(std::string* id, ExprNode* expr)

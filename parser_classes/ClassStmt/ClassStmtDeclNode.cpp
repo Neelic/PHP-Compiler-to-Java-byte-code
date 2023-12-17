@@ -2,8 +2,9 @@
 
 int ClassStmtDeclNode::GLOBAL_ID = 0;
 
-std::string ClassStmtDeclNode::IdTag() {
-    return std::string("ClassStmtDecl") + std::to_string(this->cur_id);
+std::string *ClassStmtDeclNode::idTag() const {
+    auto* tmp = new std::string(std::string("ClassStmtDecl") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 ClassStmtDeclNode* ClassStmtDeclNode::CreateFromNoModDefinition(ClassDefNode* class_def, ClassStmtList* class_stmt_list)

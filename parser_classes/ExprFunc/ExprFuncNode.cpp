@@ -2,8 +2,9 @@
 
 int ExprFuncNode::GLOBAL_ID = 0;
 
-std::string ExprFuncNode::IdTag() {
-    return std::string("ExprFunc") + std::to_string(this->cur_id);
+std::string *ExprFuncNode::idTag() const {
+    auto* tmp = new std::string(std::string("ExprFunc") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 ExprFuncNode* ExprFuncNode::CreateFromGetValueFunc(GetValueFuncNode* get_value_func)

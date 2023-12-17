@@ -2,8 +2,9 @@
 
 int InterfaceExprDefNode::GLOBAL_ID = 0;
 
-std::string InterfaceExprDefNode::IdTag() {
-    return std::string("InterfaceExprDef") + std::to_string(this->cur_id);
+std::string *InterfaceExprDefNode::idTag() const {
+    auto* tmp = new std::string(std::string("InterfaceExprDef") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 InterfaceExprDefNode* InterfaceExprDefNode::CreateFromNoExtendedDefinition(std::string* id)

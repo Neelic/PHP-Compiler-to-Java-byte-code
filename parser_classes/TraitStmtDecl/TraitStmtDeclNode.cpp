@@ -2,8 +2,9 @@
 
 int TraitStmtDeclNode::GLOBAL_ID = 0;
 
-std::string TraitStmtDeclNode::IdTag() {
-    return std::string("TraitStmtDecl") + std::to_string(this->cur_id);
+std::string *TraitStmtDeclNode::idTag() const {
+    auto* tmp = new std::string(std::string("TraitStmtDecl") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 TraitStmtDeclNode* TraitStmtDeclNode::CreateNode(std::string* id, ClassStmtList* stmt_list)

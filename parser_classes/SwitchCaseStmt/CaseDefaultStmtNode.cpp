@@ -2,8 +2,9 @@
 
 int CaseDefaultStmtNode::GLOBAL_ID = 0;
 
-std::string CaseDefaultStmtNode::IdTag() {
-    return std::string("CaseDefaultStmt") + std::to_string(this->cur_id);
+std::string *CaseDefaultStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("CaseDefaultStmt") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 CaseDefaultStmtNode* CaseDefaultStmtNode::CreateFromCaseStmt(ExprNode* expr, StmtList* stmtList)

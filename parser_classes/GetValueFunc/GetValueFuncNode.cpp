@@ -2,8 +2,9 @@
 
 int GetValueFuncNode::GLOBAL_ID = 0;
 
-std::string GetValueFuncNode::IdTag() {
-    return std::string("GetValueFunc") + std::to_string(this->cur_id);
+std::string *GetValueFuncNode::idTag() const {
+    auto* tmp = new std::string(std::string("GetValueFunc") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 GetValueFuncNode* GetValueFuncNode::CreateFromRefValue(std::string* id_value)

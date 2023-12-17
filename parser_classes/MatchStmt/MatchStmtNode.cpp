@@ -2,8 +2,9 @@
 
 int MatchStmtNode::GLOBAL_ID = 0;
 
-std::string MatchStmtNode::IdTag() {
-    return std::string("MatchStmt") + std::to_string(this->cur_id);
+std::string *MatchStmtNode::idTag() const {
+    auto* tmp = new std::string(std::string("MatchStmt") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 MatchStmtNode* MatchStmtNode::CreateFromMatchStmtNode(ExprNode* expr, MatchArmList* matchList)

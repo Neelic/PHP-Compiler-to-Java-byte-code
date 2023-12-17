@@ -2,8 +2,9 @@
 
 int FunctionStmtDeclNode::GLOBAL_ID = 0;
 
-std::string FunctionStmtDeclNode::IdTag() {
-    return std::string("FunctionStmtDecl") + std::to_string(this->cur_id);
+std::string *FunctionStmtDeclNode::idTag() const {
+    auto* tmp = new std::string(std::string("FunctionStmtDecl") + std::to_string(this->cur_id));
+    return tmp;
 }
 
 FunctionStmtDeclNode* FunctionStmtDeclNode::CreateNode(FunctionDefNode* function_def, StmtList* stmt_list)

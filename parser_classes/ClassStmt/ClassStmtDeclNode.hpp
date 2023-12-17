@@ -17,5 +17,5 @@ public:
     static ClassStmtDeclNode* CreateFromFinalModDefinition(ClassDefNode* class_def, ClassStmtList* class_stmt_list);
     static ClassStmtDeclNode* CreateFromAbstractModDefinition(ClassDefNode* class_def, ClassStmtList* class_stmt_list);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };
