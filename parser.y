@@ -162,6 +162,7 @@ class StmtList;
 %token TRAIT
 %token THIS
 %token SELF
+%token PARENT
 
 %right THROW
 %left LOGIC_OR
@@ -384,7 +385,6 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | STRING                                                     {$$=ExprNode::CreateFromStringValue($1);}
         | COM_STRING                                                 {$$=ExprNode::CreateFromComStringValue($1);}
         | '$' THIS                                                   {$$=ExprNode::CreateFromThisKeyword();}
-        | SELF                                                       {$$=ExprNode::CreateFromSelfKeyword();}
         | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, $2);}
         | ID                                                         {$$=ExprNode::CreateFromId($1);}
         | expr '=' expr                                              {$$=ExprNode::CreateFromAssignOp($1, $3);}
@@ -400,10 +400,21 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr R_ARROW get_value '{' expr '}'                        {$$=ExprNode::CreateFromGetValueWithExprReference($1, $3, $5);}
         | expr R_ARROW ID '(' expr_list ')'                          {$$=ExprNode::CreateFromMethodReference($1, $3, $5);}
         | expr R_ARROW get_value ID '(' expr_list ')'                {$$=ExprNode::CreateFromGetValueMethodReference($1, $3, $4, $6);}
-        | expr R_ARROW get_value ID '{' expr '}' '(' expr_list ')'   {$$=ExprNode::CreateFromGetValueWithExprMethodReference($1, $3, $4, $6, $9);}
         | expr QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots($1, $3);}
         | expr QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots($1, $3, $4);}
         | expr QUARTER_DOT get_value '{' expr '}'                    {$$=ExprNode::CreateFromGetValueWithExprReferenceDots($1, $3, $5);}
+        | expr QUARTER_DOT ID '(' expr_list ')'                      {/*TODO додулать*/}
+        | expr QUARTER_DOT get_value ID '(' expr_list ')'            {/*TODO додулать*/}
+        | SELF QUARTER_DOT ID                                        {/*TODO додулать*/}
+        | SELF QUARTER_DOT get_value ID                              {/*TODO додулать*/}
+        | SELF QUARTER_DOT get_value '{' expr '}'                    {/*TODO додулать*/}
+        | SELF QUARTER_DOT ID '(' expr_list ')'                      {/*TODO додулать*/}
+        | SELF QUARTER_DOT get_value ID '(' expr_list ')'            {/*TODO додулать*/}
+        | PARENT QUARTER_DOT ID                                      {/*TODO додулать*/}
+        | PARENT QUARTER_DOT get_value ID                            {/*TODO додулать*/}
+        | PARENT QUARTER_DOT get_value '{' expr '}'                  {/*TODO додулать*/}
+        | PARENT QUARTER_DOT ID '(' expr_list ')'                    {/*TODO додулать*/}
+        | PARENT QUARTER_DOT get_value ID '(' expr_list ')'          {/*TODO додулать*/}
         | '(' expr ')'                                               {$$=$2;}
         | expr '-' expr                                              {$$=ExprNode::CreateFromSubtraction($1, $3);}
         | expr '+' expr                                              {$$=ExprNode::CreateFromAddition($1, $3);}
