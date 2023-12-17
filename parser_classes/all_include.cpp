@@ -24,6 +24,7 @@ void printMatchStmt(MatchStmtNode *node, std::string *parentId);
 void printConstDeclList(ConstDeclList *node, std::string *parentId);
 void printHtmlStmt(HtmlStmtNode *node, std::string *parentId);
 void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel);
+void printExprList(ExprList *node, std::string *parentId);
 void printFunctionStmtDecl(FunctionStmtDeclNode *node, std::string *parentId);
 void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId);
 void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, std::string *parentId);
@@ -179,9 +180,9 @@ void printStaticVar(StaticVarNode *node, std::string *parentId)
     printExpr(node->expr, node->idTag(), new std::string(""));
 }
 
-//Пока только два варианта для примера
 void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
 {
+  // Значения
   switch (node->exprType)
   {
   case ExprType::int_val: //Если просто значение, может просто его и печатать? А то получится узел ради узла
@@ -192,6 +193,7 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
     GRAPH_STR += *node->idTag() + " [label=\" \\\"" + *node->string_val + "\\\" \"];\n";
     break;
   
+  // Ключевые слова
   case ExprType::this_keyword:
     GRAPH_STR += *node->idTag() + " [label=\" This \"];\n";
     break;
@@ -204,6 +206,7 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
     GRAPH_STR += *node->idTag() + " [label=\" Parent \"];\n";
     break;
 
+  // Переменные
   case ExprType::variable:
     GRAPH_STR += *node->idTag() + " [label=\"Variable\"];\n";
     printGetValue(node->get_value, node->idTag());
@@ -214,6 +217,7 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
     GRAPH_STR += *node->idTag() + " [label=\" \\\"" + *node->id + "\\\" \"];\n";
     break;
 
+  // Присвоение
   case ExprType::assign_op:
     GRAPH_STR += *node->idTag() + " [label=\"=\"];\n";
     printExpr(node->left, node->idTag(), new std::string("left"));
@@ -226,36 +230,39 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
     printExpr(node->right, node->idTag(), new std::string("right"));
     break;
 
-  case ExprType::int_cast: //Если операция более сложная, пишем название операции в лейбл
+  // Cast
+  case ExprType::int_cast: 
     GRAPH_STR += *node->idTag() + " [label=\"Int cast\"];\n";
     printExpr(node->left, node->idTag(), new std::string(""));
     break;
 
-  case ExprType::float_cast: //Если операция более сложная, пишем название операции в лейбл
+  case ExprType::float_cast: 
     GRAPH_STR += *node->idTag() + " [label=\"Float cast\"];\n";
     printExpr(node->left, node->idTag(), new std::string(""));
     break;
 
-  case ExprType::string_cast: //Если операция более сложная, пишем название операции в лейбл
+  case ExprType::string_cast: 
     GRAPH_STR += *node->idTag() + " [label=\"String cast\"];\n";
     printExpr(node->left, node->idTag(), new std::string(""));
     break;
 
-  case ExprType::array_cast: //Если операция более сложная, пишем название операции в лейбл
+  case ExprType::array_cast: 
     GRAPH_STR += *node->idTag() + " [label=\"Array cast\"];\n";
     printExpr(node->left, node->idTag(), new std::string(""));
     break;
 
-  case ExprType::object_cast: //Если операция более сложная, пишем название операции в лейбл
+  case ExprType::object_cast: 
     GRAPH_STR += *node->idTag() + " [label=\"Object cast\"];\n";
     printExpr(node->left, node->idTag(), new std::string(""));
     break;
 
-  case ExprType::bool_cast: //Если операция более сложная, пишем название операции в лейбл
+  case ExprType::bool_cast: 
     GRAPH_STR += *node->idTag() + " [label=\"Bool cast\"];\n";
     printExpr(node->left, node->idTag(), new std::string(""));
     break;
 
+  // Обращение к полям и методам класса
+  // Right arrow
   case ExprType::class_inst_field_ref_op:
     GRAPH_STR += *node->idTag() + " [label=\"->\"];\n";
     if (node->get_value != nullptr)
@@ -271,12 +278,284 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
     printExpr(node->left, node->idTag(), new std::string("left"));
     printExpr(node->right, node->idTag(), new std::string("right"));
     break;
+
+  case ExprType::class_method_ref_op:
+    GRAPH_STR += *node->idTag() + " [label=\"->\"];\n";
+    if (node->get_value != nullptr)
+      printGetValue(node->get_value, node->idTag());
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    printExprList(node->listParams, node->idTag());
+    break;
+
+  //Quarter dot
+  case ExprType::class_inst_field_ref_dots_op:
+    GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
+    if (node->get_value != nullptr)
+      printGetValue(node->get_value, node->idTag());
+    printExpr(node->left, node->idTag(), new std::string(""));
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::class_inst_field_by_ref_dots_op:
+    GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
+    if (node->get_value != nullptr)
+      printGetValue(node->get_value, node->idTag());
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::class_inst_method_by_ref_op:
+    GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    printExprList(node->listParams, node->idTag());
+    break;
+
+  case ExprType::class_inst_get_value_method_by_ref_op:
+    GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
+    if (node->get_value != nullptr)
+      printGetValue(node->get_value, node->idTag());
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    printExprList(node->listParams, node->idTag());
     break;
   
-  case ExprType::plus_op: // Если операция с одним символом, просто пишем операцию в лейбле
+  //Математические операции
+  case ExprType::plus_op:
     GRAPH_STR += *node->idTag() + " [label=\"+\"];\n";
     printExpr(node->left, node->idTag(), new std::string("left"));
     printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::minus_op:
+    GRAPH_STR += *node->idTag() + " [label=\"-\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::mult_op:
+    GRAPH_STR += *node->idTag() + " [label=\" * \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::div_op:
+    GRAPH_STR += *node->idTag() + " [label=\" / \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::mod_op:
+    GRAPH_STR += *node->idTag() + " [label=\" % \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::pow_op:
+    GRAPH_STR += *node->idTag() + " [label=\" pow \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  //Конкатенация
+  case ExprType::concat_op:
+    GRAPH_STR += *node->idTag() + " [label=\" concatenation \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+  
+  //Логические операции
+  case ExprType::bool_more:
+    GRAPH_STR += *node->idTag() + " [label=\">\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bool_less:
+    GRAPH_STR += *node->idTag() + " [label=\"<\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bool_or:
+    GRAPH_STR += *node->idTag() + " [label=\"||\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bool_and:
+    GRAPH_STR += *node->idTag() + " [label=\"&&\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+  
+  case ExprType::bool_equal:
+    GRAPH_STR += *node->idTag() + " [label=\"==\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bool_equal_strict:
+    GRAPH_STR += *node->idTag() + " [label=\"===\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bool_equal_more:
+    GRAPH_STR += *node->idTag() + " [label=\" >= \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bool_equal_less:
+    GRAPH_STR += *node->idTag() + " [label=\" <= \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bool_not:
+    GRAPH_STR += *node->idTag() + " [label=\"!\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    break;
+  
+  //Logic
+  case ExprType::logic_and:
+    GRAPH_STR += *node->idTag() + " [label=\" AND \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::logic_or:
+    GRAPH_STR += *node->idTag() + " [label=\" OR \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::logic_xor:
+    GRAPH_STR += *node->idTag() + " [label=\" XOR \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  //Bitwise
+  case ExprType::bitwise_shift_l:
+    GRAPH_STR += *node->idTag() + " [label=\" SHIFT_L \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bitwise_shift_r:
+    GRAPH_STR += *node->idTag() + " [label=\" SHIFT_R \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bitwise_xor:
+    GRAPH_STR += *node->idTag() + " [label=\" ^ \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bitwise_and:
+    GRAPH_STR += *node->idTag() + " [label=\" & \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bitwise_or:
+    GRAPH_STR += *node->idTag() + " [label=\" | \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::bitwise_not:
+    GRAPH_STR += *node->idTag() + " [label=\" ~ \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  //Unary
+  case ExprType::u_minus_op:
+    GRAPH_STR += *node->idTag() + " [label=\" UNARY MINUS \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    break;
+  
+  case ExprType::u_plus_op:
+    GRAPH_STR += *node->idTag() + " [label=\" UNARY PLUS \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    break;
+
+  //Clone
+  case ExprType::clone_op:
+    GRAPH_STR += *node->idTag() + " [label=\" CLONE \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    break;
+  
+  //Trenary 
+  case ExprType::ternary_op:
+    GRAPH_STR += *node->idTag() + " [label=\" Trenary \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    if(node->central != nullptr)
+      printExpr(node->central, node->idTag(), new std::string("central"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+  
+  //Ref op
+  case ExprType::ref_op:
+    GRAPH_STR += *node->idTag() + " [label=\" Trenary \"];\n";
+    printGetValue(node->get_value, node->idTag());
+    printExpr(node->right, node->idTag(), new std::string(""));
+    break;
+
+  //Array op
+  case ExprType::get_value_array:
+    GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::add_array_val:
+    GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  //Functions op
+  case ExprType::call_get_value_func:
+    GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    printExprList(node->listParams, node->idTag());
+    break;
+
+  //Declarations
+  case ExprType::new_decl:
+    GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    printExprList(node->listParams, node->idTag());
+    break;
+
+  case ExprType::new_decl_no_params:
+    GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    break;
+  
+  case ExprType::new_decl_no_id:
+    GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+    printExpr(node->left, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::new_get_value_decl:
+    GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+    printGetValue(node->get_value, node->idTag());
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    printExprList(node->listParams, node->idTag());
+    break;
+  
+  case ExprType::new_get_value_decl_no_params:
+    GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+    printGetValue(node->get_value, node->idTag());
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
     break;
   }
 

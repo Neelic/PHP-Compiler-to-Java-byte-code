@@ -241,7 +241,7 @@ ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode *left, GetValueNode *
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->right = get_value_expr;
-    tmp->exprType = ExprType::class_inst_field_by_ref_op;
+    tmp->exprType = ExprType::class_inst_field_by_ref_dots_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
@@ -524,7 +524,7 @@ ExprNode *ExprNode::CreateFromCloneOp(ExprNode *left) {
 }
 
 // Ternary
-ExprNode *ExprNode::CreateFromTernaryOp(ExprNode *left, ExprNode *right, ExprNode *central) {
+ExprNode *ExprNode::CreateFromTernaryOp(ExprNode *left, ExprNode *central, ExprNode *right) {
     auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;

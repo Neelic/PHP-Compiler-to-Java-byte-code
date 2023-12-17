@@ -27,7 +27,6 @@ enum ExprType
     class_method_by_ref_op,
     class_inst_field_ref_dots_op,
     class_inst_field_by_ref_dots_op,
-    
     bracket,
     minus_op,
     plus_op,
