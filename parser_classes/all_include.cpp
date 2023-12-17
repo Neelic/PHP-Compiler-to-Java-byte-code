@@ -28,6 +28,7 @@ void printFunctionStmtDecl(FunctionStmtDeclNode *node, std::string *parentId);
 void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId);
 void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, std::string *parentId);
 void printTraitStmtDeclNode(TraitStmtDeclNode *node, std::string *parentId);
+void printGetValue(GetValueNode *node, std::string *parentId);
 void printStringValueNode(std::string *value, std::string *parentId, std::string *arrowLabel); // Печатает узел со строковым значением
 
 void printTreeGraph(StartNode *node) {
@@ -187,8 +188,40 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
     GRAPH_STR += *node->idTag() + " [label=\"" + std::to_string(node->int_val) + "\"];\n";
     break;
 
-  case ExprType::plus_op: // Если операция с одним символом, просто пишем операцию в лейбле
-    GRAPH_STR += *node->idTag() + " [label=\"+\"];\n";
+  case ExprType::string_val:
+    GRAPH_STR += *node->idTag() + " [label=\" \\\"" + *node->string_val + "\\\" \"];\n";
+    break;
+  
+  case ExprType::this_keyword:
+    GRAPH_STR += *node->idTag() + " [label=\" This \"];\n";
+    break;
+
+  case ExprType::self_keyword:
+    GRAPH_STR += *node->idTag() + " [label=\" Self \"];\n";
+    break;
+
+  case ExprType::parent_keyword:
+    GRAPH_STR += *node->idTag() + " [label=\" Parent \"];\n";
+    break;
+
+  case ExprType::variable:
+    GRAPH_STR += *node->idTag() + " [label=\"Variable\"];\n";
+    printGetValue(node->get_value, node->idTag());
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::constant:
+    GRAPH_STR += *node->idTag() + " [label=\" \\\"" + *node->id + "\\\" \"];\n";
+    break;
+
+  case ExprType::assign_op:
+    GRAPH_STR += *node->idTag() + " [label=\"=\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::assign_ref_op:
+    GRAPH_STR += *node->idTag() + " [label=\"assign ref\"];\n";
     printExpr(node->left, node->idTag(), new std::string("left"));
     printExpr(node->right, node->idTag(), new std::string("right"));
     break;
@@ -196,6 +229,54 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
   case ExprType::int_cast: //Если операция более сложная, пишем название операции в лейбл
     GRAPH_STR += *node->idTag() + " [label=\"Int cast\"];\n";
     printExpr(node->left, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::float_cast: //Если операция более сложная, пишем название операции в лейбл
+    GRAPH_STR += *node->idTag() + " [label=\"Float cast\"];\n";
+    printExpr(node->left, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::string_cast: //Если операция более сложная, пишем название операции в лейбл
+    GRAPH_STR += *node->idTag() + " [label=\"String cast\"];\n";
+    printExpr(node->left, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::array_cast: //Если операция более сложная, пишем название операции в лейбл
+    GRAPH_STR += *node->idTag() + " [label=\"Array cast\"];\n";
+    printExpr(node->left, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::object_cast: //Если операция более сложная, пишем название операции в лейбл
+    GRAPH_STR += *node->idTag() + " [label=\"Object cast\"];\n";
+    printExpr(node->left, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::bool_cast: //Если операция более сложная, пишем название операции в лейбл
+    GRAPH_STR += *node->idTag() + " [label=\"Bool cast\"];\n";
+    printExpr(node->left, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::class_inst_field_ref_op:
+    GRAPH_STR += *node->idTag() + " [label=\"->\"];\n";
+    if (node->get_value != nullptr)
+      printGetValue(node->get_value, node->idTag());
+    printExpr(node->left, node->idTag(), new std::string(""));
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+    break;
+
+  case ExprType::class_inst_field_by_ref_op:
+    GRAPH_STR += *node->idTag() + " [label=\"->\"];\n";
+    if (node->get_value != nullptr)
+      printGetValue(node->get_value, node->idTag());
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+    break;
+  
+  case ExprType::plus_op: // Если операция с одним символом, просто пишем операцию в лейбле
+    GRAPH_STR += *node->idTag() + " [label=\"+\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
     break;
   }
 
