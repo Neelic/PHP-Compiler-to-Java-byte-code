@@ -66,6 +66,13 @@ ExprNode *ExprNode::CreateFromSelfKeyword() {
     return tmp;
 }
 
+ExprNode *ExprNode::CreateFromParentKeyword() {
+    auto *tmp = new ExprNode();
+    tmp->exprType = ExprType::parent_keyword;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
+    return tmp;
+}
+
 ExprNode *ExprNode::CreateFromGetValueId(GetValueNode *get_value, std::string *id) {
     auto *tmp = new ExprNode();
     tmp->get_value = get_value;
@@ -236,6 +243,28 @@ ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode *left, GetValueNode *
     tmp->get_value = get_value;
     tmp->right = get_value_expr;
     tmp->exprType = ExprType::class_inst_field_by_ref_op;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
+    return tmp;
+}
+
+ExprNode *ExprNode::CreateFromMethodReferenceDots(ExprNode *left, std::string *id, ExprList *list) {
+    auto *tmp = new ExprNode();
+    tmp->left = left;
+    tmp->id = id;
+    tmp->listParams = list;
+    tmp->exprType = ExprType::class_inst_method_by_ref_op;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
+    return tmp;
+}
+
+ExprNode *ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode *left, GetValueNode *get_value, std::string *id,
+                                                          ExprList *listParams) {
+    auto *tmp = new ExprNode();
+    tmp->left = left;
+    tmp->get_value = get_value;
+    tmp->id = id;
+    tmp->listParams = listParams;
+    tmp->exprType = ExprType::class_inst_get_value_method_by_ref_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
