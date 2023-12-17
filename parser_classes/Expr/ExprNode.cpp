@@ -170,8 +170,7 @@ ExprNode *ExprNode::CreateFromGetValueFieldReference(ExprNode *left, GetValueNod
     return tmp;
 }
 
-ExprNode *
-ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValueNode *get_value, ExprNode *get_value_expr) {
+ExprNode *ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValueNode *get_value, ExprNode *get_value_expr) {
     auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->get_value = get_value;
