@@ -8,7 +8,7 @@
   #include <sstream>
   #include <vector>
   // #include "FlexLexer.h"
-  #include "parser.tab."
+  #include "parser.tab.h"
 
   extern int yyparse(void);
   void error_print(char* errormsg, int lineCount, bool isWarning);
@@ -47,7 +47,7 @@ SPACE [\t\r\t\f\v ]
   if (!mis_symbols.empty()) {
     yytokentype tmp_s = mis_symbols[mis_symbols.size() - 1];
     mis_symbols.pop_back();
-    std::cout << std::to_string(tmp_s);
+    // std::cout << std::to_string(tmp_s);
     return tmp_s;
   }
 
@@ -104,7 +104,7 @@ default		        {printf("Found keyword: %s\n", yytext); return DEFAULT;}
 break		          {printf("Found keyword: %s\n", yytext); return BREAK;}
 if			          {printf("Found keyword: %s\n", yytext); return IF;}
 else		          {printf("Found keyword: %s\n", yytext); return ELSE;}
-elseif            {printf("Found keyword: %s\n", yytext); mis_symbols.push_back(IF); return ELSE; /*! TODO Не факт, что работает*/}
+elseif            {printf("Found keyword: %s\n", yytext); mis_symbols.push_back(IF); return ELSE; /*! Не работает в нынешнем виде*/}
 endif             {printf("Found keyword: %s\n", yytext); return END_IF;}
 match		          {printf("Found keyword: %s\n", yytext); return MATCH;}
 and 		          {printf("Found keyword: %s\n", yytext); return LOGIC_AND;}
