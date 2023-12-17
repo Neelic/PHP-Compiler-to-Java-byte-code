@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class ClassStmtNode;
 
@@ -7,6 +8,7 @@ public:
     static int GLOBAL_ID;
     int cur_id;
     std::vector<ClassStmtNode *> vector;
+    std::string IdTag() const;
 
     static ClassStmtList *CreateNode(ClassStmtNode *node);
 };

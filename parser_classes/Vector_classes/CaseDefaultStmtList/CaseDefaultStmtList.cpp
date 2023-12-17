@@ -11,3 +11,7 @@ CaseDefaultStmtList *CaseDefaultStmtList::CreateNode(CaseDefaultStmtNode *node) 
     return tmp;
 }
 
+std::string CaseDefaultStmtList::IdTag() const {
+    return std::string("CaseDefaultStmtList") + std::to_string(this->cur_id);
+}
+

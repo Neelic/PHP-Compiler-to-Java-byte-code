@@ -9,3 +9,7 @@ ConstDeclList *ConstDeclList::CreateNode(ConstDeclNode *node) {
     tmp->cur_id = ConstDeclList::GLOBAL_ID++;
     return tmp;
 }
+
+std::string ConstDeclList::IdTag() const {
+    return std::string("ConstDeclList") + std::to_string(this->cur_id);
+}

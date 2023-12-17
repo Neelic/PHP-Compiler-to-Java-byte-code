@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class StaticVarNode;
 
@@ -9,4 +10,6 @@ public:
     std::vector<StaticVarNode *> vector;
 
     static StaticVarList *CreateNode(StaticVarNode *node);
+    
+    std::string IdTag() const;
 };

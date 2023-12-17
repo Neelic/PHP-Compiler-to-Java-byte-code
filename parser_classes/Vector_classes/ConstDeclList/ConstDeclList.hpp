@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class ConstDeclNode;
 
@@ -9,4 +10,6 @@ public:
     std::vector<ConstDeclNode *> vector;
 
     static ConstDeclList *CreateNode(ConstDeclNode *node);
+    
+    std::string IdTag() const;
 };

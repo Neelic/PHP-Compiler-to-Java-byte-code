@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class ClassAccessModNode;
 
@@ -9,4 +10,7 @@ public:
     std::vector<ClassAccessModNode *> vector;
 
     static ClassAccessModList *CreateNode(ClassAccessModNode *node);
+
+    
+    std::string IdTag() const;
 };

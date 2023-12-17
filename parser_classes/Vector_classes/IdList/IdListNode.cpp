@@ -9,3 +9,7 @@ IdListNode *IdListNode::CreateNode(std::string *id) {
     tmp->cur_id = IdListNode::GLOBAL_ID++;
     return tmp;
 }
+
+std::string IdListNode::IdTag() const {
+    return std::string("IdListNode") + std::to_string(this->cur_id);
+}

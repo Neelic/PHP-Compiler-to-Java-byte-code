@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class ExprFuncNode;
 
@@ -9,4 +10,6 @@ public:
     std::vector<ExprFuncNode *> vector;
 
     static ExprFuncList *CreateNode(ExprFuncNode *node);
+    
+    std::string IdTag() const;
 };

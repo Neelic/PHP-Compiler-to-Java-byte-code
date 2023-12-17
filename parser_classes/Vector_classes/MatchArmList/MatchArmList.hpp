@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class MatchArmNode;
 
@@ -9,4 +10,6 @@ public:
     std::vector<MatchArmNode *> vector;
 
     static MatchArmList *CreateNode(MatchArmNode *node);
+    
+    std::string IdTag() const;
 };

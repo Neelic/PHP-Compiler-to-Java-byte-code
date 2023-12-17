@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class GetValueFuncNode;
 
@@ -9,4 +10,6 @@ public:
     std::vector<GetValueFuncNode *> vector;
 
     static GetValueFuncList *CreateNode(GetValueFuncNode *node);
+    
+    std::string IdTag() const;
 };

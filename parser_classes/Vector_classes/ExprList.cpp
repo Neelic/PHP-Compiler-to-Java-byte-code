@@ -9,3 +9,7 @@ ExprList *ExprList::CreateNode(ExprNode *node) {
     tmp->cur_id = ExprList::GLOBAL_ID++;
     return tmp;
 }
+
+std::string ExprList::IdTag() const {
+    return std::string("ExprList") + std::to_string(this->cur_id);
+}

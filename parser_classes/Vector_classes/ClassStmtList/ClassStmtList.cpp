@@ -10,3 +10,7 @@ ClassStmtList *ClassStmtList::CreateNode(ClassStmtNode *node) {
     return tmp;
 }
 
+std::string ClassStmtList::IdTag() const {
+    return std::string("ClassStmtList") + std::to_string(this->cur_id);
+}
+

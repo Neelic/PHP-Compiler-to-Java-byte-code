@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class InterfaceStmtNode;
 
@@ -10,4 +11,6 @@ public:
   std::vector<InterfaceStmtNode*> vector;
 
   static InterfaceStmtList *CreateNode(InterfaceStmtNode *node);
+    
+    std::string IdTag() const;
 };

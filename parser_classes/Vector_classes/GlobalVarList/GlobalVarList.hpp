@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 class GlobalVarNode;
 
@@ -10,4 +11,6 @@ public:
   std::vector<GlobalVarNode*> vector;
 
   static GlobalVarList *CreateNode(GlobalVarNode *node);
+    
+    std::string IdTag() const;
 };

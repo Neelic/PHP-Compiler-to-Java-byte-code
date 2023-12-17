@@ -1,5 +1,5 @@
 #include <vector>
-
+#include <string>
 class CaseDefaultStmtNode;
 
 class CaseDefaultStmtList {
@@ -9,4 +9,6 @@ public:
     std::vector<CaseDefaultStmtNode *> vector;
 
     static CaseDefaultStmtList *CreateNode(CaseDefaultStmtNode *node);
+
+    std::string IdTag() const;
 };

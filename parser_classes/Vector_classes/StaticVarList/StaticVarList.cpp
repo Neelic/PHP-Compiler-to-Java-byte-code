@@ -9,3 +9,7 @@ StaticVarList *StaticVarList::CreateNode(StaticVarNode *node) {
     tmp->cur_id = StaticVarList::GLOBAL_ID++;
     return tmp;
 }
+
+std::string StaticVarList::IdTag() const {
+    return std::string("StaticVarList") + std::to_string(this->cur_id);
+}

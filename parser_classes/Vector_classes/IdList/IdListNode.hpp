@@ -8,4 +8,6 @@ public:
     std::vector<std::string *> vector;
 
     static IdListNode *CreateNode(std::string *id);
+    
+    std::string IdTag() const;
 };

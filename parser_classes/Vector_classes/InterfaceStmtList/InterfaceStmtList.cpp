@@ -9,3 +9,7 @@ InterfaceStmtList *InterfaceStmtList::CreateNode(InterfaceStmtNode *node) {
     tmp->cur_id = InterfaceStmtList::GLOBAL_ID++;
     return tmp;
 }
+
+std::string InterfaceStmtList::IdTag() const {
+    return std::string("InterfaceStmtList") + std::to_string(this->cur_id);
+}

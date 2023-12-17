@@ -10,3 +10,7 @@ ExprFuncList *ExprFuncList::CreateNode(ExprFuncNode *node) {
     return tmp;
 }
 
+std::string ExprFuncList::IdTag() const {
+    return std::string("ExprFuncList") + std::to_string(this->cur_id);
+}
+
