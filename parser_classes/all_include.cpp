@@ -1,27 +1,34 @@
 #include "all_include.hpp"
 
-std::string GRAPH_STR("digraph Tree {\n");
+std::string GRAPH_STR("digraph Tree {\n"); 
+
+static int VALUE_ID; // Для тегов узлов с конечным значением
+int VALUE_ID = 0;
 
 void printTopStmtList(TopStmtList *node, std::string *parentId);
 void printTopStmt(TopStmtNode *node, std::string *parentId);
 void printStmt(StmtNode *node, std::string *parentId);
 void printIfStmt(IfStmtNode *node, std::string *parentId);
 void printSwitchStmt(SwitchStmtNode *node, std::string *parentId);
-void printStmtList(StmtList *list, std::string *parentId);
-void printStaticVarList(StaticVarList *list, std::string *parentId);
-void printGlobalVarList(GlobalVarList *list, std::string *parentId);
+void printCaseDefaultStmtList(CaseDefaultStmtList *node, std::string *parentId);
+void printCaseDefaultStmt(CaseDefaultStmtNode *node, std::string *parentId);
+void printStmtList(StmtList *node, std::string *parentId);
+void printStaticVarList(StaticVarList *node, std::string *parentId);
+void printStaticVar(StaticVarNode *node, std::string *parentId);
+void printGlobalVarList(GlobalVarList *node, std::string *parentId);
 void printWhileStmt(WhileStmtNode *node, std::string *parentId);
 void printDoWhileStmt(DoWhileStmtNode *node, std::string *parentId);
 void printForStmt(ForStmtNode *node, std::string *parentId);
 void printForEachStmt(ForEachStmtNode *node, std::string *parentId);
 void printMatchStmt(MatchStmtNode *node, std::string *parentId);
-void printConstDeclList(ConstDeclList *list, std::string *parentId);
+void printConstDeclList(ConstDeclList *node, std::string *parentId);
 void printHtmlStmt(HtmlStmtNode *node, std::string *parentId);
-void printExpr(ExprNode *node, std::string *parentId);
+void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel);
 void printFunctionStmtDecl(FunctionStmtDeclNode *node, std::string *parentId);
 void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId);
 void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, std::string *parentId);
 void printTraitStmtDeclNode(TraitStmtDeclNode *node, std::string *parentId);
+void printStringValueNode(std::string *value, std::string *parentId, std::string *arrowLabel); // Печатает узел со строковым значением
 
 void printTreeGraph(StartNode *node) {
     GRAPH_STR += *node->idTag() + " [label=\"Start\"];\n";
@@ -55,7 +62,8 @@ void printTopStmt(TopStmtNode *node, std::string *parentId) {
     printTraitStmtDeclNode(node->trait_stmt_decl, node->idTag());
 }
 
-void printStmt(StmtNode *node, std::string *parentId)
+//Возможно переделать
+void printStmt(StmtNode *node, std::string *parentId) 
 {
   GRAPH_STR += *node->idTag() + " [label=\"stmt\"];\n";
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
@@ -64,15 +72,15 @@ void printStmt(StmtNode *node, std::string *parentId)
     printIfStmt(node->if_stmt, node->idTag());
   if (node->switch_stmt != nullptr)
     printSwitchStmt(node->switch_stmt, node->idTag());
-  if(node->stmtList != NULL)
+  if(node->stmtList != nullptr)
     printStmtList(node->stmtList, node->idTag());
   if(node->expr_left != nullptr)
-    printExpr(node->expr_left, node->idTag());
+    printExpr(node->expr_left, node->idTag(), new std::string("left")); //TODO: В зависимости от node->type передавать разные значения для label
   if(node->expr_right != nullptr)
-    printExpr(node->expr_right, node->idTag());
-  if(node->static_var != NULL)
+    printExpr(node->expr_right, node->idTag(), new std::string("right")); //TODO: В зависимости от node->type передавать разные значения для label
+  if(node->static_var != nullptr)
     printStaticVarList(node->static_var, node->idTag());
-  if(node->global_var != NULL)
+  if(node->global_var != nullptr)
     printGlobalVarList(node->global_var, node->idTag());
   if(node->while_stmt != nullptr)
     printWhileStmt(node->while_stmt, node->idTag());
@@ -84,7 +92,7 @@ void printStmt(StmtNode *node, std::string *parentId)
     printForEachStmt(node->foreach_stmt, node->idTag());
   if(node->match_stmt != nullptr)
     printMatchStmt(node->match_stmt, node->idTag());
-  if(node->const_decl != NULL)
+  if(node->const_decl != nullptr)
     printConstDeclList(node->const_decl, node->idTag());
   if (node->html_stmt != nullptr)
     printHtmlStmt(node->html_stmt, node->idTag());
@@ -92,24 +100,112 @@ void printStmt(StmtNode *node, std::string *parentId)
 
 void printIfStmt(IfStmtNode *node, std::string *parentId)
 {
-  GRAPH_STR += *node->idTag() + " [label=\"If_stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " [label=\"If stmt\"];\n";
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
   
   if (node->expr != nullptr)
-    printExpr(node->expr, node->idTag());
+    printExpr(node->expr, node->idTag(), new std::string("condition"));
   if (node->stmt_main != nullptr)
     printStmt(node->stmt_main, node->idTag());
   if (node->stmt_else != nullptr)
     printStmt(node->stmt_else, node->idTag());
-  if (node->stmtListMain != NULL)
+  if (node->stmtListMain != nullptr)
     printStmtList(node->stmtListMain, node->idTag());
-  if (node->stmtListElse != NULL)
+  if (node->stmtListElse != nullptr)
     printStmtList(node->stmtListElse, node->idTag());
 };
 
 void printSwitchStmt(SwitchStmtNode *node, std::string *parentId)
 {
-  GRAPH_STR += *node->idTag() + " [label=\"Switch_stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " [label=\"Switch stmt\"];\n";
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if (node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string("param"));
+  if (node->defaultStmtList != nullptr)
+    printCaseDefaultStmtList(node->defaultStmtList, node->idTag());
 };
 
+void printCaseDefaultStmtList(CaseDefaultStmtList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Case default stmt list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printCaseDefaultStmt((node->vector)[i], node->idTag());
+  }
+}
+
+void printCaseDefaultStmt(CaseDefaultStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Switch stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if (node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string("condition"));
+  if (node->stmtList != nullptr)
+    printStmtList(node->stmtList, node->idTag());
+};
+
+void printStmtList(StmtList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Stmt list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printStmt((node->vector)[i], node->idTag());
+  }
+};
+
+void printStaticVarList(StaticVarList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Static var list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printStaticVar((node->vector)[i], node->idTag());
+  }
+};
+
+void printStaticVar(StaticVarNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Switch stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if (node->id != nullptr)
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+  if(node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string(""));
+}
+
+//Пока только два варианта для примера
+void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
+{
+  switch (node->exprType)
+  {
+  case ExprType::int_val: //Если просто значение, может просто его и печатать? А то получится узел ради узла
+    GRAPH_STR += *node->idTag() + " [label=\"" + std::to_string(node->int_val) + "\"];\n";
+    break;
+
+  case ExprType::plus_op: // Если операция с одним символом, просто пишем операцию в лейбле
+    GRAPH_STR += *node->idTag() + " [label=\"+\"];\n";
+    printExpr(node->left, node->idTag(), new std::string("left"));
+    printExpr(node->right, node->idTag(), new std::string("right"));
+    break;
+
+  case ExprType::int_cast: //Если операция более сложная, пишем название операции в лейбл
+    GRAPH_STR += *node->idTag() + " [label=\"Int cast\"];\n";
+    printExpr(node->left, node->idTag(), new std::string(""));
+    break;
+  }
+
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "[label=\"" + *arrowLabel + "\"];\n";
+};
+
+void printStringValueNode(std::string *value, std::string *parentId, std::string *arrowLabel)
+{
+  std::string tag("VAL_" + std::to_string(VALUE_ID++));
+
+  GRAPH_STR += tag + " [label=\"" + *value + "\"];\n";
+  GRAPH_STR += tag + " -> " + *parentId + " [label=\"" + *arrowLabel + "\"];\n";
+};
