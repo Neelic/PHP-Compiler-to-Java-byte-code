@@ -1,4 +1,5 @@
 #include "ForStmtType.cpp"
+#include <string>
 #include <vector>
 
 class ExprNode;
@@ -14,7 +15,11 @@ public:
     StmtNode* stmt;
     StmtList* stmtList;
     ForStmtType type;
+    int cur_id;
+    static int GLOBAL_ID;
 
     static ForStmtNode* CreateFromForStmt(ExprNode* expr_left, ExprNode* expr_central, ExprNode* expr_right, StmtNode* stmt);
     static ForStmtNode* CreateFromForEndStmt(ExprNode* expr_left, ExprNode* expr_central, ExprNode* expr_right, StmtList* stmtList);
+
+    std::string IdTag();
 };

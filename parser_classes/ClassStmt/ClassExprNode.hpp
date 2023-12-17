@@ -15,8 +15,12 @@ public:
     ExprNode* expr;
     ConstDeclList* const_decl_list;
     ClassExprType type;
+    int cur_id;
+    static int GLOBAL_ID;
 
     static ClassExprNode* CreateFromGetValueAssign(ClassAccessModList* access_mod_list, GetValueNode* get_value, std::string* id, ExprNode* expr);
     static ClassExprNode* CreateFromGetValue(ClassAccessModList* access_mod_list, GetValueNode* get_value, std::string* id);
     static ClassExprNode* CreateFromConstant(ClassAccessModList* access_mod_list, ConstDeclList* const_decl_list);
+
+    std::string IdTag();
 };

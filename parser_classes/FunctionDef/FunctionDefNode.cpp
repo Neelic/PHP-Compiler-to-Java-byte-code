@@ -1,11 +1,18 @@
 #include "FunctionDefNode.hpp"
 
+int FunctionDefNode::GLOBAL_ID = 0;
+
+std::string FunctionDefNode::IdTag() {
+    return std::string("FunctionDef") + std::to_string(this->cur_id);
+}
+
 FunctionDefNode* FunctionDefNode::CreateFromDefWithNoType(std::string* func_id, ExprFuncList* expr_func_list)
 {
     FunctionDefNode* tmp = new FunctionDefNode();
     tmp->func_id = func_id;
     tmp->expr_func_list = expr_func_list;
     tmp->type = FunctionDefType::no_type;
+    tmp->cur_id = FunctionDefNode::GLOBAL_ID++;
     return tmp;
 }
 
@@ -16,5 +23,6 @@ FunctionDefNode* FunctionDefNode::CreateFromDefWithType(std::string* func_id, Ex
     tmp->expr_func_list = expr_func_list;
     tmp->type_id = type_id;
     tmp->type = FunctionDefType::with_type;
+    tmp->cur_id = FunctionDefNode::GLOBAL_ID++;
     return tmp;
 }
