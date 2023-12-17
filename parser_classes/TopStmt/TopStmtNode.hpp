@@ -30,7 +30,7 @@ public:
     static TopStmtNode* CreateFromInterfaceDecl(InterfaceStmtDeclNode* interface_stmt_decl);
     static TopStmtNode* CreateFromTraitDecl(TraitStmtDeclNode* trait_stmt_decl);
 
-    std::string IdTag();
+    std::string* idTag() const;
 };
 
 #endif

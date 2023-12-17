@@ -2,40 +2,69 @@
 
 std::string GRAPH_STR("digraph Tree {\n");
 
-void printTopStmtList(TopStmtList *node, StartNode *parent);
-void printTopStmt(TopStmtNode *node, TopStmtList *parent);
-void printStmtFromTopStmt(StmtNode *node, TopStmtNode *parent);
+void printTopStmtList(TopStmtList *node, std::string *parentId);
 
-void printTreeGraph(StartNode *node)
-{
-  GRAPH_STR += node->IdTag() + " [label=\"Start\"];\n";
+void printTopStmt(TopStmtNode *node, std::string *parentId);
 
-  if (node->top_stmt_list != NULL)
-    printTopStmtList(node->top_stmt_list, node);
+void printStmt(StmtNode *node, std::string *parentId);
+
+void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId);
+
+void printTraitStmtDecl(TraitStmtDeclNode *node, std::string *parentId);
+
+void printInterfaceStmtDecl(TraitStmtDeclNode *node, std::string *parentId);
+
+void printFuncStmtDecl(FunctionStmtDeclNode *node, std::string *parentId);
+
+void printTreeGraph(StartNode *node) {
+    GRAPH_STR += *node->idTag() + " [label=\"Start\"];\n";
+
+    if (node->top_stmt_list != nullptr)
+        printTopStmtList(node->top_stmt_list, node->idTag());
 }
 
-void printTopStmtList(TopStmtList *node, StartNode *parent)
-{
-  GRAPH_STR += node->IdTag() + " [label=\"Top stmt list\"]\n";
-  GRAPH_STR += node->IdTag() + " -> " + parent->IdTag() + "\n";
+void printTopStmtList(TopStmtList *node, std::string *parentId) {
+    GRAPH_STR += *node->idTag() + " [label=\"Top stmt list\"];\n";
+    GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
-  for (int i = 0; i < node->vector.size(); i++)
-  {
-    printTopStmt((node->vector)[i], node);
-  }
+    for (int i = 0; i < node->vector.size(); i++) {
+        printTopStmt((node->vector)[i], node->idTag());
+    }
 }
 
-void printTopStmt(TopStmtNode *node, TopStmtList *parent)
-{
-  GRAPH_STR += node->IdTag() + " [label=\"Top stmt\"];\n";
-  GRAPH_STR += node->IdTag() + " -> " + parent->IdTag() + "\n";
+void printTopStmt(TopStmtNode *node, std::string *parentId) {
+    GRAPH_STR += *node->idTag() + " [label=\"Top stmt\"];\n";
+    GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
-  if (node->stmt != nullptr)
-    printStmtFromTopStmt(node->stmt, node);
+    if (node->stmt != nullptr)
+        printStmt(node->stmt, node->idTag());
+    else if (node->class_stmt_decl != nullptr)
+        printClassStmtDecl(node->class_stmt_decl, node->idTag());
+    else if (node->trait_stmt_decl != nullptr)
+        printTraitStmtDecl(node->trait_stmt_decl, node->idTag());
+    else if (node->interface_stmt_decl != nullptr)
+        printInterfaceStmtDecl(node->trait_stmt_decl, node->idTag());
+    else if (node->func_stmt_decl != nullptr)
+        printFuncStmtDecl(node->func_stmt_decl, node->idTag());
 }
 
-void printStmtFromTopStmt(StmtNode *node, TopStmtNode *parent)
-{
-  GRAPH_STR += node->IdTag() + " [label=\"stmt\"];\n";
-  GRAPH_STR += node->IdTag() + " -> " + parent->IdTag() + "\n";
+void printStmt(StmtNode *node, std::string *parentId) {
+    GRAPH_STR += *node->idTag() + " [label=\"Stmt\"];\n";
+    GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+}
+
+void printFuncStmtDecl(FunctionStmtDeclNode *node, std::string *parentId) {
+
+}
+
+void printInterfaceStmtDecl(TraitStmtDeclNode *node, std::string *parentId) {
+
+}
+
+void printTraitStmtDecl(TraitStmtDeclNode *node, std::string *basicString) {
+
+}
+
+void printClassStmtDecl(ClassStmtDeclNode *node, std::string *basicString) {
+
 }

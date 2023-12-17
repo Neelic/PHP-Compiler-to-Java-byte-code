@@ -18,7 +18,7 @@ public:
 
     static TopStmtList *CreateNode(TopStmtNode *node);
 
-    std::string IdTag() const;
+    std::string* idTag() const;
 };
 
 #endif

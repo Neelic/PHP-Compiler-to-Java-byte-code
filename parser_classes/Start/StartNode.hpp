@@ -12,5 +12,5 @@ public:
     TopStmtList *top_stmt_list;
 
     static StartNode *CreateNode(TopStmtList *top_stmt_list);
-    static std::string IdTag();
+    std::string * idTag() const;
 };
