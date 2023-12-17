@@ -220,7 +220,7 @@ ExprNode *ExprNode::CreateFromFieldReferenceDots(ExprNode *left, std::string *id
     auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->id = id;
-    tmp->exprType = ExprType::class_inst_field_ref_op;
+    tmp->exprType = ExprType::class_inst_field_ref_dots_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
@@ -230,7 +230,7 @@ ExprNode *ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode *left, GetValu
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->id = id;
-    tmp->exprType = ExprType::class_inst_field_ref_op;
+    tmp->exprType = ExprType::class_inst_field_ref_dots_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
