@@ -22,6 +22,8 @@ void printDoWhileStmt(DoWhileStmtNode *node, std::string *parentId);
 void printForStmt(ForStmtNode *node, std::string *parentId);
 void printForEachStmt(ForEachStmtNode *node, std::string *parentId);
 void printMatchStmt(MatchStmtNode *node, std::string *parentId);
+void printMatchArmList(MatchArmList *node, std::string *parentId);
+void printMatchArm(MatchArmNode *node, std::string *parentId);
 void printConstDeclList(ConstDeclList *node, std::string *parentId);
 void printHtmlStmt(HtmlStmtNode *node, std::string *parentId);
 void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel);
@@ -245,6 +247,97 @@ void printGlobalVar(GlobalVarNode *node, std::string *parentId)
     printGetValue(node->get_value, node->idTag());
 }
 
+void printWhileStmt(WhileStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"While stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string("condition"));
+  if(node->stmt != nullptr)
+    printStmt(node->stmt, node->idTag(), new std::string("body"));
+  if(node->stmtList != nullptr)
+    printStmtList(node->stmtList, node->idTag(), new std::string("body"));
+};
+
+void printDoWhileStmt(DoWhileStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Do while stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string("condition"));
+  if(node->stmt != nullptr)
+    printStmt(node->stmt, node->idTag(), new std::string("body"));
+};
+
+void printForStmt(ForStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Do while stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->expr_left != nullptr)
+    printExpr(node->expr_left, node->idTag(), new std::string("condition left"));
+  if(node->expr_central != nullptr)
+    printExpr(node->expr_central, node->idTag(), new std::string("condition central"));
+  if(node->expr_right != nullptr)
+   printExpr(node->expr_right, node->idTag(), new std::string("condition right"));
+  if(node->stmt != nullptr)
+    printStmt(node->stmt, node->idTag(), new std::string("body"));
+  if(node->stmtList)
+    printStmtList(node->stmtList, node->idTag(), new std::string("body"));
+};
+
+void printForEachStmt(ForEachStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Do while stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->expr_left != nullptr)
+    printExpr(node->expr_left, node->idTag(), new std::string("condition left"));
+  if(node->expr_right != nullptr)
+   printExpr(node->expr_right, node->idTag(), new std::string("condition right"));
+  if(node->stmt != nullptr)
+    printStmt(node->stmt, node->idTag(), new std::string("body"));
+  if(node->id != nullptr)
+    printStringValueNode(node->id, node->idTag(), new std::string("param name"));
+  if(node->stmtList)
+    printStmtList(node->stmtList, node->idTag(), new std::string("body"));
+}
+
+void printMatchStmt(MatchStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Match stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string("condition"));
+  if(node->matchList != nullptr)
+    printMatchArmList(node->matchList, node->idTag());
+};
+
+void printMatchArmList(MatchArmList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Match arm list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printMatchArm((node->vector)[i], node->idTag());
+  }
+};
+
+void printMatchArm(MatchArmNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Match arm\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->exprList != nullptr)
+    printExprList(node->exprList, node->idTag());
+  if(node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string("default"));
+};
+
+//ExprNode
 void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
 {
   // Значения
@@ -625,6 +718,13 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
   }
 
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "[label=\"" + *arrowLabel + "\"];\n";
+};
+
+
+void printGetValue(GetValueNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Get value count:" + std::to_string(node->count) + "\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 };
 
 void printStringValueNode(std::string *value, std::string *parentId, std::string *arrowLabel)
