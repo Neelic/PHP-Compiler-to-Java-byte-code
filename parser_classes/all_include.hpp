@@ -70,6 +70,7 @@
 #include "ForStmt/ForStmtNode.hpp"
 
 #include "IfStmt/IfStmtNode.hpp"
+#include "Vector_classes/ElseIfDotList/ElseIfDotList.h"
 
 #include "Start/StartNode.hpp"
 

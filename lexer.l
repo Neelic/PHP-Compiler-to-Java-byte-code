@@ -37,16 +37,16 @@ SPACE [\t\r\t\f\v ]
 
 %{
   std::string str;
-  static std::vector<yytokentype> mis_symbols;
+  static std::vector<yytokentype> mis_keyword;
   int tmp;
   float test = .0;
   int nestingCount = 0;
   static int lineCount = 1;
   static bool inCode = false;
 
-  if (!mis_symbols.empty()) {
-    yytokentype tmp_s = mis_symbols[mis_symbols.size() - 1];
-    mis_symbols.pop_back();
+  if (!mis_keyword.empty()) {
+    yytokentype tmp_s = mis_keyword[mis_keyword.size() - 1];
+    mis_keyword.pop_back();
     // std::cout << std::to_string(tmp_s);
     return tmp_s;
   }
@@ -104,7 +104,7 @@ default		        {printf("Found keyword: %s\n", yytext); return DEFAULT;}
 break		          {printf("Found keyword: %s\n", yytext); return BREAK;}
 if			          {printf("Found keyword: %s\n", yytext); return IF;}
 else		          {printf("Found keyword: %s\n", yytext); return ELSE;}
-elseif            {printf("Found keyword: %s\n", yytext); mis_symbols.push_back(IF); return ELSE; /*! Не работает в нынешнем виде*/}
+elseif            {printf("Found keyword: %s\n", yytext); mis_keyword.push_back(IF); return ELSE;}
 endif             {printf("Found keyword: %s\n", yytext); return END_IF;}
 match		          {printf("Found keyword: %s\n", yytext); return MATCH;}
 and 		          {printf("Found keyword: %s\n", yytext); return LOGIC_AND;}
@@ -195,7 +195,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                       printf("Found end php code section: %s\n", yytext); 
                       inCode = false; 
                       str = ""; 
-                      mis_symbols.push_back(END_CODE_PHP_TAG); /*! TODO Не факт, что работает */
+                      mis_keyword.push_back(END_CODE_PHP_TAG); /*! TODO Не факт, что работает */
                       BEGIN(NOT_IN_PHP_CODE);
                       return ';';
                     }

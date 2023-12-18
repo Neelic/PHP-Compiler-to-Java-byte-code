@@ -2,8 +2,8 @@
 
 int StaticVarNode::GLOBAL_ID = 0;
 
-std::string StaticVarNode::IdTag() {
-    return std::string("StaticVar") + std::to_string(this->cur_id);
+std::string* StaticVarNode::idTag() const {
+    return new std::string (std::string("StaticVar") + std::to_string(this->cur_id));
 }
 
 StaticVarNode* StaticVarNode::CreateFromId(std::string* id)

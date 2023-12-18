@@ -7,13 +7,13 @@
 </head>
 <body>
     <div class=".<\?php>">
-        <?php if (true): $a = 1; $b = 2?>
-        <?php elseif(true):?>
+        <?php if ($_COOKIE): $a = 1; $b = 2?>
+        <?php else: ?>
         <? echo "SOMETHING \$";?>
         <?php echo "abc
                     cbd";?>
         <!-- <\?php -->
-        <?php endif;?>
+        <?php endif?>
         <?php for ($i = 0; $i <= 1; $i = $i+1):?>
         <?php endfor;?>
         <?php while (1): ?>
@@ -35,8 +35,6 @@ class Person
     static public $name = 100;
     private static $age;
 
-    private static $a = static function() use ($name):void {};
-
     public function __construct($name, $age)
     {
         $this->name = $name;
@@ -46,22 +44,19 @@ class Person
     public function greet()
     {
         echo "Hello, \u{41} my \x41 name is " . $this->name . " and I am " . self::$age . " years old." . PHP_EOL;
-        die();
     }
 
     public static function statFunc($name)
     {
         echo "Hello,\ \ \my $name \is A \n \x and I am " . self::$age . " years old." . PHP_EOL;
-        
-        yield;
     }
 }
 
 abstract class Example extends Person {
     use property, ai;
     abstract public $c = 1;
-    const NAME = 1, abc = '123';
-    function b() {
+    private const NAME = 1, abc = '123';
+    protected function b() {
         parent::greet();
         self::${$_COOKIE};
     }
@@ -86,8 +81,6 @@ b()::a;
 
 ${1 + 2}->cal_info();
 
-static fn(int $x) => throw $a;
-
 // Creating instances of the Person class 
 $person1 = new Person("John", 2.5);
 $person2 = new Person("Jane", 30);
@@ -99,8 +92,6 @@ Person::statFunc('a');
 
 ('a' . 's')[0];
 
-$persons = [$person1, $person2];
-
 static $int = 1_000; 
 $hexdec = 0x1A;
 $octal = 0123;
@@ -108,9 +99,6 @@ $octal_other = 0o123;
 $binary = 0b11111111;
 $interpolStr = "String interpol $int";
 $interpolStrOther = "String interpol {$person->name}";
-
-define('person', 1);
-$tmp = person - 1;
 
 // Loops - for loop
 for ($i = 0; $i < count($persons); $i++) {
@@ -177,11 +165,6 @@ $float_exp_alt = 7E-10;
 $float_lin_exp = 1_23.45e-2_0;
 $somenullby = 0;
 
-declare(ticks=1);
-
-goto a;
-
-a:
 echo 'Bar' . "";
 
 $output = `ls -al` . '';

@@ -2,8 +2,8 @@
 
 std::string GRAPH_STR("digraph Tree {\n"); 
 
-static int VALUE_ID; // Для тегов узлов с конечным значением
-int VALUE_ID = 0;
+static int VALUE_ID = 0; // Для тегов узлов с конечным значением
+//int VALUE_ID = 0;
 
 void printTopStmtList(TopStmtList *node, std::string *parentId);
 void printTopStmt(TopStmtNode *node, std::string *parentId);
