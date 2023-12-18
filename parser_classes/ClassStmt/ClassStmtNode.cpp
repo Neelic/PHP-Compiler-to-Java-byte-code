@@ -53,3 +53,11 @@ ClassStmtNode* ClassStmtNode::CreateFromClassStmtDecl(ClassStmtDeclNode* class_s
     tmp->cur_id = ClassStmtNode::GLOBAL_ID++;
     return tmp;
 }
+
+ClassStmtNode *ClassStmtNode::CreateFromFunctionDef(ClassAccessModList *access_mod, FunctionDefNode *function_def) {
+    auto *tmp = new ClassStmtNode();
+    tmp->access_mod = access_mod;
+    tmp->function_def = function_def;
+    tmp->cur_id = ClassStmtNode::GLOBAL_ID++;
+    return tmp;
+}
