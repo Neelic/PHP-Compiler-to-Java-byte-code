@@ -25,14 +25,29 @@ void printMatchStmt(MatchStmtNode *node, std::string *parentId);
 void printMatchArmList(MatchArmList *node, std::string *parentId);
 void printMatchArm(MatchArmNode *node, std::string *parentId);
 void printConstDeclList(ConstDeclList *node, std::string *parentId);
+void printConstDecl(ConstDeclNode *node, std::string *parentId);
 void printHtmlStmt(HtmlStmtNode *node, std::string *parentId);
 void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel);
 void printExprList(ExprList *node, std::string *parentId);
 void printFunctionStmtDecl(FunctionStmtDeclNode *node, std::string *parentId);
+void printFunctionDef(FunctionDefNode *node, std::string *parentId);
+void printExprFuncList(ExprFuncList *node, std::string *parentId);
+void printExprFunc(ExprFuncNode *node, std::string *parentId);
+void printGetValueFunc(GetValueFuncNode *node, std::string *parentId);
 void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId);
+void printClassDef(ClassDefNode *node, std::string *parentId);
+void printClassStmtList(ClassStmtList *node, std::string *parentId);
+void printClassStmt(ClassStmtNode *node, std::string *parentId);
+void printClassExpr(ClassExprNode *node, std::string *parentId);
+void printClassAccessModList(ClassAccessModList *node, std::string *parentId);
+void printClassAccessMod(ClassAccessModNode *node, std::string *parentId);
 void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, std::string *parentId);
+void printInterfaceExprDef(InterfaceExprDefNode *node, std::string *parentId);
+void printInterfaceStmtList(InterfaceStmtList *node, std::string *parentId);
+void printInterfaceStmt(InterfaceStmtNode *node, std::string *parentId);
 void printTraitStmtDeclNode(TraitStmtDeclNode *node, std::string *parentId);
 void printGetValue(GetValueNode *node, std::string *parentId);
+void printIdList(IdListNode *node, std::string *parentId, std::string *arrowLabel);
 void printStringValueNode(std::string *value, std::string *parentId, std::string *arrowLabel); // Печатает узел со строковым значением
 
 void printTreeGraph(StartNode *node) {
@@ -335,6 +350,33 @@ void printMatchArm(MatchArmNode *node, std::string *parentId)
     printExprList(node->exprList, node->idTag());
   if(node->expr != nullptr)
     printExpr(node->expr, node->idTag(), new std::string("default"));
+};
+
+void printConstDeclList(ConstDeclList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Const declaration list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printConstDecl((node->vector)[i], node->idTag());
+  }
+};
+
+void printConstDecl(ConstDeclNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Const declaration\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->id != nullptr)
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+  if(node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string(""));
+};
+
+void printHtmlStmt(HtmlStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Const declaration\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 };
 
 //ExprNode
@@ -720,11 +762,262 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "[label=\"" + *arrowLabel + "\"];\n";
 };
 
+//Function stmt
+void printFunctionStmtDecl(FunctionStmtDeclNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Function stmt declaration\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->function_def != nullptr)
+    printFunctionDef(node->function_def, node->idTag());
+  if(node->stmt_list != nullptr)
+    printStmtList(node->stmt_list, node->idTag(), new std::string("body"));
+};
+
+void printFunctionDef(FunctionDefNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Function definition\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->func_id != nullptr)
+    printStringValueNode(node->func_id, node->idTag(), new std::string("function name"));
+  if(node->type_id != nullptr)
+    printStringValueNode(node->type_id, node->idTag(), new std::string("function type"));
+  if(node->expr_func_list != nullptr)
+    printExprFuncList(node->expr_func_list, node->idTag());
+};
+
+void printExprFuncList(ExprFuncList *node, std::string *parentId){
+  GRAPH_STR += *node->idTag() + " [label=\"Expr function list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + " [label=\"params\"];\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printExprFunc((node->vector)[i], node->idTag());
+  }
+};
+
+void printExprFunc(ExprFuncNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Expr function\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->get_value_func != nullptr)
+    printGetValueFunc(node->get_value_func, node->idTag());
+  if(node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string(""));
+};
+
+void printGetValueFunc(GetValueFuncNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Get value function\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->id_value != nullptr)
+    printStringValueNode(node->id_value, node->idTag(), new std::string("name"));
+  if(node->id_type != nullptr)
+    printStringValueNode(node->id_type, node->idTag(), new std::string("type"));
+};
+
+//Class nodes
+void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId)
+{
+  switch (node->type)
+  {
+  case ClassStmtDeclType::no_modifiers_type:
+    GRAPH_STR += *node->idTag() + " [label=\"Class declaration\"];\n";
+    break;
+
+  case ClassStmtDeclType::abstract_type:
+    GRAPH_STR += *node->idTag() + " [label=\"Class declaration abstract\"];\n";
+    break;
+  
+  case ClassStmtDeclType::final_type:
+    GRAPH_STR += *node->idTag() + " [label=\"Class declaration final\"];\n";
+    break;
+  }
+
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->class_def != nullptr)
+    printClassDef(node->class_def, node->idTag());
+  if(node->class_stmt_list != nullptr)
+    printClassStmtList(node->class_stmt_list, node->idTag());
+};
+
+void printClassDef(ClassDefNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Class definition\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->class_id != nullptr)
+    printStringValueNode(node->class_id, node->idTag(), new std::string("name"));
+  if(node->extend_id)
+    printStringValueNode(node->extend_id, node->idTag(), new std::string("extends"));
+  if(node->impl_id_list)
+    printIdList(node->impl_id_list, node->idTag(), new std::string("implements"));
+};
+
+void printClassStmtList(ClassStmtList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Class stmt list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printClassStmt((node->vector)[i], node->idTag());
+  }
+};
+
+void printClassStmt(ClassStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Class stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->class_expr != nullptr)
+    printClassExpr(node->class_expr, node->idTag());
+  if(node->access_mod != nullptr)
+    printClassAccessModList(node->access_mod, node->idTag());
+  if(node->function_stmt_decl != nullptr)
+    printFunctionStmtDecl(node->function_stmt_decl, node->idTag());
+  if(node->function_def != nullptr)
+    printFunctionDef(node->function_def, node->idTag());
+  if(node->id_list != nullptr)
+    printIdList(node->id_list, node->idTag(), new std::string(""));
+  if(node->class_stmt_decl != nullptr)
+    printClassStmtDecl(node->class_stmt_decl, node->idTag());
+};
+
+void printClassExpr(ClassExprNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Class expr\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->access_mod_list != nullptr)
+    printClassAccessModList(node->access_mod_list, node->idTag());
+  if(node->get_value != nullptr)
+    printGetValue(node->get_value, node->idTag());
+  if(node->id != nullptr)
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+  if(node->expr != nullptr)
+    printExpr(node->expr, node->idTag(), new std::string(""));
+  if(node->const_decl_list != nullptr)
+    printConstDeclList(node->const_decl_list, node->idTag());
+};
+
+void printClassAccessModList(ClassAccessModList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Access mod list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printClassAccessMod((node->vector)[i], node->idTag());
+  }
+};
+
+void printClassAccessMod(ClassAccessModNode *node, std::string *parentId)
+{
+  switch (node->access_mod)
+  {
+  case ClassAccessMod::public_node:
+    GRAPH_STR += *node->idTag() + " [label=\"Access mod: public\"];\n";
+    break;
+
+  case ClassAccessMod::protected_node:
+    GRAPH_STR += *node->idTag() + " [label=\"Access mod: protected\"];\n";
+    break;
+
+  case ClassAccessMod::private_node:
+    GRAPH_STR += *node->idTag() + " [label=\"Access mod: private\"];\n";
+    break;
+
+  case ClassAccessMod::final_node:
+    GRAPH_STR += *node->idTag() + " [label=\"Access mod: final\"];\n";
+    break;
+
+  case ClassAccessMod::abstract_node:
+    GRAPH_STR += *node->idTag() + " [label=\"Access mod: abstract\"];\n";
+    break;
+
+  case ClassAccessMod::read_only_node:
+    GRAPH_STR += *node->idTag() + " [label=\"Access mod: read only\"];\n";
+    break;
+
+  case ClassAccessMod::static_node:
+    GRAPH_STR += *node->idTag() + " [label=\"Access mod: static\"];\n";
+    break;
+  }
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+};
+
+//Interface nodes
+void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Interface stmt declaration\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->expr_definition != nullptr)
+    printInterfaceExprDef(node->expr_definition, node->idTag());
+  if(node->stmt_list != nullptr)
+    printInterfaceStmtList(node->stmt_list, node->idTag());
+};
+
+void printInterfaceExprDef(InterfaceExprDefNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Interface expr definition\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->id != nullptr)
+    printStringValueNode(node->id, node->idTag(), new std::string("name"));
+  if(node->id_extended_list != nullptr)
+    printIdList(node->id_extended_list, node->idTag(), new std::string("extends"));
+};
+
+void printInterfaceStmtList(InterfaceStmtList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Interface stmt list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printInterfaceStmt((node->vector)[i], node->idTag());
+  }
+};
+
+void printInterfaceStmt(InterfaceStmtNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Interface stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->access_mod != nullptr)
+    printClassAccessModList(node->access_mod, node->idTag());
+  if(node->function_def != nullptr)
+    printFunctionDef(node->function_def, node->idTag());
+};
+
+void printTraitStmtDeclNode(TraitStmtDeclNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Trait stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if(node->id != nullptr)
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+  if(node->stmt_list != nullptr)
+    printClassStmtList(node->stmt_list, node->idTag());
+};
+
 
 void printGetValue(GetValueNode *node, std::string *parentId)
 {
   GRAPH_STR += *node->idTag() + " [label=\"Get value count:" + std::to_string(node->count) + "\"];\n";
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+};
+
+void printIdList(IdListNode *node, std::string *parentId, std::string *arrowLabel)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Id list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + " [label=\"" + *arrowLabel + "\"];\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printStringValueNode((node->vector)[i], node->idTag(), new std::string(""));
+  }
 };
 
 void printStringValueNode(std::string *value, std::string *parentId, std::string *arrowLabel)
