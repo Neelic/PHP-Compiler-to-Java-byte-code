@@ -26,6 +26,16 @@ ClassStmtNode* ClassStmtNode::CreateFromFunctionStmtDecl(ClassAccessModList* acc
     return tmp;
 }
 
+static ClassStmtNode* CreateFromFunctionDef(ClassAccessModList* access_mod, FunctionDefNode* function_def)
+{
+    ClassStmtNode* tmp = new ClassStmtNode();
+    tmp->access_mod = access_mod;
+    tmp->function_def = function_def;
+    tmp->type = ClassStmtType::function_def;
+    tmp->cur_id = ClassStmtNode::GLOBAL_ID++;
+    return tmp;
+}
+
 ClassStmtNode* ClassStmtNode::CreateFromIdList(IdListNode* id_list)
 {
     ClassStmtNode* tmp = new ClassStmtNode();

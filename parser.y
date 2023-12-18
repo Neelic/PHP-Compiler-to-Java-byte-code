@@ -503,7 +503,7 @@ class_stmt_list_not_e:    class_stmt                                 {$$=ClassSt
 
 class_stmt: class_expr ';'                                           {cout<<"Reduce expr to class stmt\n";$$=ClassStmtNode::CreateFromClassExpr($1);}
         |   class_access_mod_list function_stmt_decl                 {cout<<"Reduce func to class stmt\n";$$=ClassStmtNode::CreateFromFunctionStmtDecl($1, $2);}
-        |   class_access_mod_list function_def ';'                   {}
+        |   class_access_mod_list function_def ';'                   {cout<<"Reduce func to class def\n";$$=ClassStmtNode::CreateFromFunctionDef($1, $2);}
         |   USE id_list ';'                                          {cout<<"Reduce use to class stmt\n";$$=ClassStmtNode::CreateFromIdList($2);}
         |   class_stmt_decl                                          {cout<<"Reduce class to class stmt\n";$$=ClassStmtNode::CreateFromClassStmtDecl($1);}
         ;       
