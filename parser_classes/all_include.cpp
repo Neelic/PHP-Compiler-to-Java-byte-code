@@ -16,6 +16,7 @@ void printStmtList(StmtList *node, std::string *parentId, std::string *arrowLabe
 void printStaticVarList(StaticVarList *node, std::string *parentId);
 void printStaticVar(StaticVarNode *node, std::string *parentId);
 void printGlobalVarList(GlobalVarList *node, std::string *parentId);
+void printGlobalVar(GlobalVarNode *node, std::string *parentId);
 void printWhileStmt(WhileStmtNode *node, std::string *parentId);
 void printDoWhileStmt(DoWhileStmtNode *node, std::string *parentId);
 void printForStmt(ForStmtNode *node, std::string *parentId);
@@ -67,9 +68,6 @@ void printTopStmt(TopStmtNode *node, std::string *parentId) {
 //Возможно переделать
 void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel) 
 {
-  
-  
-
   switch (node->type)
   {
   case StmtType::throw_stmt:
@@ -129,7 +127,7 @@ void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel)
     break;
   }
 
-  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "[label=\"" + *arrowLabel + "\"];\n";
 };
 
 void printIfStmt(IfStmtNode *node, std::string *parentId)
@@ -198,7 +196,7 @@ void printCaseDefaultStmt(CaseDefaultStmtNode *node, std::string *parentId)
 void printStmtList(StmtList *node, std::string *parentId, std::string *arrowLabel)
 {
   GRAPH_STR += *node->idTag() + " [label=\"Stmt list\"];\n";
-  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "[label=\"" + *arrowLabel + "\"];\n";
 
   for (int i = 0; i < node->vector.size(); i++) {
       printStmt((node->vector)[i], node->idTag(), new std::string(""));
@@ -217,13 +215,34 @@ void printStaticVarList(StaticVarList *node, std::string *parentId)
 
 void printStaticVar(StaticVarNode *node, std::string *parentId)
 {
-  GRAPH_STR += *node->idTag() + " [label=\"Switch stmt\"];\n";
+  GRAPH_STR += *node->idTag() + " [label=\"Static var\"];\n";
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
   if (node->id != nullptr)
     printStringValueNode(node->id, node->idTag(), new std::string(""));
   if(node->expr != nullptr)
     printExpr(node->expr, node->idTag(), new std::string(""));
+}
+
+void printGlobalVarList(GlobalVarList *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Global var list\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  for (int i = 0; i < node->vector.size(); i++) {
+      printGlobalVar((node->vector)[i], node->idTag());
+  }
+};
+
+void printGlobalVar(GlobalVarNode *node, std::string *parentId)
+{
+  GRAPH_STR += *node->idTag() + " [label=\"Global var\"];\n";
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+
+  if (node->id != nullptr)
+    printStringValueNode(node->id, node->idTag(), new std::string(""));
+  if(node->get_value != nullptr)
+    printGetValue(node->get_value, node->idTag());
 }
 
 void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel)
