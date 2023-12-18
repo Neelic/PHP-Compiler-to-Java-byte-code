@@ -2,8 +2,8 @@
 
 std::string GRAPH_STR("digraph Tree {\n"); 
 
-static int VALUE_ID; // Для тегов узлов с конечным значением
-int VALUE_ID = 0;
+static int VALUE_ID = 0; // Для тегов узлов с конечным значением
+//int VALUE_ID = 0;
 
 void printTopStmtList(TopStmtList *node, std::string *parentId);
 void printTopStmt(TopStmtNode *node, std::string *parentId);
@@ -50,16 +50,16 @@ void printTopStmt(TopStmtNode *node, std::string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Top stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
-  if (node->stmt != nullptr)
-    printStmt(node->stmt, node-> idTag());
-  if (node->func_stmt_decl != nullptr)
-    printFunctionStmtDecl(node->func_stmt_decl, node->idTag());
-  if (node->class_stmt_decl != nullptr)
-    printClassStmtDecl(node->class_stmt_decl, node->idTag());
-  if (node->interface_stmt_decl != nullptr)
-    printInterfaceStmtDecl(node->interface_stmt_decl, node->idTag());
-  if (node->trait_stmt_decl != nullptr)
-    printTraitStmtDeclNode(node->trait_stmt_decl, node->idTag());
+//  if (node->stmt != nullptr)
+//    printStmt(node->stmt, node-> idTag());
+//  if (node->func_stmt_decl != nullptr)
+//    printFunctionStmtDecl(node->func_stmt_decl, node->idTag());
+//  if (node->class_stmt_decl != nullptr)
+//    printClassStmtDecl(node->class_stmt_decl, node->idTag());
+//  if (node->interface_stmt_decl != nullptr)
+//    printInterfaceStmtDecl(node->interface_stmt_decl, node->idTag());
+//  if (node->trait_stmt_decl != nullptr)
+//    printTraitStmtDeclNode(node->trait_stmt_decl, node->idTag());
 }
 
 //Возможно переделать
@@ -68,34 +68,34 @@ void printStmt(StmtNode *node, std::string *parentId)
   GRAPH_STR += *node->idTag() + " [label=\"stmt\"];\n";
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
-  if (node->if_stmt != nullptr)
-    printIfStmt(node->if_stmt, node->idTag());
-  if (node->switch_stmt != nullptr)
-    printSwitchStmt(node->switch_stmt, node->idTag());
-  if(node->stmtList != nullptr)
-    printStmtList(node->stmtList, node->idTag());
-  if(node->expr_left != nullptr)
-    printExpr(node->expr_left, node->idTag(), new std::string("left")); //TODO: В зависимости от node->type передавать разные значения для label
-  if(node->expr_right != nullptr)
-    printExpr(node->expr_right, node->idTag(), new std::string("right")); //TODO: В зависимости от node->type передавать разные значения для label
-  if(node->static_var != nullptr)
-    printStaticVarList(node->static_var, node->idTag());
-  if(node->global_var != nullptr)
-    printGlobalVarList(node->global_var, node->idTag());
-  if(node->while_stmt != nullptr)
-    printWhileStmt(node->while_stmt, node->idTag());
-  if(node->do_while_stmt != nullptr)
-    printDoWhileStmt(node->do_while_stmt, node->idTag());
-  if(node->for_stmt != nullptr)
-    printForStmt(node->for_stmt, node->idTag());
-  if(node->foreach_stmt != nullptr)
-    printForEachStmt(node->foreach_stmt, node->idTag());
-  if(node->match_stmt != nullptr)
-    printMatchStmt(node->match_stmt, node->idTag());
-  if(node->const_decl != nullptr)
-    printConstDeclList(node->const_decl, node->idTag());
-  if (node->html_stmt != nullptr)
-    printHtmlStmt(node->html_stmt, node->idTag());
+//  if (node->if_stmt != nullptr)
+//    printIfStmt(node->if_stmt, node->idTag());
+//  if (node->switch_stmt != nullptr)
+//    printSwitchStmt(node->switch_stmt, node->idTag());
+//  if(node->stmtList != nullptr)
+//    printStmtList(node->stmtList, node->idTag());
+//  if(node->expr_left != nullptr)
+//    printExpr(node->expr_left, node->idTag(), new std::string("left")); //TODO: В зависимости от node->type передавать разные значения для label
+//  if(node->expr_right != nullptr)
+//    printExpr(node->expr_right, node->idTag(), new std::string("right")); //TODO: В зависимости от node->type передавать разные значения для label
+//  if(node->static_var != nullptr)
+//    printStaticVarList(node->static_var, node->idTag());
+//  if(node->global_var != nullptr)
+//    printGlobalVarList(node->global_var, node->idTag());
+//  if(node->while_stmt != nullptr)
+//    printWhileStmt(node->while_stmt, node->idTag());
+//  if(node->do_while_stmt != nullptr)
+//    printDoWhileStmt(node->do_while_stmt, node->idTag());
+//  if(node->for_stmt != nullptr)
+//    printForStmt(node->for_stmt, node->idTag());
+//  if(node->foreach_stmt != nullptr)
+//    printForEachStmt(node->foreach_stmt, node->idTag());
+//  if(node->match_stmt != nullptr)
+//    printMatchStmt(node->match_stmt, node->idTag());
+//  if(node->const_decl != nullptr)
+//    printConstDeclList(node->const_decl, node->idTag());
+//  if (node->html_stmt != nullptr)
+//    printHtmlStmt(node->html_stmt, node->idTag());
 };
 
 void printIfStmt(IfStmtNode *node, std::string *parentId)

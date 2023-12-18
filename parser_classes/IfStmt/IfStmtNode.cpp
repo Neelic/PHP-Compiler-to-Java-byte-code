@@ -48,3 +48,13 @@ IfStmtNode* IfStmtNode::CreateFromIfElseEndIfStmt(ExprNode* expr, StmtList* stmt
     tmp->cur_id = IfStmtNode::GLOBAL_ID++;
     return tmp;
 }
+
+IfStmtNode *IfStmtNode::CreateFromIfElseListDot(ExprNode *expr, StmtList *stmtListMain, ElseIfDotList *list) {
+    auto *tmp = new IfStmtNode();
+    tmp->expr = expr;
+    tmp->stmtListMain = stmtListMain;
+    tmp->listElse = list;
+    tmp->type = IfStmtType::if_else_list_endif;
+    tmp->cur_id = IfStmtNode::GLOBAL_ID++;
+    return tmp;
+}

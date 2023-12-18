@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.26)
 project(PHP_Compiler)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -178,4 +178,6 @@ add_executable(PHP_Compiler
         lex.yy.c
         main.cpp
         parser.tab.h
-        parser.tab.c)
+        parser.tab.c
+        parser_classes/Vector_classes/ElseIfDotList/ElseIfDotList.cpp
+        parser_classes/Vector_classes/ElseIfDotList/ElseIfDotList.h)
