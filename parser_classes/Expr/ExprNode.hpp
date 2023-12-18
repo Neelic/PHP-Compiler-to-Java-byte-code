@@ -98,7 +98,7 @@ public:
     //Clone
     static ExprNode* CreateFromCloneOp(ExprNode* left);
     //Ternary
-    static ExprNode* CreateFromTernaryOp(ExprNode* left, ExprNode* right, ExprNode* central);
+    static ExprNode* CreateFromTernaryOp(ExprNode* left, ExprNode* central, ExprNode* right);
     //Ref op - уточнить
     static ExprNode* CreateFromRefOp(GetValueNode* get_value, ExprNode* right);
     //Array
