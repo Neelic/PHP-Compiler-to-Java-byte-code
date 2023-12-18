@@ -67,37 +67,69 @@ void printTopStmt(TopStmtNode *node, std::string *parentId) {
 //Возможно переделать
 void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel) 
 {
-  GRAPH_STR += *node->idTag() + " [label=\"stmt\"];\n";
-  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
+  
+  
 
-  if (node->if_stmt != nullptr)
+  switch (node->type)
+  {
+  case StmtType::throw_stmt:
+    GRAPH_STR += *node->idTag() + " [label=\"Throw\"];\n";
+    printExpr(node->expr_left, node->idTag(), new std::string(""));
+    break;
+
+  case StmtType::return_stmt:
+    GRAPH_STR += *node->idTag() + " [label=\"Return\"];\n";
+    printExpr(node->expr_left, node->idTag(), new std::string(""));
+    break;
+
+  case StmtType::break_stmt:
+    GRAPH_STR += *node->idTag() + " [label=\"Break\"];\n";
+    break;
+
+  case StmtType::t_echo_stmt:
+    GRAPH_STR += *node->idTag() + " [label=\"t-echo\"];\n";
+    printExpr(node->expr_left, node->idTag(), new std::string(""));
+    break;
+  
+  case StmtType::continue_stmt:
+    GRAPH_STR += *node->idTag() + " [label=\"Continue\"];\n";
+    break;
+
+  default:
+    GRAPH_STR += *node->idTag() + " [label=\"stmt\"];\n";
+
+    if (node->if_stmt != nullptr)
     printIfStmt(node->if_stmt, node->idTag());
-  if (node->switch_stmt != nullptr)
-    printSwitchStmt(node->switch_stmt, node->idTag());
-  if(node->stmtList != nullptr)
-    printStmtList(node->stmtList, node->idTag(), new std::string(""));
-  if(node->expr_left != nullptr)
-    printExpr(node->expr_left, node->idTag(), new std::string("left")); //TODO: В зависимости от node->type передавать разные значения для label
-  if(node->expr_right != nullptr)
-    printExpr(node->expr_right, node->idTag(), new std::string("right")); //TODO: В зависимости от node->type передавать разные значения для label
-  if(node->static_var != nullptr)
-    printStaticVarList(node->static_var, node->idTag());
-  if(node->global_var != nullptr)
-    printGlobalVarList(node->global_var, node->idTag());
-  if(node->while_stmt != nullptr)
-    printWhileStmt(node->while_stmt, node->idTag());
-  if(node->do_while_stmt != nullptr)
-    printDoWhileStmt(node->do_while_stmt, node->idTag());
-  if(node->for_stmt != nullptr)
-    printForStmt(node->for_stmt, node->idTag());
-  if(node->foreach_stmt != nullptr)
-    printForEachStmt(node->foreach_stmt, node->idTag());
-  if(node->match_stmt != nullptr)
-    printMatchStmt(node->match_stmt, node->idTag());
-  if(node->const_decl != nullptr)
-    printConstDeclList(node->const_decl, node->idTag());
-  if (node->html_stmt != nullptr)
-    printHtmlStmt(node->html_stmt, node->idTag());
+    if (node->switch_stmt != nullptr)
+      printSwitchStmt(node->switch_stmt, node->idTag());
+    if(node->stmtList != nullptr)
+      printStmtList(node->stmtList, node->idTag(), new std::string(""));
+    if(node->expr_left != nullptr)
+      printExpr(node->expr_left, node->idTag(), new std::string("left")); //TODO: В зависимости от node->type передавать разные значения для label
+    if(node->expr_right != nullptr)
+      printExpr(node->expr_right, node->idTag(), new std::string("right")); //TODO: В зависимости от node->type передавать разные значения для label
+    if(node->static_var != nullptr)
+      printStaticVarList(node->static_var, node->idTag());
+    if(node->global_var != nullptr)
+      printGlobalVarList(node->global_var, node->idTag());
+    if(node->while_stmt != nullptr)
+      printWhileStmt(node->while_stmt, node->idTag());
+    if(node->do_while_stmt != nullptr)
+      printDoWhileStmt(node->do_while_stmt, node->idTag());
+    if(node->for_stmt != nullptr)
+      printForStmt(node->for_stmt, node->idTag());
+    if(node->foreach_stmt != nullptr)
+      printForEachStmt(node->foreach_stmt, node->idTag());
+    if(node->match_stmt != nullptr)
+      printMatchStmt(node->match_stmt, node->idTag());
+    if(node->const_decl != nullptr)
+      printConstDeclList(node->const_decl, node->idTag());
+    if (node->html_stmt != nullptr)
+      printHtmlStmt(node->html_stmt, node->idTag());
+    break;
+  }
+
+  GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 };
 
 void printIfStmt(IfStmtNode *node, std::string *parentId)
