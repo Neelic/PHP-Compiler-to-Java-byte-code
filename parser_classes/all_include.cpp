@@ -7,12 +7,12 @@ int VALUE_ID = 0;
 
 void printTopStmtList(TopStmtList *node, std::string *parentId);
 void printTopStmt(TopStmtNode *node, std::string *parentId);
-void printStmt(StmtNode *node, std::string *parentId);
+void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel);
 void printIfStmt(IfStmtNode *node, std::string *parentId);
 void printSwitchStmt(SwitchStmtNode *node, std::string *parentId);
 void printCaseDefaultStmtList(CaseDefaultStmtList *node, std::string *parentId);
 void printCaseDefaultStmt(CaseDefaultStmtNode *node, std::string *parentId);
-void printStmtList(StmtList *node, std::string *parentId);
+void printStmtList(StmtList *node, std::string *parentId, std::string *arrowLabel);
 void printStaticVarList(StaticVarList *node, std::string *parentId);
 void printStaticVar(StaticVarNode *node, std::string *parentId);
 void printGlobalVarList(GlobalVarList *node, std::string *parentId);
@@ -53,7 +53,7 @@ void printTopStmt(TopStmtNode *node, std::string *parentId) {
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
   if (node->stmt != nullptr)
-    printStmt(node->stmt, node-> idTag());
+    printStmt(node->stmt, node-> idTag(), new std::string(""));
   if (node->func_stmt_decl != nullptr)
     printFunctionStmtDecl(node->func_stmt_decl, node->idTag());
   if (node->class_stmt_decl != nullptr)
@@ -65,7 +65,7 @@ void printTopStmt(TopStmtNode *node, std::string *parentId) {
 }
 
 //Возможно переделать
-void printStmt(StmtNode *node, std::string *parentId) 
+void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel) 
 {
   GRAPH_STR += *node->idTag() + " [label=\"stmt\"];\n";
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
@@ -75,7 +75,7 @@ void printStmt(StmtNode *node, std::string *parentId)
   if (node->switch_stmt != nullptr)
     printSwitchStmt(node->switch_stmt, node->idTag());
   if(node->stmtList != nullptr)
-    printStmtList(node->stmtList, node->idTag());
+    printStmtList(node->stmtList, node->idTag(), new std::string(""));
   if(node->expr_left != nullptr)
     printExpr(node->expr_left, node->idTag(), new std::string("left")); //TODO: В зависимости от node->type передавать разные значения для label
   if(node->expr_right != nullptr)
@@ -108,13 +108,13 @@ void printIfStmt(IfStmtNode *node, std::string *parentId)
   if (node->expr != nullptr)
     printExpr(node->expr, node->idTag(), new std::string("condition"));
   if (node->stmt_main != nullptr)
-    printStmt(node->stmt_main, node->idTag());
+    printStmt(node->stmt_main, node->idTag(), new std::string("true"));
   if (node->stmt_else != nullptr)
-    printStmt(node->stmt_else, node->idTag());
+    printStmt(node->stmt_else, node->idTag(), new std::string("false"));
   if (node->stmtListMain != nullptr)
-    printStmtList(node->stmtListMain, node->idTag());
+    printStmtList(node->stmtListMain, node->idTag(), new std::string("true"));
   if (node->stmtListElse != nullptr)
-    printStmtList(node->stmtListElse, node->idTag());
+    printStmtList(node->stmtListElse, node->idTag(), new std::string("false"));
 };
 
 void printSwitchStmt(SwitchStmtNode *node, std::string *parentId)
@@ -140,22 +140,36 @@ void printCaseDefaultStmtList(CaseDefaultStmtList *node, std::string *parentId)
 
 void printCaseDefaultStmt(CaseDefaultStmtNode *node, std::string *parentId)
 {
-  GRAPH_STR += *node->idTag() + " [label=\"Switch stmt\"];\n";
+  
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
-  if (node->expr != nullptr)
+  switch (node->type)
+  {
+  case CaseDefaultType::case_stmt:
+    GRAPH_STR += *node->idTag() + " [label=\"Case \"];\n";
     printExpr(node->expr, node->idTag(), new std::string("condition"));
-  if (node->stmtList != nullptr)
-    printStmtList(node->stmtList, node->idTag());
+    printStmtList(node->stmtList, node->idTag(), new std::string("code"));
+    break;
+
+  case CaseDefaultType::default_stmt:
+    GRAPH_STR += *node->idTag() + " [label=\"Default \"];\n";
+    printStmtList(node->stmtList, node->idTag(), new std::string("code"));
+    break;
+
+  case CaseDefaultType::finally_stmt:
+    GRAPH_STR += *node->idTag() + " [label=\"Finally \"];\n";
+    printStmtList(node->stmtList, node->idTag(), new std::string("code"));
+    break;
+  }
 };
 
-void printStmtList(StmtList *node, std::string *parentId)
+void printStmtList(StmtList *node, std::string *parentId, std::string *arrowLabel)
 {
   GRAPH_STR += *node->idTag() + " [label=\"Stmt list\"];\n";
   GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
   for (int i = 0; i < node->vector.size(); i++) {
-      printStmt((node->vector)[i], node->idTag());
+      printStmt((node->vector)[i], node->idTag(), new std::string(""));
   }
 };
 
