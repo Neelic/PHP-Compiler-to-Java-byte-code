@@ -39,8 +39,8 @@ class GlobalVarList;
 
 class StmtNode {
 public:
-    ExprNode *expr_left;
-    ExprNode *expr_right;
+    ExprNode *expr_left = nullptr;
+    ExprNode *expr_right = nullptr;
     IfStmtNode *if_stmt;
     SwitchStmtNode *switch_stmt;
     StmtList *stmtList;

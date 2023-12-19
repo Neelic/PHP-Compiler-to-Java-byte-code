@@ -37,6 +37,8 @@ SPACE [\t\r\t\f\v ]
 
 %{
   std::string str;
+  std::string tmp_string;
+  std::stringstream stream;
   static std::vector<yytokentype> mis_keyword;
   int tmp;
   float test = .0;
@@ -200,9 +202,9 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                       return ';';
                     }
 {IDENTIFIER}        { printf("Found identifier: %s\n", yytext);
-                      std::string tmp = std::string(yytext);
-                      yylval.sval=&tmp;
-                      return ID;}
+                      yylval.sval=new std::string(yytext);;
+                      return ID;
+                    }
 {INTEGER}           {squeeze(yytext, '_'); printf("Found integer number: %s\n", yytext); yylval.ival=atoi(yytext); return INT_NUMBER;}
 {INT_HEXIDECIMAL}   {squeeze(yytext, '_'); printf("Found integer hexidecimal number: %s\n", yytext); /*TODO do convert*/}
 {INT_OCTAL}         {squeeze(yytext, '_'); printf("Found integer octal number: %s\n", yytext); /*TODO do convert*/}
@@ -260,7 +262,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 <MULTILINE_COMMENT>"*/"       {printf("Found multiline comment: %s\n", str.c_str()); BEGIN(INITIAL);}
 
 <EXECUTION_OPERATOR>[^`]+     {str += yytext;}
-<EXECUTION_OPERATOR>"`"       {printf("Found shell command: %s\n", str.c_str()); BEGIN(INITIAL); yylval.sval=&str; return COM_STRING;}
+<EXECUTION_OPERATOR>"`"       {printf("Found shell command: %s\n", str.c_str()); BEGIN(INITIAL); yylval.sval=new std::string(str); str=""; return COM_STRING;}
 
 <SINGLE_QUOTE_STRING>[^\'\\]+   {str += yytext;}
 <SINGLE_QUOTE_STRING>\\\'       {str += "\'";}
@@ -268,7 +270,8 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 <SINGLE_QUOTE_STRING>\'         {
                                   printf("Found string literal: %s\n", str.c_str());
                                   BEGIN(INITIAL);
-                                  yylval.sval=&str;
+                                  yylval.sval=new std::string(str);
+                                  str="";
                                   return STRING;
                                 }
 
@@ -284,17 +287,20 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 <DOUBLE_QUOTE_STRING>\\\"                    {str += "\"";}
 <DOUBLE_QUOTE_STRING>\\\$                    {str += "$";}
 <DOUBLE_QUOTE_STRING>\\[^nrtvefu"$\\]        {str += yytext;}
-<DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {std::stringstream stream;
+<DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {
                                               stream << std::__cxx11::stoi(yytext + 2);
                                               stream >> std::hex >> tmp;
-                                              str += (char) tmp;}
-<DOUBLE_QUOTE_STRING>\\u\{[0-9A-Fa-f]+\}     {std::string temp = ""; 
-                                              temp += yytext+3; 
-                                              temp.erase(temp.find('}'), 1);
+                                              str += (char) tmp;
+                                              }
+<DOUBLE_QUOTE_STRING>\\u\{[0-9A-Fa-f]+\}     {
+                                              tmp_string = ""; 
+                                              tmp_string += yytext+3; 
+                                              tmp_string.erase(tmp_string.find('}'), 1);
                                               std::stringstream stream;
-                                              stream << std::__cxx11::stoi(temp);
+                                              stream << std::__cxx11::stoi(tmp_string);
                                               stream >> std::hex >> tmp;
-                                              str += (char) tmp;}
+                                              str += (char) tmp;
+                                              }
 <DOUBLE_QUOTE_STRING>\\u\{[^0-9A-Fa-f]\}      {str += yytext;}
 <DOUBLE_QUOTE_STRING>\\u[^{]*                 {str += yytext;}
 <DOUBLE_QUOTE_STRING>\\u\{[^}]*               {str += yytext;}
@@ -307,7 +313,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                                                 printf("Found operation: $\n");
                                                 nestingCount++;
                                                 BEGIN(INITIAL);
-                                                yylval.sval=&str;
+                                                yylval.sval=new std::string(str);
                                                 return STRING;
                                               }
 <DOUBLE_QUOTE_STRING>\$[^a-zA-Z_]?            {str += yytext;}
@@ -321,7 +327,8 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
     }
     printf("Found string literal: %s\n", str.c_str());
     BEGIN(INITIAL);
-    yylval.sval=&str;
+    yylval.sval=new std::string(str);
+    str="";
     return STRING;
 }
 

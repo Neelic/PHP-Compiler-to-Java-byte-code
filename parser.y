@@ -299,11 +299,11 @@ for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt 
         ;
 
 foreach_stmt: FOREACH '(' expr AS expr ')' stmt                                                                 {$$=ForEachStmtNode::CreateFromForeachStmt($3, $5, $7);}
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' stmt                                           {$$=ForEachStmtNode::CreateFromForeachRightArrowStmt($3, $5, $8, $10);}
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' stmt                                       {$$=ForEachStmtNode::CreateFromForeachRightArrowPointerStmt($3, $5, $9, $11);}
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' stmt                                           {$$=ForEachStmtNode::CreateFromForeachRightArrowStmt($3, $5, new string(*$8), $10);}
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' stmt                                       {$$=ForEachStmtNode::CreateFromForeachRightArrowPointerStmt($3, $5, new string(*$9), $11);}
         |     FOREACH '(' expr AS expr ')' ':' stmt_list_may_empty END_FOREACH ';'                              {$$=ForEachStmtNode::CreateFromEndForeachStmt($3, $5, $8);}
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'        {$$=ForEachStmtNode::CreateFromEndForeachRightArrowStmt($3, $5, $8, $11);}
-        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'    {$$=ForEachStmtNode::CreateFromEndForeachRightArrowPointerStmt($3, $5, $9, $12);}
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'        {$$=ForEachStmtNode::CreateFromEndForeachRightArrowStmt($3, $5, new string(*$8), $11);}
+        |     FOREACH '(' expr AS expr R_DOUBLE_ARROW '&' '$' ID ')' ':' stmt_list_may_empty END_FOREACH ';'    {$$=ForEachStmtNode::CreateFromEndForeachRightArrowPointerStmt($3, $5, new string(*$9), $12);}
         ;
 
 while_stmt: WHILE '(' expr ')' stmt                                                   {$$=WhileStmtNode::CreateFromWhileStmt($3, $5);}
@@ -317,7 +317,7 @@ match_stmt: MATCH '(' expr ')' '{' match_stmt_list '}' ';'                      
         ;
 
 match_stmt_list:  match_stmt_list_not_e                                               {$$=$1;}
-                | /* empty */                                                         {}
+                | /* empty */                                                         {$$=nullptr;}
                 ;
 
 match_stmt_list_not_e:    match_arm                                                   {$$=MatchArmList::CreateNode($1);}
@@ -349,14 +349,14 @@ stmt:     expr_may_empty ';'                                                    
         | CONTINUE ';'                                                                {$$=StmtNode::CreateFromContinueStmt();}
         ;
 
-static_var_list:  '$' ID                                                              {$$=StaticVarList::CreateNode(StaticVarNode::CreateFromId($2));}
-                | '$' ID '=' expr                                                     {$$=StaticVarList::CreateNode(StaticVarNode::CreateFromIdAssign($2, $4));}
-                | static_var_list ',' '$' ID                                          {$1->vector.push_back(StaticVarNode::CreateFromId($4));$$=$1;}
-                | static_var_list ',' '$' ID '=' expr                                 {$1->vector.push_back(StaticVarNode::CreateFromIdAssign($4, $6));$$=$1;}
+static_var_list:  '$' ID                                                              {$$=StaticVarList::CreateNode(StaticVarNode::CreateFromId(new string(*$2)));}
+                | '$' ID '=' expr                                                     {$$=StaticVarList::CreateNode(StaticVarNode::CreateFromIdAssign(new string(*$2), $4));}
+                | static_var_list ',' '$' ID                                          {$1->vector.push_back(StaticVarNode::CreateFromId(new string(*$4)));$$=$1;}
+                | static_var_list ',' '$' ID '=' expr                                 {$1->vector.push_back(StaticVarNode::CreateFromIdAssign(new string(*$4), $6));$$=$1;}
                 ;
 
-global_var_list:  get_value ID                                                        {$$=GlobalVarList::CreateNode(GlobalVarNode::CreateFromGlobalValue($1, $2));}
-                | global_var_list ',' get_value ID                                    {$1->vector.push_back(GlobalVarNode::CreateFromGlobalValue($3, $4));$$=$1;}                    
+global_var_list:  get_value ID                                                        {$$=GlobalVarList::CreateNode(GlobalVarNode::CreateFromGlobalValue($1, new string(*$2)));}
+                | global_var_list ',' get_value ID                                    {$1->vector.push_back(GlobalVarNode::CreateFromGlobalValue($3, new string(*$4)));$$=$1;}                    
                 ;
 
 stmt_list: stmt                                                                       {$$=StmtList::CreateNode($1);}
@@ -364,20 +364,20 @@ stmt_list: stmt                                                                 
         ;
 
 stmt_list_may_empty: stmt_list                                                        {cout<<"Reduce to stmt list me\n";$$=$1;}
-                |    /* empty */                                                      {}
+                |    /* empty */                                                      {$$=nullptr;}
                 ;
 
-html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG                  {$$=HtmlStmtNode::CreateNode($2);}
-        |  END_CODE_PHP_TAG START_CODE_PHP_TAG                       {auto*tmp=new string;$$=HtmlStmtNode::CreateNode(tmp);}
+html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG                  {$$=HtmlStmtNode::CreateNode(new string(*$2));}
+        |  END_CODE_PHP_TAG START_CODE_PHP_TAG                       {$$=HtmlStmtNode::CreateNode(new string());}
         ;
 
 expr:     INT_NUMBER                                                 {$$=ExprNode::CreateFromIntValue($1);}
         | FLOAT_NUMBER                                               {$$=ExprNode::CreateFromFloatValue($1);}
-        | STRING                                                     {$$=ExprNode::CreateFromStringValue($1);}
-        | COM_STRING                                                 {$$=ExprNode::CreateFromComStringValue($1);}
+        | STRING                                                     {$$=ExprNode::CreateFromStringValue(new string(*$1));}
+        | COM_STRING                                                 {$$=ExprNode::CreateFromComStringValue(new string(*$1));}
         | '$' THIS                                                   {$$=ExprNode::CreateFromThisKeyword();}
-        | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, $2);}
-        | ID                                                         {$$=ExprNode::CreateFromId($1);}
+        | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, new string(*$2));}
+        | ID                                                         {$$=ExprNode::CreateFromId(new string(*$1));}
         | expr '=' expr                                              {$$=ExprNode::CreateFromAssignOp($1, $3);}
         | expr '=' '&' expr %prec '='                                {$$=ExprNode::CreateFromAssignRefOp($1, $4);}
         | INT_CAST expr                                              {$$=ExprNode::CreateFromIntCast($2);}
@@ -386,26 +386,26 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | ARRAY_CAST expr                                            {$$=ExprNode::CreateFromArrayCast($2);}
         | OBJECT_CAST expr                                           {$$=ExprNode::CreateFromObjectCast($2);}
         | BOOL_CAST expr                                             {$$=ExprNode::CreateFromBoolCast($2);}
-        | expr R_ARROW ID                                            {$$=ExprNode::CreateFromFieldReference($1, $3);}
-        | expr R_ARROW get_value ID                                  {$$=ExprNode::CreateFromGetValueFieldReference($1, $3, $4);}
+        | expr R_ARROW ID                                            {$$=ExprNode::CreateFromFieldReference($1, new string(*$3));}
+        | expr R_ARROW get_value ID                                  {$$=ExprNode::CreateFromGetValueFieldReference($1, $3, new string(*$4));}
         | expr R_ARROW get_value '{' expr '}'                        {$$=ExprNode::CreateFromGetValueWithExprReference($1, $3, $5);}
-        | expr R_ARROW ID '(' expr_list ')'                          {$$=ExprNode::CreateFromMethodReference($1, $3, $5);}
-        | expr R_ARROW get_value ID '(' expr_list ')'                {$$=ExprNode::CreateFromGetValueMethodReference($1, $3, $4, $6);}
-        | expr QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots($1, $3);}
-        | expr QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots($1, $3, $4);}
+        | expr R_ARROW ID '(' expr_list ')'                          {$$=ExprNode::CreateFromMethodReference($1, new string(*$3), $5);}
+        | expr R_ARROW get_value ID '(' expr_list ')'                {$$=ExprNode::CreateFromGetValueMethodReference($1, $3, new string(*$4), $6);}
+        | expr QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots($1, new string(*$3));}
+        | expr QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots($1, $3, new string(*$4));}
         | expr QUARTER_DOT get_value '{' expr '}'                    {$$=ExprNode::CreateFromGetValueWithExprReferenceDots($1, $3, $5);}
-        | expr QUARTER_DOT ID '(' expr_list ')'                      {$$=ExprNode::CreateFromMethodReferenceDots($1, $3, $5);}
-        | expr QUARTER_DOT get_value ID '(' expr_list ')'            {$$=ExprNode::CreateFromGetValueMethodReferenceDots($1, $3, $4, $6);}
-        | SELF QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots(ExprNode::CreateFromSelfKeyword(), $3);}
-        | SELF QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, $4);}
+        | expr QUARTER_DOT ID '(' expr_list ')'                      {$$=ExprNode::CreateFromMethodReferenceDots($1, new string(*$3), $5);}
+        | expr QUARTER_DOT get_value ID '(' expr_list ')'            {$$=ExprNode::CreateFromGetValueMethodReferenceDots($1, $3, new string(*$4), $6);}
+        | SELF QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots(ExprNode::CreateFromSelfKeyword(), new string(*$3));}
+        | SELF QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, new string(*$4));}
         | SELF QUARTER_DOT get_value '{' expr '}'                    {$$=ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, $5);}
-        | SELF QUARTER_DOT ID '(' expr_list ')'                      {$$=ExprNode::CreateFromMethodReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, $5);}
-        | SELF QUARTER_DOT get_value ID '(' expr_list ')'            {$$=ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, $4, $6);}
-        | PARENT QUARTER_DOT ID                                      {$$=ExprNode::CreateFromFieldReferenceDots(ExprNode::CreateFromParentKeyword(), $3);}
-        | PARENT QUARTER_DOT get_value ID                            {$$=ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode::CreateFromParentKeyword(), $3, $4);}
+        | SELF QUARTER_DOT ID '(' expr_list ')'                      {$$=ExprNode::CreateFromMethodReferenceDots(ExprNode::CreateFromSelfKeyword(), new string(*$3), $5);}
+        | SELF QUARTER_DOT get_value ID '(' expr_list ')'            {$$=ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, new string(*$4), $6);}
+        | PARENT QUARTER_DOT ID                                      {$$=ExprNode::CreateFromFieldReferenceDots(ExprNode::CreateFromParentKeyword(), new string(*$3));}
+        | PARENT QUARTER_DOT get_value ID                            {$$=ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode::CreateFromParentKeyword(), $3, new string(*$4));}
         | PARENT QUARTER_DOT get_value '{' expr '}'                  {$$=ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode::CreateFromParentKeyword(), $3, $5);}
-        | PARENT QUARTER_DOT ID '(' expr_list ')'                    {$$=ExprNode::CreateFromMethodReferenceDots(ExprNode::CreateFromParentKeyword(), $3, $5);}
-        | PARENT QUARTER_DOT get_value ID '(' expr_list ')'          {$$=ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode::CreateFromParentKeyword(), $3, $4, $6);}
+        | PARENT QUARTER_DOT ID '(' expr_list ')'                    {$$=ExprNode::CreateFromMethodReferenceDots(ExprNode::CreateFromParentKeyword(), new string(*$3), $5);}
+        | PARENT QUARTER_DOT get_value ID '(' expr_list ')'          {$$=ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode::CreateFromParentKeyword(), $3, new string(*$4), $6);}
         | '(' expr ')'                                               {$$=$2;}
         | expr '-' expr                                              {$$=ExprNode::CreateFromSubtraction($1, $3);}
         | expr '+' expr                                              {$$=ExprNode::CreateFromAddition($1, $3);}
@@ -423,7 +423,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr LOGIC_AND expr                                        {$$=ExprNode::CreateFromLogicOpAnd($1, $3);}
         | expr EQUAL expr                                            {$$=ExprNode::CreateFromBooleanOpEqual($1, $3);}
         | expr EQUAL_STRICT expr                                     {$$=ExprNode::CreateFromBooleanOpEqualStrict($1, $3);}
-        | expr EQU_NOT expr                                          {}
+        | expr EQU_NOT expr                                          {$$=nullptr;}
         | expr EQU_MORE expr                                         {$$=ExprNode::CreateFromBooleanOpEqualMore($1, $3);}
         | expr EQU_LESS expr                                         {$$=ExprNode::CreateFromBooleanOpEqualLess($1, $3);}
         | expr SHIFT_L expr                                          {$$=ExprNode::CreateFromShiftLeft($1, $3);}
@@ -441,20 +441,20 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | get_value '{' expr '}'                                     {$$=ExprNode::CreateFromRefOp($1, $3);}
         | expr '[' expr ']'                                          {$$=ExprNode::CreateFromGetArrayVal($1, $3);}
         | expr '[' ']' '=' expr                                      {$$=ExprNode::CreateFromAssignArrayValByExpr($1, $5);}
-        | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromGetValueFunction($1, $3);}
-        | NEW ID '(' expr_list ')'                                   {$$=ExprNode::CreateFromNewDecl($2, $4);}
-        | NEW ID                                                     {$$=ExprNode::CreateFromNewDeclNoParams($2);}
-        | NEW get_value ID                                           {$$=ExprNode::CreateFromGetValueDeclNoParams($2, $3);}
-        | NEW get_value ID '(' expr_list ')'                         {$$=ExprNode::CreateFromGetValueDecl($2, $3, $5);}
+        | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromGetValueFunction(new string(*$1), $3);}
+        | NEW ID '(' expr_list ')'                                   {$$=ExprNode::CreateFromNewDecl(new string(*$2), $4);}
+        | NEW ID                                                     {$$=ExprNode::CreateFromNewDeclNoParams(new string(*$2));}
+        | NEW get_value ID                                           {$$=ExprNode::CreateFromGetValueDeclNoParams($2, new string(*$3));}
+        | NEW get_value ID '(' expr_list ')'                         {$$=ExprNode::CreateFromGetValueDecl($2, new string(*$3), $5);}
         | NEW '(' expr ')'                                           {$$=ExprNode::CreateFromNewDeclNoId($3);}
         ;
 
 expr_may_empty: expr                                                 {$$=$1;}
-                | /* empty */                                        {}
+                | /* empty */                                        {$$=nullptr;}
                 ;
 
-id_list:  ID                                                         {$$=IdListNode::CreateNode($1);}
-        | id_list ',' ID                                             {$1->vector.push_back($3);$$=$1;}
+id_list:  ID                                                         {$$=IdListNode::CreateNode(new string(*$1));}
+        | id_list ',' ID                                             {$1->vector.push_back(new string(*$3));$$=$1;}
         ;
 
 expr_list_not_e:  expr                                               {$$=ExprList::CreateNode($1);}
@@ -462,17 +462,17 @@ expr_list_not_e:  expr                                               {$$=ExprLis
                 ;
 
 expr_list: expr_list_not_e                                           {$$=$1;}
-	| /* empty */                                                {}
+	| /* empty */                                                {$$=nullptr;}
         ;
 
-const_decl_list_not_e:    ID '=' expr                                {$$=ConstDeclList::CreateNode(ConstDeclNode::CreateFromConstDeclaration($1, $3));}
-                        | const_decl_list_not_e ',' ID '=' expr      {$1->vector.push_back(ConstDeclNode::CreateFromConstDeclaration($3, $5));$$=$1;}
+const_decl_list_not_e:    ID '=' expr                                {$$=ConstDeclList::CreateNode(ConstDeclNode::CreateFromConstDeclaration(new string(*$1), $3));}
+                        | const_decl_list_not_e ',' ID '=' expr      {$1->vector.push_back(ConstDeclNode::CreateFromConstDeclaration(new string(*$3), $5));$$=$1;}
                         ;
 
-class_def: CLASS ID                                                  {$$=ClassDefNode::CreateFromClassDef($2);}                     
-        |  CLASS ID EXTENDS ID                                       {$$=ClassDefNode::CreateFromExtendedDef($2, $4);}
-        |  CLASS ID IMPLEMENTS id_list                               {$$=ClassDefNode::CreateFromImplementDef($2, $4);}
-        |  CLASS ID EXTENDS ID IMPLEMENTS id_list                    {$$=ClassDefNode::CreateFromExtendedImplementedDef($2, $4, $6);}                   
+class_def: CLASS ID                                                  {$$=ClassDefNode::CreateFromClassDef(new string(*$2));}                     
+        |  CLASS ID EXTENDS ID                                       {$$=ClassDefNode::CreateFromExtendedDef(new string(*$2), new string(*$4));}
+        |  CLASS ID IMPLEMENTS id_list                               {$$=ClassDefNode::CreateFromImplementDef(new string(*$2), $4);}
+        |  CLASS ID EXTENDS ID IMPLEMENTS id_list                    {$$=ClassDefNode::CreateFromExtendedImplementedDef(new string(*$2), new string(*$4), $6);}                   
         ;
 
 class_stmt_decl:  class_def '{' class_stmt_list '}'                  {$$=ClassStmtDeclNode::CreateFromNoModDefinition($1, $3);}
@@ -481,7 +481,7 @@ class_stmt_decl:  class_def '{' class_stmt_list '}'                  {$$=ClassSt
                 ;
 
 class_stmt_list: class_stmt_list_not_e                               {$$=$1;}
-                | /* empty */                                        {}
+                | /* empty */                                        {$$=nullptr;}
                 ;
 
 class_access_mod: PUBLIC                                             {$$=ClassAccessModNode::CreateNode(ClassAccessMod::public_node);}
@@ -501,27 +501,27 @@ class_stmt_list_not_e:    class_stmt                                 {$$=ClassSt
                         | class_stmt_list_not_e class_stmt           {$1->vector.push_back($2);$$=$1;}
                         ;
 
-class_stmt: class_expr ';'                                           {cout<<"Reduce expr to class stmt\n";$$=ClassStmtNode::CreateFromClassExpr($1);}
-        |   class_access_mod_list function_stmt_decl                 {cout<<"Reduce func to class stmt\n";$$=ClassStmtNode::CreateFromFunctionStmtDecl($1, $2);}
-        |   class_access_mod_list function_def ';'                   {cout<<"Reduce func to class def\n";$$=ClassStmtNode::CreateFromFunctionDef($1, $2);}
-        |   USE id_list ';'                                          {cout<<"Reduce use to class stmt\n";$$=ClassStmtNode::CreateFromIdList($2);}
-        |   class_stmt_decl                                          {cout<<"Reduce class to class stmt\n";$$=ClassStmtNode::CreateFromClassStmtDecl($1);}
+class_stmt: class_expr ';'                                           {$$=ClassStmtNode::CreateFromClassExpr($1);}
+        |   class_access_mod_list function_stmt_decl                 {$$=ClassStmtNode::CreateFromFunctionStmtDecl($1, $2);}
+        |   class_access_mod_list function_def ';'                   {$$=ClassStmtNode::CreateFromFunctionDef($1, $2);}
+        |   USE id_list ';'                                          {$$=ClassStmtNode::CreateFromIdList($2);}
+        |   class_stmt_decl                                          {$$=ClassStmtNode::CreateFromClassStmtDecl($1);}
         ;       
 
-class_expr: class_access_mod_list get_value ID '=' expr              {$$=ClassExprNode::CreateFromGetValueAssign($1, $2, $3, $5);}
-        |   class_access_mod_list get_value ID                       {$$=ClassExprNode::CreateFromGetValue($1, $2, $3);}
+class_expr: class_access_mod_list get_value ID '=' expr              {$$=ClassExprNode::CreateFromGetValueAssign($1, $2, new string(*$3), $5);}
+        |   class_access_mod_list get_value ID                       {$$=ClassExprNode::CreateFromGetValue($1, $2, new string(*$3));}
         |   class_access_mod_list CONST const_decl_list_not_e        {$$=ClassExprNode::CreateFromConstant($1, $3);}
         ;
 
-interface_expr_def: INTERFACE ID                                     {$$=InterfaceExprDefNode::CreateFromNoExtendedDefinition($2);}
-                |   INTERFACE ID EXTENDS id_list                     {$$=InterfaceExprDefNode::CreatedFromDefinitionWithExtended($2, $4);}
+interface_expr_def: INTERFACE ID                                     {$$=InterfaceExprDefNode::CreateFromNoExtendedDefinition(new string(*$2));}
+                |   INTERFACE ID EXTENDS id_list                     {$$=InterfaceExprDefNode::CreatedFromDefinitionWithExtended(new string(*$2), $4);}
                 ;
 
 interface_stmt_decl: interface_expr_def '{' interface_stmt_list '}'  {$$=InterfaceStmtDeclNode::CreateNode($1, $3);}
                 ;
 
 interface_stmt_list: interface_stmt_list_not_e                       {$$=$1;}
-                |    /* empty */                                     {}
+                |    /* empty */                                     {$$=nullptr;}
                 ;
 
 interface_stmt_list_not_e: interface_stmt                            {$$=InterfaceStmtList::CreateNode($1);}
@@ -531,24 +531,24 @@ interface_stmt_list_not_e: interface_stmt                            {$$=Interfa
 interface_stmt: class_access_mod_list function_def ';'               {$$=InterfaceStmtNode::CreateNode($1, $2);}
                 ;
 
-trait_stmt_decl: TRAIT ID  '{' class_stmt_list '}'                   {$$=TraitStmtDeclNode::CreateNode($2, $4);}
+trait_stmt_decl: TRAIT ID  '{' class_stmt_list '}'                   {$$=TraitStmtDeclNode::CreateNode(new string(*$2), $4);}
                 ;
 
-function_def: FUNCTION ID '(' expr_func_list ')'                     {$$=FunctionDefNode::CreateFromDefWithNoType($2, $4);}
-        |     FUNCTION ID '(' expr_func_list ')' ':' ID              {$$=FunctionDefNode::CreateFromDefWithType($2, $4, $7);}
+function_def: FUNCTION ID '(' expr_func_list ')'                     {$$=FunctionDefNode::CreateFromDefWithNoType(new string(*$2), $4);}
+        |     FUNCTION ID '(' expr_func_list ')' ':' ID              {$$=FunctionDefNode::CreateFromDefWithType(new string(*$2), $4, new string(*$7));}
         ;
 
 function_stmt_decl: function_def '{' stmt_list_may_empty '}'         {$$=FunctionStmtDeclNode::CreateNode($1, $3);}
                 ;
 
 expr_func_list:   expr_func_list_not_e                                {$$=$1;}
-                | /* empty */                                         {}
+                | /* empty */                                         {$$=nullptr;}
                 ;
 
-get_value_func:   '&' '$' ID                                          {$$=GetValueFuncNode::CreateFromRefValue($3);}
-                | '$' ID                                              {$$=GetValueFuncNode::CreateFromGetValue($2);}
-                | ID '&' '$' ID                                       {$$=GetValueFuncNode::CreateFromRefValueWithType($4, $1);}
-                | ID '$' ID                                           {$$=GetValueFuncNode::CreateFromGetValueWithType($3, $1);}
+get_value_func:   '&' '$' ID                                          {$$=GetValueFuncNode::CreateFromRefValue(new string(*$3));}
+                | '$' ID                                              {$$=GetValueFuncNode::CreateFromGetValue(new string(*$2));}
+                | ID '&' '$' ID                                       {$$=GetValueFuncNode::CreateFromRefValueWithType(new string(*$4), new string(*$1));}
+                | ID '$' ID                                           {$$=GetValueFuncNode::CreateFromGetValueWithType(new string(*$3), new string(*$1));}
                 ;
 
 expr_func_list_not_e: get_value_func                                            {$$=ExprFuncList::CreateNode(ExprFuncNode::CreateFromGetValueFunc($1));}

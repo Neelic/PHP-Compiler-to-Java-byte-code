@@ -4,7 +4,8 @@ int StmtNode::GLOBAL_ID = 0;
 
 StmtNode *StmtNode::CreateFromExpr(ExprNode *expr) {
     auto *tmp = new StmtNode();
-    tmp->expr_left = expr;
+    if (expr != nullptr)
+        tmp->expr_left = expr;
     tmp->type = StmtType::expr;
     tmp->cur_id = StmtNode::GLOBAL_ID++;
     return tmp;
