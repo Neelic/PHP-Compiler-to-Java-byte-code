@@ -434,7 +434,7 @@ void printConstDecl(ConstDeclNode *node, std::string *parentId) {
 }
 
 void printHtmlStmt(HtmlStmtNode *node, std::string *parentId) {
-    GRAPH_STR += *node->idTag() + " [label=\"Const declaration\"];\n";
+    GRAPH_STR += *node->idTag() + " [label=\"Html stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
     delete parentId;
 }
