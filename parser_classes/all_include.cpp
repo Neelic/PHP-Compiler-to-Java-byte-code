@@ -100,6 +100,10 @@ void printTreeGraph(StartNode *node) {
 
     if (node->top_stmt_list != nullptr)
         printTopStmtList(node->top_stmt_list, node->idTag());
+    if (node->html_after != nullptr){}
+        printHtmlStmt(node->html_after, node->idTag());
+    if (node->html_before != nullptr)
+        printHtmlStmt(node->html_before, node->idTag());
 }
 
 void printTopStmtList(TopStmtList *node, std::string *parentId) {

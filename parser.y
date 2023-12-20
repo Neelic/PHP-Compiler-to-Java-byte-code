@@ -245,14 +245,14 @@ class ElseIfDotList;
 
 start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {StartNode*tmp=StartNode::CreateNode($2);printTreeGraph(tmp);$$=tmp;}                     
         | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {StartNode*tmp=StartNode::CreateNode($2);printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {StartNode*tmp=StartNode::CreateNode($2);printTreeGraph(tmp);$$=tmp;}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {StartNode*tmp=StartNode::CreateNode($3);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {StartNode*tmp=StartNode::CreateNodeFromHtmlAfter($2, HtmlStmtNode::CreateNode(new string(*$4)));printTreeGraph(tmp);$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {StartNode*tmp=StartNode::CreateNodeFromHtmlBefore(HtmlStmtNode::CreateNode(new string(*$1)), $3);printTreeGraph(tmp);$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {StartNode*tmp=StartNode::CreateNodeFromHtmlBefore(HtmlStmtNode::CreateNode(new string(*$1)), $3);printTreeGraph(tmp);$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {StartNode*tmp=StartNode::CreateNodeFromHtmlAround(HtmlStmtNode::CreateNode(new string(*$1)), $3, HtmlStmtNode::CreateNode(new string(*$5)));printTreeGraph(tmp);$$=tmp;}
         | START_CODE_PHP_TAG                                                          {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
         | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
-        | HTML                                                                        {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {StartNode*tmp=StartNode::CreateNodeFromHtmlOnly(HtmlStmtNode::CreateNode(new string(*$3)));printTreeGraph(tmp);$$=tmp;}
+        | HTML                                                                        {StartNode*tmp=StartNode::CreateNodeFromHtmlOnly(HtmlStmtNode::CreateNode(new string(*$1)));printTreeGraph(tmp);$$=tmp;}
         ;
 
 top_stmt_list_not_e: top_stmt                                                         {$$=TopStmtList::CreateNode($1);}                                                                                                           
