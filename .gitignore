@@ -13,3 +13,4 @@ graph.dot
 x64
 .vs
 cmake-build-debug
+/build/
