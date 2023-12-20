@@ -9,7 +9,7 @@ StartNode *StartNode::CreateNode(TopStmtList *top_stmt_list) {
     return tmp;
 }
 
-static StartNode *CreateNodeFromHtmlBefore(HtmlStmtNode *html_before, TopStmtList *top_stmt_list)
+StartNode *StartNode::CreateNodeFromHtmlBefore(HtmlStmtNode *html_before, TopStmtList *top_stmt_list)
 {
     auto *tmp = new StartNode();
     tmp->top_stmt_list = top_stmt_list;
@@ -18,7 +18,7 @@ static StartNode *CreateNodeFromHtmlBefore(HtmlStmtNode *html_before, TopStmtLis
     return tmp;
 }
 
-static StartNode *CreateNodeFromHtmlAfter(TopStmtList *top_stmt_list, HtmlStmtNode *html_after)
+StartNode *StartNode::CreateNodeFromHtmlAfter(TopStmtList *top_stmt_list, HtmlStmtNode *html_after)
 {
     auto *tmp = new StartNode();
     tmp->top_stmt_list = top_stmt_list;
@@ -26,7 +26,7 @@ static StartNode *CreateNodeFromHtmlAfter(TopStmtList *top_stmt_list, HtmlStmtNo
     tmp->cur_id = StartNode::GLOBAL_ID++;
     return tmp;
 }
-static StartNode *CreateNodeFromHtmlAround(HtmlStmtNode *html_before, TopStmtList *top_stmt_list, HtmlStmtNode *html_after)
+StartNode *StartNode::CreateNodeFromHtmlAround(HtmlStmtNode *html_before, TopStmtList *top_stmt_list, HtmlStmtNode *html_after)
 {
     auto *tmp = new StartNode();
     tmp->top_stmt_list = top_stmt_list;
@@ -36,7 +36,7 @@ static StartNode *CreateNodeFromHtmlAround(HtmlStmtNode *html_before, TopStmtLis
     return tmp; 
 }
 
-static StartNode *CreateNodeFromHtmlOnly(HtmlStmtNode *html_after)
+StartNode *StartNode::StartNode::CreateNodeFromHtmlOnly(HtmlStmtNode *html_after)
 {
     auto *tmp = new StartNode();
     tmp->html_after = html_after;
