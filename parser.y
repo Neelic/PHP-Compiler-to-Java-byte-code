@@ -485,8 +485,8 @@ class_stmt_list: class_stmt_list_not_e                               {$$=$1;}
                 ;
 
 class_access_mod: PUBLIC                                             {$$=ClassAccessModNode::CreateNode(ClassAccessMod::public_node);}
-                | PROTECTED                                          {$$=ClassAccessModNode::CreateNode(ClassAccessMod::private_node);}
-                | PRIVATE                                            {$$=ClassAccessModNode::CreateNode(ClassAccessMod::protected_node);}
+                | PROTECTED                                          {$$=ClassAccessModNode::CreateNode(ClassAccessMod::protected_node);}
+                | PRIVATE                                            {$$=ClassAccessModNode::CreateNode(ClassAccessMod::private_node);}
                 | FINAL                                              {$$=ClassAccessModNode::CreateNode(ClassAccessMod::final_node);}
                 | ABSTRACT                                           {$$=ClassAccessModNode::CreateNode(ClassAccessMod::abstract_node);}
                 | READ_ONLY                                          {$$=ClassAccessModNode::CreateNode(ClassAccessMod::read_only_node);}
