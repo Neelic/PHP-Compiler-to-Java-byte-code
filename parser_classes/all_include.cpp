@@ -479,7 +479,7 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
             break;
         case ExprType::constant:
             std::cout<<GRAPH_STR.size()<<" from constant"<<"\n";
-            GRAPH_STR += *node->idTag() + " [label=\" \\\"" + *node->id + "\\\" \"];\n";
+            GRAPH_STR += *node->idTag() + " [label=\"" + *node->id + "\"];\n";
             break;
             // Присвоение
         case ExprType::assign_op:
@@ -565,7 +565,7 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
         case ExprType::class_inst_method_by_ref_op:
             GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
             printExpr(node->left, node->idTag(), new std::string("left"));
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printStringValueNode(node->id, node->idTag(), new std::string("right"));
             if (node->listParams != nullptr)
                 printExprList(node->listParams, node->idTag());
             break;
