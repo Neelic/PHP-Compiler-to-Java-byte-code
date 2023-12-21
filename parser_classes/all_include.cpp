@@ -797,19 +797,17 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
         case command_string_val:
             break;
         case class_field_ref_op:
-            //TODO
             break;
         case class_field_by_ref_op:
-            //TODO
             break;
         case class_method_by_ref_op:
             //TODO
-            break;
-        case get_array_val:
-            //TODO
+            std::cout<<"USELESS RULE";
             break;
         case call_func:
-            //TODO
+            GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
+            printStringValueNode(node->id, node->idTag(), new std::string("id"));
+            printExprList(node->listParams, node->idTag());
             break;
     }
     std::cout << GRAPH_STR.size() << "\n";
