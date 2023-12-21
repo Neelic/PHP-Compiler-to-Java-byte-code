@@ -40,11 +40,18 @@ SPACE [\t\r\t\f\v ]
   std::string tmp_string;
   std::stringstream stream;
   static std::vector<yytokentype> mis_keyword;
+  static std::vector<char> mis_char;
   int tmp;
   float test = .0;
-  int nestingCount = 0;
+  static int nestingCount = 0;
   static int lineCount = 1;
   static bool inCode = false;
+
+  if (!mis_char.empty()) {
+    auto tmp_c = mis_char[mis_char.size() - 1];
+    mis_char.pop_back();
+    return tmp_c;
+  }
 
   if (!mis_keyword.empty()) {
     yytokentype tmp_s = mis_keyword[mis_keyword.size() - 1];
@@ -147,7 +154,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                             BEGIN(DOUBLE_QUOTE_STRING);
                             str = "";
                             printf("Found concatenation: .\n");
-                            return ';';
+                            return '.';
                         }
                     }
 
@@ -289,6 +296,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 <DOUBLE_QUOTE_STRING>\\\$                    {str += "$";}
 <DOUBLE_QUOTE_STRING>\\[^nrtvefu"$\\]        {str += yytext;}
 <DOUBLE_QUOTE_STRING>\\x[0-9A-Fa-f]{1,2}     {
+                                              stream = std::stringstream();
                                               stream << std::__cxx11::stoi(yytext + 2);
                                               stream >> std::hex >> tmp;
                                               str += (char) tmp;
@@ -297,7 +305,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                                               tmp_string = ""; 
                                               tmp_string += yytext+3; 
                                               tmp_string.erase(tmp_string.find('}'), 1);
-                                              std::stringstream stream;
+                                              stream = std::stringstream();
                                               stream << std::__cxx11::stoi(tmp_string);
                                               stream >> std::hex >> tmp;
                                               str += (char) tmp;
@@ -315,6 +323,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                                                 nestingCount++;
                                                 BEGIN(INITIAL);
                                                 yylval.sval=new std::string(str);
+                                                mis_char.push_back('.');
                                                 return STRING;
                                               }
 <DOUBLE_QUOTE_STRING>\$[^a-zA-Z_]?            {str += yytext;}

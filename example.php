@@ -98,7 +98,7 @@ static $int = 1_000;
 // $octal_other = 0o123;
 // $binary = 0b11111111;
 $interpolStr = "String interpol $int";
-// $interpolStrOther = "String interpol {$person->name}" !TODO Ошибка на этом моменте;
+$interpolStrOther = "String interpol {$person->name}"; //TODO Ошибка на этом моменте;
 
 // Loops - for loop
 for ($i = 0; $i < count($persons); $i=$i+1) {
