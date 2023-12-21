@@ -79,7 +79,7 @@ final         	  {printf("Found keyword: %s\n", yytext); return FINAL;}
 finally         	{printf("Found keyword: %s\n", yytext); return FINALLY;}
 fn          	    {printf("Found keyword: %s\n", yytext); return FN;}
 implements        {printf("Found keyword: %s\n", yytext); return IMPLEMENTS;}
-instanceof        {printf("Found keyword: %s\n", yytext); /* return INSTANCE_OF; */}
+instanceof        {printf("Found keyword: %s\n", yytext); return INSTANCE_OF;}
 interface         {printf("Found keyword: %s\n", yytext); return INTERFACE;}
 namespace         {printf("Found keyword: %s\n", yytext); /* return NAMESPACE; */}
 or              	{printf("Found keyword: %s\n", yytext); return LOGIC_OR;}

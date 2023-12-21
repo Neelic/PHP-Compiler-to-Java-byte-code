@@ -28,6 +28,7 @@ enum ExprType
     class_inst_field_ref_dots_op,
     class_inst_field_by_ref_dots_op,
     bracket,
+    instance_of,
     minus_op,
     plus_op,
     mult_op,

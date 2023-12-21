@@ -121,6 +121,7 @@ class ElseIfDotList;
 %token <sval> COM_STRING
 %token CONST
 %token RETURN
+%token INSTANCE_OF
 
 %token TRY
 %token CATCH
@@ -186,6 +187,7 @@ class ElseIfDotList;
 %right '~' U_MINUS U_PLUS INT_CAST FLOAT_CAST STRING_CAST ARRAY_CAST OBJECT_CAST BOOL_CAST
 %left '['']' R_ARROW R_DOUBLE_ARROW QUARTER_DOT
 %right POW
+%left INSTANCE_OF
 %nonassoc '('')'
 %nonassoc NEW CLONE
 
@@ -316,7 +318,6 @@ stmt:     expr_may_empty ';'                                                    
         | do_while_stmt                                                               {$$=StmtNode::CreateFromDoWhileStmt($1);}
         | for_stmt                                                                    {$$=StmtNode::CreateFromForStmt($1);}
         | foreach_stmt                                                                {$$=StmtNode::CreateFromForEachStmt($1);}
-        | THROW expr ';'                                                              {$$=StmtNode::CreateFromThrowStmt($2);}
         | CONST const_decl_list_not_e ';'                                             {$$=StmtNode::CreateFromConstDecl($2);}
         | RETURN expr_may_empty ';'                                                   {$$=StmtNode::CreateFromReturnStmt($2);}
         | html_stmt                                                                   {cout<<"Reduce to stmt from html stmt\n";$$=StmtNode::CreateFromHtmlStmt($1);}
@@ -383,6 +384,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | PARENT QUARTER_DOT ID '(' expr_list ')'                    {$$=ExprNode::CreateFromMethodReferenceDots(ExprNode::CreateFromParentKeyword(), new string(*$3), $5);}
         | PARENT QUARTER_DOT get_value ID '(' expr_list ')'          {$$=ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode::CreateFromParentKeyword(), $3, new string(*$4), $6);}
         | '(' expr ')'                                               {$$=$2;}
+        | expr INSTANCE_OF expr                                      {$$=ExprNode::CreateFromInstanceOf($1, $3);}
         | expr '-' expr                                              {$$=ExprNode::CreateFromSubtraction($1, $3);}
         | expr '+' expr                                              {$$=ExprNode::CreateFromAddition($1, $3);}
         | expr '*' expr                                              {$$=ExprNode::CreateFromMultiplication($1, $3);}
@@ -399,7 +401,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | expr LOGIC_AND expr                                        {$$=ExprNode::CreateFromLogicOpAnd($1, $3);}
         | expr EQUAL expr                                            {$$=ExprNode::CreateFromBooleanOpEqual($1, $3);}
         | expr EQUAL_STRICT expr                                     {$$=ExprNode::CreateFromBooleanOpEqualStrict($1, $3);}
-        | expr EQU_NOT expr                                          {$$=nullptr;}
+        | expr EQU_NOT expr                                          {$$=ExprNode::CreateFromBooleanOpEqual($1, ExprNode::CreateFromBooleanOpNot($3));}
         | expr EQU_MORE expr                                         {$$=ExprNode::CreateFromBooleanOpEqualMore($1, $3);}
         | expr EQU_LESS expr                                         {$$=ExprNode::CreateFromBooleanOpEqualLess($1, $3);}
         | expr SHIFT_L expr                                          {$$=ExprNode::CreateFromShiftLeft($1, $3);}

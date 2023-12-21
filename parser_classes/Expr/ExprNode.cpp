@@ -618,6 +618,15 @@ ExprNode *ExprNode::CreateFromGetValueDeclNoParams(GetValueNode *get_value, std:
     return tmp;
 }
 
+ExprNode *ExprNode::CreateFromInstanceOf(ExprNode *left, ExprNode *right) {
+    auto *tmp = new ExprNode();
+    tmp->left = left;
+    tmp->right = right;
+    tmp->exprType = ExprType::instance_of;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
+    return tmp;
+}
+
 std::string * ExprNode::idTag() const {
     auto *tmp = new std::string(std::string("Expr") + std::to_string(this->cur_id));
     return tmp;
