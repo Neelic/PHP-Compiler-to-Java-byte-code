@@ -88,9 +88,6 @@ class ElseIfDotList;
         ForEachStmtNode* foreach_stmt_union;
         WhileStmtNode* while_stmt_union;
         DoWhileStmtNode* do_while_stmt_union;
-        MatchStmtNode* match_stmt_union;
-        MatchArmList* match_stmt_list_union;
-        MatchArmNode* match_arm_union;
         StaticVarList* static_var_list_union;
         GlobalVarList* global_var_list_union;
         StmtList* stmt_list_union;
@@ -213,10 +210,6 @@ class ElseIfDotList;
 %type <foreach_stmt_union> foreach_stmt
 %type <while_stmt_union> while_stmt
 %type <do_while_stmt_union> do_while_stmt
-%type <match_stmt_union> match_stmt
-%type <match_stmt_list_union> match_stmt_list
-%type <match_stmt_list_union> match_stmt_list_not_e
-%type <match_arm_union> match_arm
 %type <static_var_list_union> static_var_list
 %type <global_var_list_union> global_var_list
 %type <stmt_list_union> stmt_list
@@ -313,22 +306,6 @@ while_stmt: WHILE '(' expr ')' stmt                                             
 do_while_stmt: DO stmt WHILE '(' expr ')' ';'                                         {$$=DoWhileStmtNode::CreateFromDoWhileStmt($2, $5);}
         ;
 
-match_stmt: MATCH '(' expr ')' '{' match_stmt_list '}' ';'                            {$$=MatchStmtNode::CreateFromMatchStmtNode($3, $6);}
-        ;
-
-match_stmt_list:  match_stmt_list_not_e                                               {$$=$1;}
-                | /* empty */                                                         {$$=nullptr;}
-                ;
-
-match_stmt_list_not_e:    match_arm                                                   {$$=MatchArmList::CreateNode($1);}
-                        | match_stmt_list_not_e ',' match_arm                         {$1->vector.push_back($3);$$=$1;}
-                        ;
-
-match_arm: expr_list_not_e R_DOUBLE_ARROW expr                                        {$$=MatchArmNode::CreateFromMatchArmStmt($1, $3);}
-        |  DEFAULT R_DOUBLE_ARROW expr                                                {$$=MatchArmNode::CreateFromDefaultArmStmt($3);}
-        |  DEFAULT ',' R_DOUBLE_ARROW expr                                            {$$=MatchArmNode::CreateFromDefaultArmWithCommaStmt($4);}
-        ;
-
 stmt:     expr_may_empty ';'                                                          {$$=StmtNode::CreateFromExpr($1);}
         | if_stmt                                                                     {$$=StmtNode::CreateFromIfStmt($1);}
         | switch_stmt                                                                 {$$=StmtNode::CreateFromSwitchStmt($1);}
@@ -340,7 +317,6 @@ stmt:     expr_may_empty ';'                                                    
         | for_stmt                                                                    {$$=StmtNode::CreateFromForStmt($1);}
         | foreach_stmt                                                                {$$=StmtNode::CreateFromForEachStmt($1);}
         | THROW expr ';'                                                              {$$=StmtNode::CreateFromThrowStmt($2);}
-        | match_stmt                                                                  {$$=StmtNode::CreateFromMatchStmt($1);}
         | CONST const_decl_list_not_e ';'                                             {$$=StmtNode::CreateFromConstDecl($2);}
         | RETURN expr_may_empty ';'                                                   {$$=StmtNode::CreateFromReturnStmt($2);}
         | html_stmt                                                                   {cout<<"Reduce to stmt from html stmt\n";$$=StmtNode::CreateFromHtmlStmt($1);}

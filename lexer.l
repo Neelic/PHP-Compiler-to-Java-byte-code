@@ -147,6 +147,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                             BEGIN(DOUBLE_QUOTE_STRING);
                             str = "";
                             printf("Found concatenation: .\n");
+                            return ';';
                         }
                     }
 
@@ -197,7 +198,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                       printf("Found end php code section: %s\n", yytext); 
                       inCode = false; 
                       str = ""; 
-                      mis_keyword.push_back(END_CODE_PHP_TAG); /*! TODO Не факт, что работает */
+                      mis_keyword.push_back(END_CODE_PHP_TAG);
                       BEGIN(NOT_IN_PHP_CODE);
                       return ';';
                     }
