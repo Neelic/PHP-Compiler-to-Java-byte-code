@@ -482,6 +482,8 @@ class_stmt_list_not_e:    class_stmt                                 {$$=ClassSt
 class_stmt: class_expr ';'                                           {$$=ClassStmtNode::CreateFromClassExpr($1);}
         |   class_access_mod_list function_stmt_decl                 {$$=ClassStmtNode::CreateFromFunctionStmtDecl($1, $2);}
         |   class_access_mod_list function_def ';'                   {$$=ClassStmtNode::CreateFromFunctionDef($1, $2);}
+        |   function_stmt_decl                                       {$$=ClassStmtNode::CreateFromFunctionStmtDecl(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1);}
+        |   function_def ';'                                         {$$=ClassStmtNode::CreateFromFunctionDef(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1);}
         |   USE id_list ';'                                          {$$=ClassStmtNode::CreateFromIdList($2);}
         |   class_stmt_decl                                          {$$=ClassStmtNode::CreateFromClassStmtDecl($1);}
         ;       
@@ -489,6 +491,9 @@ class_stmt: class_expr ';'                                           {$$=ClassSt
 class_expr: class_access_mod_list get_value ID '=' expr              {$$=ClassExprNode::CreateFromGetValueAssign($1, $2, new string(*$3), $5);}
         |   class_access_mod_list get_value ID                       {$$=ClassExprNode::CreateFromGetValue($1, $2, new string(*$3));}
         |   class_access_mod_list CONST const_decl_list_not_e        {$$=ClassExprNode::CreateFromConstant($1, $3);}
+        |   get_value ID '=' expr                                    {$$=ClassExprNode::CreateFromGetValueAssign(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1, new string(*$2), $4);}
+        |   get_value ID                                             {$$=ClassExprNode::CreateFromGetValue(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1, new string(*$2));}
+        |   CONST const_decl_list_not_e                              {$$=ClassExprNode::CreateFromConstant(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $2);}
         ;
 
 interface_expr_def: INTERFACE ID                                     {$$=InterfaceExprDefNode::CreateFromNoExtendedDefinition(new string(*$2));}

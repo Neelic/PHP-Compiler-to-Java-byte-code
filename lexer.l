@@ -250,7 +250,16 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
 <NOT_IN_PHP_CODE>[^\<\n]+ {str += yytext;}
 <NOT_IN_PHP_CODE>\n       {str += yytext; lineCount += yyleng;}
 <NOT_IN_PHP_CODE>\<+[^?]  {str += yytext;}
-<NOT_IN_PHP_CODE><<EOF>>  {printf("Found html code section: %s\n", str.c_str()); BEGIN(INITIAL);}
+<NOT_IN_PHP_CODE><<EOF>>  {
+                            printf("Found html code section: %s\n", str.c_str());
+                            if (str.length() != 0) {
+                              yylval.sval=new std::string(str); 
+                              str = "";
+                              return HTML;
+                            } else {
+                              return 0;
+                            }
+                          }
 
 <SINGLE_LINE_COMMENT>[^?\n]+  {str += yytext;}
 <SINGLE_LINE_COMMENT>\?[^>]   {str += yytext;}

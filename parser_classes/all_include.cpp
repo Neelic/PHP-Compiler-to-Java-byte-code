@@ -97,13 +97,14 @@ void printStringValueNode(std::string *value, std::string *parentId,
 void printTreeGraph(StartNode *node) {
     std::cout << "START PRINT\n";
     GRAPH_STR += *node->idTag() + " [label=\"Start\"];\n";
+    GRAPH_STR.length();
 
+    if (node->html_before != nullptr)
+        printHtmlStmt(node->html_before, node->idTag());
     if (node->top_stmt_list != nullptr)
         printTopStmtList(node->top_stmt_list, node->idTag());
     if (node->html_after != nullptr)
         printHtmlStmt(node->html_after, node->idTag());
-    if (node->html_before != nullptr)
-        printHtmlStmt(node->html_before, node->idTag());
 }
 
 void printTopStmtList(TopStmtList *node, std::string *parentId) {
@@ -801,7 +802,6 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
         case class_field_by_ref_op:
             break;
         case class_method_by_ref_op:
-            //TODO
             std::cout<<"USELESS RULE";
             break;
         case call_func:
