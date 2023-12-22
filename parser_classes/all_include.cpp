@@ -97,7 +97,6 @@ void printStringValueNode(std::string *value, std::string *parentId,
 void printTreeGraph(StartNode *node) {
     std::cout << "START PRINT\n";
     GRAPH_STR += *node->idTag() + " [label=\"Start\"];\n";
-    GRAPH_STR.length();
 
     if (node->html_before != nullptr)
         printHtmlStmt(node->html_before, node->idTag());
