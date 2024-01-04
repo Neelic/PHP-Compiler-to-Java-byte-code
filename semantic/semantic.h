@@ -9,13 +9,19 @@
 
 using namespace std;
 
-bool isDeclaredVariable(ExprNode *node, const vector<ExprNode *>& list);
+bool isDeclaredVariable(string *id, const vector<ExprNode *>& list);
 
-bool isDeclaredConst(ConstDeclNode *node, const vector<ConstDeclNode *>& list);
+bool isDeclaredConst(string *id, const vector<ConstDeclNode *>& list);
 
-bool isDeclaredFunction(FunctionStmtDeclNode *node, const vector<FunctionStmtDeclNode *> &list);
+bool isDeclaredFunction(string *id, const vector<FunctionStmtDeclNode *> &list);
 
-bool isDeclaredClass(ClassStmtDeclNode *node, const vector<ClassStmtDeclNode *>& list);
+bool isDeclaredClass(string *id, const vector<ClassStmtDeclNode *>& list);
+
+bool isStandartType(string *id);
+
+bool isPredeclaredConst(string *id);
+
+bool isPredeclaredVariable(string *id);
 
 void inspectGlobalScope(StartNode* node);
 
