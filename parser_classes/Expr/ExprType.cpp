@@ -63,12 +63,12 @@ enum ExprType
     get_value_array,
     add_array_val,
     call_anon_func,
-    decl_anon_func,
     call_func,
     call_get_value_func,
     new_decl,
     new_decl_no_params,
     new_decl_no_id,
     new_get_value_decl,
-    new_get_value_decl_no_params
+    new_get_value_decl_no_params,
+    null_keyword,
 };

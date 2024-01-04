@@ -1,101 +1,103 @@
 #include <iostream>
 #include "all_include.hpp"
 
-std::string GRAPH_STR("digraph Tree {\n");
+StartNode *startNode;
+
+string GRAPH_STR("digraph Tree {\n");
 
 static int VALUE_ID = 0; // Для тегов узлов с конечным значением
 
-void printTopStmtList(TopStmtList *node, std::string *parentId);
+void printTopStmtList(TopStmtList *node, string *parentId);
 
-void printTopStmt(TopStmtNode *node, std::string *parentId);
+void printTopStmt(TopStmtNode *node, string *parentId);
 
-void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel);
+void printStmt(StmtNode *node, string *parentId, string *arrowLabel);
 
-void printIfStmt(IfStmtNode *node, std::string *parentId);
+void printIfStmt(IfStmtNode *node, string *parentId);
 
-void printSwitchStmt(SwitchStmtNode *node, std::string *parentId);
+void printSwitchStmt(SwitchStmtNode *node, string *parentId);
 
-void printCaseDefaultStmtList(CaseDefaultStmtList *node, std::string *parentId);
+void printCaseDefaultStmtList(CaseDefaultStmtList *node, string *parentId);
 
-void printCaseDefaultStmt(CaseDefaultStmtNode *node, std::string *parentId);
+void printCaseDefaultStmt(CaseDefaultStmtNode *node, string *parentId);
 
-void printStmtList(StmtList *node, std::string *parentId, std::string *arrowLabel);
+void printStmtList(StmtList *node, string *parentId, string *arrowLabel);
 
-void printStaticVarList(StaticVarList *node, std::string *parentId);
+void printStaticVarList(StaticVarList *node, string *parentId);
 
-void printStaticVar(StaticVarNode *node, std::string *parentId);
+void printStaticVar(StaticVarNode *node, string *parentId);
 
-void printGlobalVarList(GlobalVarList *node, std::string *parentId);
+void printGlobalVarList(GlobalVarList *node, string *parentId);
 
-void printGlobalVar(GlobalVarNode *node, std::string *parentId);
+void printGlobalVar(GlobalVarNode *node, string *parentId);
 
-void printWhileStmt(WhileStmtNode *node, std::string *parentId);
+void printWhileStmt(WhileStmtNode *node, string *parentId);
 
-void printDoWhileStmt(DoWhileStmtNode *node, std::string *parentId);
+void printDoWhileStmt(DoWhileStmtNode *node, string *parentId);
 
-void printForStmt(ForStmtNode *node, std::string *parentId);
+void printForStmt(ForStmtNode *node, string *parentId);
 
-void printForEachStmt(ForEachStmtNode *node, std::string *parentId);
+void printForEachStmt(ForEachStmtNode *node, string *parentId);
 
-void printMatchStmt(MatchStmtNode *node, std::string *parentId);
+void printMatchStmt(MatchStmtNode *node, string *parentId);
 
-void printMatchArmList(MatchArmList *node, std::string *parentId);
+void printMatchArmList(MatchArmList *node, string *parentId);
 
-void printMatchArm(MatchArmNode *node, std::string *parentId);
+void printMatchArm(MatchArmNode *node, string *parentId);
 
-void printConstDeclList(ConstDeclList *node, std::string *parentId);
+void printConstDeclList(ConstDeclList *node, string *parentId);
 
-void printConstDecl(ConstDeclNode *node, std::string *parentId);
+void printConstDecl(ConstDeclNode *node, string *parentId);
 
-void printHtmlStmt(HtmlStmtNode *node, std::string *parentId);
+void printHtmlStmt(HtmlStmtNode *node, string *parentId);
 
-void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel);
+void printExpr(ExprNode *node, string *parentId, string *arrowLabel);
 
-void printExprList(ExprList *node, std::string *parentId);
+void printExprList(ExprList *node, string *parentId);
 
-void printFunctionStmtDecl(FunctionStmtDeclNode *node, std::string *parentId);
+void printFunctionStmtDecl(FunctionStmtDeclNode *node, string *parentId);
 
-void printFunctionDef(FunctionDefNode *node, std::string *parentId);
+void printFunctionDef(FunctionDefNode *node, string *parentId);
 
-void printExprFuncList(ExprFuncList *node, std::string *parentId);
+void printExprFuncList(ExprFuncList *node, string *parentId);
 
-void printExprFunc(ExprFuncNode *node, std::string *parentId);
+void printExprFunc(ExprFuncNode *node, string *parentId);
 
-void printGetValueFunc(GetValueFuncNode *node, std::string *parentId);
+void printGetValueFunc(GetValueFuncNode *node, string *parentId);
 
-void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId);
+void printClassStmtDecl(ClassStmtDeclNode *node, string *parentId);
 
-void printClassDef(ClassDefNode *node, std::string *parentId);
+void printClassDef(ClassDefNode *node, string *parentId);
 
-void printClassStmtList(ClassStmtList *node, std::string *parentId);
+void printClassStmtList(ClassStmtList *node, string *parentId);
 
-void printClassStmt(ClassStmtNode *node, std::string *parentId);
+void printClassStmt(ClassStmtNode *node, string *parentId);
 
-void printClassExpr(ClassExprNode *node, std::string *parentId);
+void printClassExpr(ClassExprNode *node, string *parentId);
 
-void printClassAccessModList(ClassAccessModList *node, std::string *parentId);
+void printClassAccessModList(ClassAccessModList *node, string *parentId);
 
-void printClassAccessMod(ClassAccessModNode *node, std::string *parentId);
+void printClassAccessMod(ClassAccessModNode *node, string *parentId);
 
-void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, std::string *parentId);
+void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, string *parentId);
 
-void printInterfaceExprDef(InterfaceExprDefNode *node, std::string *parentId);
+void printInterfaceExprDef(InterfaceExprDefNode *node, string *parentId);
 
-void printInterfaceStmtList(InterfaceStmtList *node, std::string *parentId);
+void printInterfaceStmtList(InterfaceStmtList *node, string *parentId);
 
-void printInterfaceStmt(InterfaceStmtNode *node, std::string *parentId);
+void printInterfaceStmt(InterfaceStmtNode *node, string *parentId);
 
-void printTraitStmtDeclNode(TraitStmtDeclNode *node, std::string *parentId);
+void printTraitStmtDeclNode(TraitStmtDeclNode *node, string *parentId);
 
-void printGetValue(GetValueNode *node, std::string *parentId);
+void printGetValue(GetValueNode *node, string *parentId);
 
-void printIdList(IdListNode *node, std::string *parentId, std::string *arrowLabel);
+void printIdList(IdListNode *node, string *parentId, string *arrowLabel);
 
-void printStringValueNode(std::string *value, std::string *parentId,
-                          std::string *arrowLabel); // Печатает узел со строковым значением
+void printStringValueNode(string *value, string *parentId,
+                          string *arrowLabel); // Печатает узел со строковым значением
 
 void printTreeGraph(StartNode *node) {
-    std::cout << "START PRINT\n";
+    cout << "START PRINT\n";
     GRAPH_STR += *node->idTag() + " [label=\"Start\"];\n";
 
     if (node->html_before != nullptr)
@@ -106,7 +108,7 @@ void printTreeGraph(StartNode *node) {
         printHtmlStmt(node->html_after, node->idTag());
 }
 
-void printTopStmtList(TopStmtList *node, std::string *parentId) {
+void printTopStmtList(TopStmtList *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Top stmt list\"];\n";
@@ -118,12 +120,12 @@ void printTopStmtList(TopStmtList *node, std::string *parentId) {
     delete parentId;
 }
 
-void printTopStmt(TopStmtNode *node, std::string *parentId) {
+void printTopStmt(TopStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Top stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->stmt != nullptr)
-        printStmt(node->stmt, node->idTag(), new std::string(""));
+        printStmt(node->stmt, node->idTag(), new string(""));
     if (node->func_stmt_decl != nullptr)
         printFunctionStmtDecl(node->func_stmt_decl, node->idTag());
     if (node->class_stmt_decl != nullptr)
@@ -136,17 +138,17 @@ void printTopStmt(TopStmtNode *node, std::string *parentId) {
 }
 
 //Возможно переделать
-void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel) {
-    std::cout << "PRINT STMT\n";
+void printStmt(StmtNode *node, string *parentId, string *arrowLabel) {
+    cout << "PRINT STMT\n";
     switch (node->type) {
         case StmtType::throw_stmt:
             GRAPH_STR += *node->idTag() + " [label=\"Throw\"];\n";
-            printExpr(node->expr_left, node->idTag(), new std::string(""));
+            printExpr(node->expr_left, node->idTag(), new string(""));
             break;
 
         case StmtType::return_stmt:
             GRAPH_STR += *node->idTag() + " [label=\"Return\"];\n";
-            printExpr(node->expr_left, node->idTag(), new std::string(""));
+            printExpr(node->expr_left, node->idTag(), new string(""));
             break;
 
         case StmtType::break_stmt:
@@ -154,9 +156,9 @@ void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel) {
             break;
 
         case StmtType::t_echo_stmt:
-            std::cout << GRAPH_STR.size() << " from echo_stmt" << "\n";
+            cout << GRAPH_STR.size() << " from echo_stmt" << "\n";
             GRAPH_STR += *node->idTag() + " [label=\"t-echo\"];\n";
-            printExpr(node->expr_left, node->idTag(), new std::string(""));
+            printExpr(node->expr_left, node->idTag(), new string(""));
             break;
 
         case StmtType::continue_stmt:
@@ -171,13 +173,13 @@ void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel) {
             if (node->switch_stmt != nullptr)
                 printSwitchStmt(node->switch_stmt, node->idTag());
             if (node->stmtList != nullptr)
-                printStmtList(node->stmtList, node->idTag(), new std::string(""));
+                printStmtList(node->stmtList, node->idTag(), new string(""));
             if (node->expr_left != nullptr)
-                printExpr(node->expr_left, node->idTag(), new std::string(
-                        "left")); //TODO: В зависимости от node->type передавать разные значения для label
+                printExpr(node->expr_left, node->idTag(), new string(
+                        "left"));
             if (node->expr_right != nullptr)
-                printExpr(node->expr_right, node->idTag(), new std::string(
-                        "right")); //TODO: В зависимости от node->type передавать разные значения для label
+                printExpr(node->expr_right, node->idTag(), new string(
+                        "right"));
             if (node->static_var != nullptr)
                 printStaticVarList(node->static_var, node->idTag());
             if (node->global_var != nullptr)
@@ -204,35 +206,35 @@ void printStmt(StmtNode *node, std::string *parentId, std::string *arrowLabel) {
     delete arrowLabel;
 };
 
-void printIfStmt(IfStmtNode *node, std::string *parentId) {
+void printIfStmt(IfStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"If stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string("condition"));
+        printExpr(node->expr, node->idTag(), new string("condition"));
     if (node->stmt_main != nullptr)
-        printStmt(node->stmt_main, node->idTag(), new std::string("true"));
+        printStmt(node->stmt_main, node->idTag(), new string("true"));
     if (node->stmt_else != nullptr)
-        printStmt(node->stmt_else, node->idTag(), new std::string("false"));
+        printStmt(node->stmt_else, node->idTag(), new string("false"));
     if (node->stmtListMain != nullptr)
-        printStmtList(node->stmtListMain, node->idTag(), new std::string("true"));
+        printStmtList(node->stmtListMain, node->idTag(), new string("true"));
     if (node->stmtListElse != nullptr)
-        printStmtList(node->stmtListElse, node->idTag(), new std::string("false"));
+        printStmtList(node->stmtListElse, node->idTag(), new string("false"));
     delete parentId;
 };
 
-void printSwitchStmt(SwitchStmtNode *node, std::string *parentId) {
+void printSwitchStmt(SwitchStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Switch stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string("param"));
+        printExpr(node->expr, node->idTag(), new string("param"));
     if (node->defaultStmtList != nullptr)
         printCaseDefaultStmtList(node->defaultStmtList, node->idTag());
     delete parentId;
 }
 
-void printCaseDefaultStmtList(CaseDefaultStmtList *node, std::string *parentId) {
+void printCaseDefaultStmtList(CaseDefaultStmtList *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Case default stmt list\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
@@ -242,45 +244,45 @@ void printCaseDefaultStmtList(CaseDefaultStmtList *node, std::string *parentId) 
     delete parentId;
 }
 
-void printCaseDefaultStmt(CaseDefaultStmtNode *node, std::string *parentId) {
+void printCaseDefaultStmt(CaseDefaultStmtNode *node, string *parentId) {
 
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     switch (node->type) {
         case CaseDefaultType::case_stmt:
             GRAPH_STR += *node->idTag() + " [label=\"Case \"];\n";
-            printExpr(node->expr, node->idTag(), new std::string("condition"));
-            printStmtList(node->stmtList, node->idTag(), new std::string("code"));
+            printExpr(node->expr, node->idTag(), new string("condition"));
+            printStmtList(node->stmtList, node->idTag(), new string("code"));
             break;
 
         case CaseDefaultType::default_stmt:
             GRAPH_STR += *node->idTag() + " [label=\"Default \"];\n";
-            printStmtList(node->stmtList, node->idTag(), new std::string("code"));
+            printStmtList(node->stmtList, node->idTag(), new string("code"));
             break;
 
         case CaseDefaultType::finally_stmt:
             GRAPH_STR += *node->idTag() + " [label=\"Finally \"];\n";
-            printStmtList(node->stmtList, node->idTag(), new std::string("code"));
+            printStmtList(node->stmtList, node->idTag(), new string("code"));
             break;
     }
     delete parentId;
 }
 
-void printStmtList(StmtList *node, std::string *parentId, std::string *arrowLabel) {
+void printStmtList(StmtList *node, string *parentId, string *arrowLabel) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Stmt list\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "[label=\"" + *arrowLabel + "\"];\n";
 
     for (int i = 0; i < node->vector.size(); i++) {
-        std::cout << GRAPH_STR.size() << " from Stmt list member #" << i << "\n";
-        printStmt((node->vector)[i], node->idTag(), new std::string(""));
+        cout << GRAPH_STR.size() << " from Stmt list member #" << i << "\n";
+        printStmt((node->vector)[i], node->idTag(), new string(""));
     }
     delete parentId;
     delete arrowLabel;
 }
 
-void printStaticVarList(StaticVarList *node, std::string *parentId) {
+void printStaticVarList(StaticVarList *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Static var list\"];\n";
@@ -292,18 +294,18 @@ void printStaticVarList(StaticVarList *node, std::string *parentId) {
     delete parentId;
 }
 
-void printStaticVar(StaticVarNode *node, std::string *parentId) {
+void printStaticVar(StaticVarNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Static var\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->id != nullptr)
-        printStringValueNode(node->id, node->idTag(), new std::string(""));
+        printStringValueNode(node->id, node->idTag(), new string(""));
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string(""));
+        printExpr(node->expr, node->idTag(), new string(""));
     delete parentId;
 }
 
-void printGlobalVarList(GlobalVarList *node, std::string *parentId) {
+void printGlobalVarList(GlobalVarList *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Global var list\"];\n";
@@ -315,87 +317,87 @@ void printGlobalVarList(GlobalVarList *node, std::string *parentId) {
     delete parentId;
 }
 
-void printGlobalVar(GlobalVarNode *node, std::string *parentId) {
+void printGlobalVar(GlobalVarNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Global var\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->id != nullptr)
-        printStringValueNode(node->id, node->idTag(), new std::string(""));
+        printStringValueNode(node->id, node->idTag(), new string(""));
     if (node->get_value != nullptr)
         printGetValue(node->get_value, node->idTag());
     delete parentId;
 }
 
-void printWhileStmt(WhileStmtNode *node, std::string *parentId) {
+void printWhileStmt(WhileStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"While stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string("condition"));
+        printExpr(node->expr, node->idTag(), new string("condition"));
     if (node->stmt != nullptr)
-        printStmt(node->stmt, node->idTag(), new std::string("body"));
+        printStmt(node->stmt, node->idTag(), new string("body"));
     if (node->stmtList != nullptr)
-        printStmtList(node->stmtList, node->idTag(), new std::string("body"));
+        printStmtList(node->stmtList, node->idTag(), new string("body"));
     delete parentId;
 }
 
-void printDoWhileStmt(DoWhileStmtNode *node, std::string *parentId) {
+void printDoWhileStmt(DoWhileStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Do while stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string("condition"));
+        printExpr(node->expr, node->idTag(), new string("condition"));
     if (node->stmt != nullptr)
-        printStmt(node->stmt, node->idTag(), new std::string("body"));
+        printStmt(node->stmt, node->idTag(), new string("body"));
     delete parentId;
 }
 
-void printForStmt(ForStmtNode *node, std::string *parentId) {
+void printForStmt(ForStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Do while stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->expr_left != nullptr)
-        printExpr(node->expr_left, node->idTag(), new std::string("condition left"));
+        printExpr(node->expr_left, node->idTag(), new string("condition left"));
     if (node->expr_central != nullptr)
-        printExpr(node->expr_central, node->idTag(), new std::string("condition central"));
+        printExpr(node->expr_central, node->idTag(), new string("condition central"));
     if (node->expr_right != nullptr)
-        printExpr(node->expr_right, node->idTag(), new std::string("condition right"));
+        printExpr(node->expr_right, node->idTag(), new string("condition right"));
     if (node->stmt != nullptr)
-        printStmt(node->stmt, node->idTag(), new std::string("body"));
+        printStmt(node->stmt, node->idTag(), new string("body"));
     if (node->stmtList)
-        printStmtList(node->stmtList, node->idTag(), new std::string("body"));
+        printStmtList(node->stmtList, node->idTag(), new string("body"));
     delete parentId;
 }
 
-void printForEachStmt(ForEachStmtNode *node, std::string *parentId) {
+void printForEachStmt(ForEachStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Do while stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->expr_left != nullptr)
-        printExpr(node->expr_left, node->idTag(), new std::string("condition left"));
+        printExpr(node->expr_left, node->idTag(), new string("condition left"));
     if (node->expr_right != nullptr)
-        printExpr(node->expr_right, node->idTag(), new std::string("condition right"));
+        printExpr(node->expr_right, node->idTag(), new string("condition right"));
     if (node->stmt != nullptr)
-        printStmt(node->stmt, node->idTag(), new std::string("body"));
+        printStmt(node->stmt, node->idTag(), new string("body"));
     if (node->id != nullptr)
-        printStringValueNode(node->id, node->idTag(), new std::string("param name"));
+        printStringValueNode(node->id, node->idTag(), new string("param name"));
     if (node->stmtList)
-        printStmtList(node->stmtList, node->idTag(), new std::string("body"));
+        printStmtList(node->stmtList, node->idTag(), new string("body"));
     delete parentId;
 }
 
-void printMatchStmt(MatchStmtNode *node, std::string *parentId) {
+void printMatchStmt(MatchStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Match stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string("condition"));
+        printExpr(node->expr, node->idTag(), new string("condition"));
     if (node->matchList != nullptr)
         printMatchArmList(node->matchList, node->idTag());
     delete parentId;
 }
 
-void printMatchArmList(MatchArmList *node, std::string *parentId) {
+void printMatchArmList(MatchArmList *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Match arm list\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
@@ -405,18 +407,18 @@ void printMatchArmList(MatchArmList *node, std::string *parentId) {
     delete parentId;
 }
 
-void printMatchArm(MatchArmNode *node, std::string *parentId) {
+void printMatchArm(MatchArmNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Match arm\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->exprList != nullptr)
         printExprList(node->exprList, node->idTag());
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string("default"));
+        printExpr(node->expr, node->idTag(), new string("default"));
     delete parentId;
 }
 
-void printConstDeclList(ConstDeclList *node, std::string *parentId) {
+void printConstDeclList(ConstDeclList *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Const declaration list\"];\n";
@@ -428,18 +430,18 @@ void printConstDeclList(ConstDeclList *node, std::string *parentId) {
     delete parentId;
 }
 
-void printConstDecl(ConstDeclNode *node, std::string *parentId) {
+void printConstDecl(ConstDeclNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Const declaration\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->id != nullptr)
-        printStringValueNode(node->id, node->idTag(), new std::string(""));
+        printStringValueNode(node->id, node->idTag(), new string(""));
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string(""));
+        printExpr(node->expr, node->idTag(), new string(""));
     delete parentId;
 }
 
-void printHtmlStmt(HtmlStmtNode *node, std::string *parentId) {
+void printHtmlStmt(HtmlStmtNode *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Html stmt\"];\n";
@@ -448,27 +450,27 @@ void printHtmlStmt(HtmlStmtNode *node, std::string *parentId) {
 }
 
 //ExprNode
-void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
-    std::cout << "PRINT EXPR\n";
-    std::cout << GRAPH_STR.size() << " of " << GRAPH_STR.max_size() << "\n";
+void printExpr(ExprNode *node, string *parentId, string *arrowLabel) {
+    cout << "PRINT EXPR\n";
+    cout << GRAPH_STR.size() << " of " << GRAPH_STR.max_size() << "\n";
     // Значения
     switch (node->exprType) {
         case ExprType::int_val: //Если просто значение, может просто его и печатать? А то получится узел ради узла
-            std::cout << GRAPH_STR.size() << " from int_val" << "\n";
-            GRAPH_STR += *node->idTag() + " [label=\"" + std::to_string(node->int_val) + "\"];\n";
-            std::cout << GRAPH_STR.size() << " from int_val #2" << "\n";
+            cout << GRAPH_STR.size() << " from int_val" << "\n";
+            GRAPH_STR += *node->idTag() + " [label=\"" + to_string(node->int_val) + "\"];\n";
+            cout << GRAPH_STR.size() << " from int_val #2" << "\n";
             break;
         case ExprType::string_val:
-            std::cout << GRAPH_STR.size() << " from string_val" << "\n";
+            cout << GRAPH_STR.size() << " from string_val" << "\n";
             GRAPH_STR += *node->idTag() + " [label=\" \\\"" + *node->string_val + "\\\" \"];\n";
             break;
             // Ключевые слова
         case ExprType::this_keyword:
-            std::cout << GRAPH_STR.size() << " from this key\n";
+            cout << GRAPH_STR.size() << " from this key\n";
             GRAPH_STR += *node->idTag() + " [label=\" This \"];\n";
             break;
         case ExprType::self_keyword:
-            std::cout << GRAPH_STR.size() << " from self key\n";
+            cout << GRAPH_STR.size() << " from self key\n";
             GRAPH_STR += *node->idTag() + " [label=\" Self \"];\n";
             break;
         case ExprType::parent_keyword:
@@ -476,55 +478,55 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
             break;
             // Переменные
         case ExprType::variable:
-            std::cout << GRAPH_STR.size() << " from variable" << "\n";
+            cout << GRAPH_STR.size() << " from variable" << "\n";
             GRAPH_STR += *node->idTag() + " [label=\"Variable\"];\n";
             printGetValue(node->get_value, node->idTag());
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             break;
         case ExprType::constant:
-            std::cout << GRAPH_STR.size() << " from constant" << "\n";
+            cout << GRAPH_STR.size() << " from constant" << "\n";
             GRAPH_STR += *node->idTag() + " [label=\"" + *node->id + "\"];\n";
             break;
             // Присвоение
         case ExprType::assign_op:
             GRAPH_STR += *node->idTag() + " [label=\"=\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::assign_ref_op:
             GRAPH_STR += *node->idTag() + " [label=\"assign ref\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
             // Cast
         case ExprType::int_cast:
-            std::cout << GRAPH_STR.size() << " from int cast\n";
+            cout << GRAPH_STR.size() << " from int cast\n";
             GRAPH_STR += *node->idTag() + " [label=\"Int cast\"];\n";
-            printExpr(node->left, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
             break;
         case ExprType::float_cast:
-            std::cout << GRAPH_STR.size() << " from float cast\n";
+            cout << GRAPH_STR.size() << " from float cast\n";
             GRAPH_STR += *node->idTag() + " [label=\"Float cast\"];\n";
-            printExpr(node->left, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
             break;
         case ExprType::string_cast:
-            std::cout << GRAPH_STR.size() << " from string cast\n";
+            cout << GRAPH_STR.size() << " from string cast\n";
             GRAPH_STR += *node->idTag() + " [label=\"String cast\"];\n";
-            printExpr(node->left, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
             break;
         case ExprType::array_cast:
-            std::cout << GRAPH_STR.size() << " from array cast\n";
+            cout << GRAPH_STR.size() << " from array cast\n";
             GRAPH_STR += *node->idTag() + " [label=\"Array cast\"];\n";
-            printExpr(node->left, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
             break;
         case ExprType::object_cast:
-            std::cout << GRAPH_STR.size() << " from object cast\n";
+            cout << GRAPH_STR.size() << " from object cast\n";
             GRAPH_STR += *node->idTag() + " [label=\"Object cast\"];\n";
-            printExpr(node->left, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
             break;
         case ExprType::bool_cast:
             GRAPH_STR += *node->idTag() + " [label=\"Bool cast\"];\n";
-            printExpr(node->left, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
             break;
             // Обращение к полям и методам класса
             // Right arrow
@@ -532,22 +534,22 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
             GRAPH_STR += *node->idTag() + " [label=\"->\"];\n";
             if (node->get_value != nullptr)
                 printGetValue(node->get_value, node->idTag());
-            printExpr(node->left, node->idTag(), new std::string(""));
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             break;
         case ExprType::class_inst_field_by_ref_op:
             GRAPH_STR += *node->idTag() + " [label=\"->\"];\n";
             if (node->get_value != nullptr)
                 printGetValue(node->get_value, node->idTag());
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::class_method_ref_op:
             GRAPH_STR += *node->idTag() + " [label=\"->\"];\n";
             if (node->get_value != nullptr)
                 printGetValue(node->get_value, node->idTag());
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             if (node->listParams != nullptr)
                 printExprList(node->listParams, node->idTag());
             break;
@@ -556,20 +558,20 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
             GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
             if (node->get_value != nullptr)
                 printGetValue(node->get_value, node->idTag());
-            printExpr(node->left, node->idTag(), new std::string(""));
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             break;
         case ExprType::class_inst_field_by_ref_dots_op:
             GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
             if (node->get_value != nullptr)
                 printGetValue(node->get_value, node->idTag());
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::class_inst_method_by_ref_op:
             GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printStringValueNode(node->id, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printStringValueNode(node->id, node->idTag(), new string("right"));
             if (node->listParams != nullptr)
                 printExprList(node->listParams, node->idTag());
             break;
@@ -577,222 +579,222 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
             GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
             if (node->get_value != nullptr)
                 printGetValue(node->get_value, node->idTag());
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             if (node->listParams != nullptr)
                 printExprList(node->listParams, node->idTag());
             break;
             //Математические операции
         case ExprType::plus_op:
             GRAPH_STR += *node->idTag() + " [label=\"+\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::minus_op:
             GRAPH_STR += *node->idTag() + " [label=\"-\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::mult_op:
             GRAPH_STR += *node->idTag() + " [label=\" * \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::div_op:
             GRAPH_STR += *node->idTag() + " [label=\" / \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::mod_op:
             GRAPH_STR += *node->idTag() + " [label=\" % \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::pow_op:
             GRAPH_STR += *node->idTag() + " [label=\" pow \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
             //Конкатенация
         case ExprType::concat_op:
             GRAPH_STR += *node->idTag() + " [label=\" concatenation \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
             //Логические операции
         case ExprType::bool_more:
             GRAPH_STR += *node->idTag() + " [label=\">\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bool_less:
             GRAPH_STR += *node->idTag() + " [label=\"<\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bool_or:
             GRAPH_STR += *node->idTag() + " [label=\"||\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bool_and:
             GRAPH_STR += *node->idTag() + " [label=\"&&\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bool_equal:
             GRAPH_STR += *node->idTag() + " [label=\"==\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bool_equal_strict:
             GRAPH_STR += *node->idTag() + " [label=\"===\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bool_equal_more:
             GRAPH_STR += *node->idTag() + " [label=\" >= \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bool_equal_less:
             GRAPH_STR += *node->idTag() + " [label=\" <= \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bool_not:
             GRAPH_STR += *node->idTag() + " [label=\"!\"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
+            printExpr(node->left, node->idTag(), new string("left"));
             break;
             //Logic
         case ExprType::logic_and:
             GRAPH_STR += *node->idTag() + " [label=\" AND \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::logic_or:
             GRAPH_STR += *node->idTag() + " [label=\" OR \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::logic_xor:
             GRAPH_STR += *node->idTag() + " [label=\" XOR \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
             //Bitwise
         case ExprType::bitwise_shift_l:
             GRAPH_STR += *node->idTag() + " [label=\" SHIFT_L \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bitwise_shift_r:
             GRAPH_STR += *node->idTag() + " [label=\" SHIFT_R \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bitwise_xor:
             GRAPH_STR += *node->idTag() + " [label=\" ^ \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bitwise_and:
             GRAPH_STR += *node->idTag() + " [label=\" & \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bitwise_or:
             GRAPH_STR += *node->idTag() + " [label=\" | \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::bitwise_not:
             GRAPH_STR += *node->idTag() + " [label=\" ~ \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
             //Unary
         case ExprType::u_minus_op:
             GRAPH_STR += *node->idTag() + " [label=\" UNARY MINUS \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
+            printExpr(node->left, node->idTag(), new string("left"));
             break;
         case ExprType::u_plus_op:
             GRAPH_STR += *node->idTag() + " [label=\" UNARY PLUS \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
+            printExpr(node->left, node->idTag(), new string("left"));
             break;
             //Clone
         case ExprType::clone_op:
             GRAPH_STR += *node->idTag() + " [label=\" CLONE \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
+            printExpr(node->left, node->idTag(), new string("left"));
             break;
             //Trenary
         case ExprType::ternary_op:
             GRAPH_STR += *node->idTag() + " [label=\" Trenary \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
+            printExpr(node->left, node->idTag(), new string("left"));
             if (node->central != nullptr)
-                printExpr(node->central, node->idTag(), new std::string("central"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+                printExpr(node->central, node->idTag(), new string("central"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
             //Ref op
         case ExprType::ref_op:
             GRAPH_STR += *node->idTag() + " [label=\" Trenary \"];\n";
             printGetValue(node->get_value, node->idTag());
-            printExpr(node->right, node->idTag(), new std::string(""));
+            printExpr(node->right, node->idTag(), new string(""));
             break;
             //Array op
         case ExprType::get_value_array:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
         case ExprType::add_array_val:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("left"));
-            printExpr(node->right, node->idTag(), new std::string("right"));
+            printExpr(node->left, node->idTag(), new string("left"));
+            printExpr(node->right, node->idTag(), new string("right"));
             break;
             //Functions op
         case ExprType::call_get_value_func:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             if (node->listParams != nullptr)
                 printExprList(node->listParams, node->idTag());
             break;
             //Declarations
         case ExprType::new_decl:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             if (node->listParams != nullptr)
                 printExprList(node->listParams, node->idTag());
             break;
         case ExprType::new_decl_no_params:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             break;
         case ExprType::new_decl_no_id:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
-            printExpr(node->left, node->idTag(), new std::string(""));
+            printExpr(node->left, node->idTag(), new string(""));
             break;
         case ExprType::new_get_value_decl:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
             printGetValue(node->get_value, node->idTag());
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             if (node->listParams != nullptr)
                 printExprList(node->listParams, node->idTag());
             break;
         case ExprType::new_get_value_decl_no_params:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
             printGetValue(node->get_value, node->idTag());
-            printStringValueNode(node->id, node->idTag(), new std::string(""));
+            printStringValueNode(node->id, node->idTag(), new string(""));
             break;
             //TODO воэ это все ниже
         case ExprType::instance_of:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
-            printExpr(node->left, node->idTag(), new std::string("variable"));
-            printExpr(node->right, node->idTag(), new std::string("object type"));
+            printExpr(node->left, node->idTag(), new string("variable"));
+            printExpr(node->right, node->idTag(), new string("object type"));
             break;
         case float_val:
-            std::cout << GRAPH_STR.size() << " from float_val" << "\n";
-            GRAPH_STR += *node->idTag() + " [label=\"" + std::to_string(node->float_val) + "\"];\n";
+            cout << GRAPH_STR.size() << " from float_val" << "\n";
+            GRAPH_STR += *node->idTag() + " [label=\"" + to_string(node->float_val) + "\"];\n";
             break;
         case command_string_val:
             break;
@@ -801,60 +803,60 @@ void printExpr(ExprNode *node, std::string *parentId, std::string *arrowLabel) {
         case class_field_by_ref_op:
             break;
         case class_method_by_ref_op:
-            std::cout<<"USELESS RULE";
+            cout << "USELESS RULE";
             break;
         case call_func:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
-            printStringValueNode(node->id, node->idTag(), new std::string("id"));
+            printStringValueNode(node->id, node->idTag(), new string("id"));
             printExprList(node->listParams, node->idTag());
             break;
     }
-    std::cout << GRAPH_STR.size() << "\n";
+    cout << GRAPH_STR.size() << "\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "[label=\"" + *arrowLabel + "\"];\n";
     delete parentId;
     delete arrowLabel;
 }
 
-void printExprList(ExprList *node, std::string *parentId) {
+void printExprList(ExprList *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Expr list\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     for (int i = 0; i < node->vector.size(); i++) {
-        std::cout << GRAPH_STR.size() << " from expr list #" << i << "\n";
-        printExpr(node->vector[i], node->idTag(), new std::string("part"));
+        cout << GRAPH_STR.size() << " from expr list #" << i << "\n";
+        printExpr(node->vector[i], node->idTag(), new string("part"));
     }
     delete parentId;
 }
 
 //Function stmt
-void printFunctionStmtDecl(FunctionStmtDeclNode *node, std::string *parentId) {
+void printFunctionStmtDecl(FunctionStmtDeclNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Function stmt declaration\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
-    std::cout << GRAPH_STR.size() << " from function declaration\n";
+    cout << GRAPH_STR.size() << " from function declaration\n";
 
     if (node->function_def != nullptr)
         printFunctionDef(node->function_def, node->idTag());
     if (node->stmt_list != nullptr)
-        printStmtList(node->stmt_list, node->idTag(), new std::string("body"));
+        printStmtList(node->stmt_list, node->idTag(), new string("body"));
     delete parentId;
 }
 
-void printFunctionDef(FunctionDefNode *node, std::string *parentId) {
+void printFunctionDef(FunctionDefNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Function definition\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->func_id != nullptr)
-        printStringValueNode(node->func_id, node->idTag(), new std::string("function name"));
+        printStringValueNode(node->func_id, node->idTag(), new string("function name"));
     if (node->type_id != nullptr)
-        printStringValueNode(node->type_id, node->idTag(), new std::string("function type"));
+        printStringValueNode(node->type_id, node->idTag(), new string("function type"));
     if (node->expr_func_list != nullptr)
         printExprFuncList(node->expr_func_list, node->idTag());
     delete parentId;
 }
 
-void printExprFuncList(ExprFuncList *node, std::string *parentId) {
+void printExprFuncList(ExprFuncList *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Expr function list\"];\n";
@@ -866,31 +868,31 @@ void printExprFuncList(ExprFuncList *node, std::string *parentId) {
     delete parentId;
 }
 
-void printExprFunc(ExprFuncNode *node, std::string *parentId) {
+void printExprFunc(ExprFuncNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Expr function\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->get_value_func != nullptr)
         printGetValueFunc(node->get_value_func, node->idTag());
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string(""));
+        printExpr(node->expr, node->idTag(), new string(""));
     delete parentId;
 }
 
-void printGetValueFunc(GetValueFuncNode *node, std::string *parentId) {
+void printGetValueFunc(GetValueFuncNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Get value function\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
-    std::cout << GRAPH_STR.size() << " from get value func\n";
+    cout << GRAPH_STR.size() << " from get value func\n";
 
     if (node->id_value != nullptr)
-        printStringValueNode(node->id_value, node->idTag(), new std::string("name"));
+        printStringValueNode(node->id_value, node->idTag(), new string("name"));
     if (node->id_type != nullptr)
-        printStringValueNode(node->id_type, node->idTag(), new std::string("type"));
+        printStringValueNode(node->id_type, node->idTag(), new string("type"));
     delete parentId;
 }
 
 //Class nodes
-void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId) {
+void printClassStmtDecl(ClassStmtDeclNode *node, string *parentId) {
     switch (node->type) {
         case ClassStmtDeclType::no_modifiers_type:
             GRAPH_STR += *node->idTag() + " [label=\"Class declaration\"];\n";
@@ -914,31 +916,31 @@ void printClassStmtDecl(ClassStmtDeclNode *node, std::string *parentId) {
     delete parentId;
 }
 
-void printClassDef(ClassDefNode *node, std::string *parentId) {
+void printClassDef(ClassDefNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Class definition\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->class_id != nullptr)
-        printStringValueNode(node->class_id, node->idTag(), new std::string("name"));
+        printStringValueNode(node->class_id, node->idTag(), new string("name"));
     if (node->extend_id)
-        printStringValueNode(node->extend_id, node->idTag(), new std::string("extends"));
+        printStringValueNode(node->extend_id, node->idTag(), new string("extends"));
     if (node->impl_id_list)
-        printIdList(node->impl_id_list, node->idTag(), new std::string("implements"));
+        printIdList(node->impl_id_list, node->idTag(), new string("implements"));
     delete parentId;
 }
 
-void printClassStmtList(ClassStmtList *node, std::string *parentId) {
+void printClassStmtList(ClassStmtList *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Class stmt list\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     for (int i = 0; i < node->vector.size(); i++) {
-        std::cout << GRAPH_STR.size() << " from class stmt list member #" << i << "\n";
+        cout << GRAPH_STR.size() << " from class stmt list member #" << i << "\n";
         printClassStmt((node->vector)[i], node->idTag());
     }
     delete parentId;
 }
 
-void printClassStmt(ClassStmtNode *node, std::string *parentId) {
+void printClassStmt(ClassStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Class stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
@@ -951,31 +953,31 @@ void printClassStmt(ClassStmtNode *node, std::string *parentId) {
     if (node->function_def != nullptr)
         printFunctionDef(node->function_def, node->idTag());
     if (node->id_list != nullptr)
-        printIdList(node->id_list, node->idTag(), new std::string(""));
+        printIdList(node->id_list, node->idTag(), new string(""));
     if (node->class_stmt_decl != nullptr)
         printClassStmtDecl(node->class_stmt_decl, node->idTag());
     delete parentId;
 }
 
-void printClassExpr(ClassExprNode *node, std::string *parentId) {
+void printClassExpr(ClassExprNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Class expr\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
-    std::cout << GRAPH_STR.size() << " from class expr\n";
+    cout << GRAPH_STR.size() << " from class expr\n";
 
     if (node->access_mod_list != nullptr)
         printClassAccessModList(node->access_mod_list, node->idTag());
     if (node->get_value != nullptr)
         printGetValue(node->get_value, node->idTag());
     if (node->id != nullptr)
-        printStringValueNode(node->id, node->idTag(), new std::string(""));
+        printStringValueNode(node->id, node->idTag(), new string(""));
     if (node->expr != nullptr)
-        printExpr(node->expr, node->idTag(), new std::string(""));
+        printExpr(node->expr, node->idTag(), new string(""));
     if (node->const_decl_list != nullptr)
         printConstDeclList(node->const_decl_list, node->idTag());
     delete parentId;
 }
 
-void printClassAccessModList(ClassAccessModList *node, std::string *parentId) {
+void printClassAccessModList(ClassAccessModList *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Access mod list\"];\n";
@@ -987,8 +989,8 @@ void printClassAccessModList(ClassAccessModList *node, std::string *parentId) {
     delete parentId;
 }
 
-void printClassAccessMod(ClassAccessModNode *node, std::string *parentId) {
-    std::cout << GRAPH_STR.size() << " from class access mode\n";
+void printClassAccessMod(ClassAccessModNode *node, string *parentId) {
+    cout << GRAPH_STR.size() << " from class access mode\n";
     switch (node->access_mod) {
         case ClassAccessMod::public_node:
             GRAPH_STR += *node->idTag() + " [label=\"Access mod: public\"];\n";
@@ -1023,10 +1025,10 @@ void printClassAccessMod(ClassAccessModNode *node, std::string *parentId) {
 }
 
 //Interface nodes
-void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, std::string *parentId) {
+void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Interface stmt declaration\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
-    std::cout << GRAPH_STR.size() << " from interface decl\n";
+    cout << GRAPH_STR.size() << " from interface decl\n";
 
     if (node->expr_definition != nullptr)
         printInterfaceExprDef(node->expr_definition, node->idTag());
@@ -1035,18 +1037,18 @@ void printInterfaceStmtDecl(InterfaceStmtDeclNode *node, std::string *parentId) 
     delete parentId;
 }
 
-void printInterfaceExprDef(InterfaceExprDefNode *node, std::string *parentId) {
+void printInterfaceExprDef(InterfaceExprDefNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Interface expr definition\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->id != nullptr)
-        printStringValueNode(node->id, node->idTag(), new std::string("name"));
+        printStringValueNode(node->id, node->idTag(), new string("name"));
     if (node->id_extended_list != nullptr)
-        printIdList(node->id_extended_list, node->idTag(), new std::string("extends"));
+        printIdList(node->id_extended_list, node->idTag(), new string("extends"));
     delete parentId;
 }
 
-void printInterfaceStmtList(InterfaceStmtList *node, std::string *parentId) {
+void printInterfaceStmtList(InterfaceStmtList *node, string *parentId) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Interface stmt list\"];\n";
@@ -1058,7 +1060,7 @@ void printInterfaceStmtList(InterfaceStmtList *node, std::string *parentId) {
     delete parentId;
 }
 
-void printInterfaceStmt(InterfaceStmtNode *node, std::string *parentId) {
+void printInterfaceStmt(InterfaceStmtNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Interface stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
@@ -1069,41 +1071,41 @@ void printInterfaceStmt(InterfaceStmtNode *node, std::string *parentId) {
     delete parentId;
 }
 
-void printTraitStmtDeclNode(TraitStmtDeclNode *node, std::string *parentId) {
+void printTraitStmtDeclNode(TraitStmtDeclNode *node, string *parentId) {
     GRAPH_STR += *node->idTag() + " [label=\"Trait stmt\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
 
     if (node->id != nullptr)
-        printStringValueNode(node->id, node->idTag(), new std::string(""));
+        printStringValueNode(node->id, node->idTag(), new string(""));
     if (node->stmt_list != nullptr)
         printClassStmtList(node->stmt_list, node->idTag());
     delete parentId;
 }
 
-void printGetValue(GetValueNode *node, std::string *parentId) {
-    std::cout << GRAPH_STR.size() << " from get value\n";
-    GRAPH_STR += *node->idTag() + " [label=\"Get value count:" + std::to_string(node->count) + "\"];\n";
+void printGetValue(GetValueNode *node, string *parentId) {
+    cout << GRAPH_STR.size() << " from get value\n";
+    GRAPH_STR += *node->idTag() + " [label=\"Get value count:" + to_string(node->count) + "\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + "\n";
     delete parentId;
 }
 
-void printIdList(IdListNode *node, std::string *parentId, std::string *arrowLabel) {
+void printIdList(IdListNode *node, string *parentId, string *arrowLabel) {
     if (node == nullptr)
         return;
     GRAPH_STR += *node->idTag() + " [label=\"Id list\"];\n";
     GRAPH_STR += *node->idTag() + " -> " + *parentId + " [label=\"" + *arrowLabel + "\"];\n";
 
     for (int i = 0; i < node->vector.size(); i++) {
-        printStringValueNode((node->vector)[i], node->idTag(), new std::string(""));
+        printStringValueNode((node->vector)[i], node->idTag(), new string(""));
     }
     delete parentId;
     delete arrowLabel;
 }
 
-void printStringValueNode(std::string *value, std::string *parentId, std::string *arrowLabel) {
-    std::string tag("VAL_" + std::to_string(VALUE_ID++));
+void printStringValueNode(string *value, string *parentId, string *arrowLabel) {
+    string tag("VAL_" + to_string(VALUE_ID++));
 
-    std::cout << GRAPH_STR.size() << " from string value" << "\n";
+    cout << GRAPH_STR.size() << " from string value" << "\n";
     GRAPH_STR += tag + " [label=\"" + *value + "\"];\n";
     GRAPH_STR += tag + " -> " + *parentId + " [label=\"" + *arrowLabel + "\"];\n";
     delete value;

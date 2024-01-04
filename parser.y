@@ -18,6 +18,7 @@ extern int yylex(void);
 #include <vector>
 #include "parser_classes/all_include.hpp"
 using namespace std;
+extern StartNode* startNode;
 
 class IfStmtNode;
 class ExprNode;
@@ -238,16 +239,16 @@ class ElseIfDotList;
 
 %%
 
-start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {StartNode*tmp=StartNode::CreateNode($2);printTreeGraph(tmp);$$=tmp;}                     
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {StartNode*tmp=StartNode::CreateNode($2);printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {StartNode*tmp=StartNode::CreateNodeFromHtmlAfter($2, HtmlStmtNode::CreateNode(new string(*$4)));printTreeGraph(tmp);$$=tmp;}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {StartNode*tmp=StartNode::CreateNodeFromHtmlBefore(HtmlStmtNode::CreateNode(new string(*$1)), $3);printTreeGraph(tmp);$$=tmp;}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {StartNode*tmp=StartNode::CreateNodeFromHtmlBefore(HtmlStmtNode::CreateNode(new string(*$1)), $3);printTreeGraph(tmp);$$=tmp;}
-        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {StartNode*tmp=StartNode::CreateNodeFromHtmlAround(HtmlStmtNode::CreateNode(new string(*$1)), $3, HtmlStmtNode::CreateNode(new string(*$5)));printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG                                                          {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {StartNode*tmp=StartNode::CreateNode(nullptr);printTreeGraph(tmp);$$=tmp;}
-        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {StartNode*tmp=StartNode::CreateNodeFromHtmlOnly(HtmlStmtNode::CreateNode(new string(*$3)));printTreeGraph(tmp);$$=tmp;}
-        | HTML                                                                        {StartNode*tmp=StartNode::CreateNodeFromHtmlOnly(HtmlStmtNode::CreateNode(new string(*$1)));printTreeGraph(tmp);$$=tmp;}
+start:    START_CODE_PHP_TAG top_stmt_list_not_e                                      {StartNode*tmp=StartNode::CreateNode($2);startNode=tmp;$$=tmp;}                     
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                     {StartNode*tmp=StartNode::CreateNode($2);startNode=tmp;$$=tmp;}
+        | START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML                {StartNode*tmp=StartNode::CreateNodeFromHtmlAfter($2, HtmlStmtNode::CreateNode(new string(*$4)));startNode=tmp;$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e                                 {StartNode*tmp=StartNode::CreateNodeFromHtmlBefore(HtmlStmtNode::CreateNode(new string(*$1)), $3);startNode=tmp;$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG                {StartNode*tmp=StartNode::CreateNodeFromHtmlBefore(HtmlStmtNode::CreateNode(new string(*$1)), $3);startNode=tmp;$$=tmp;}
+        | HTML START_CODE_PHP_TAG top_stmt_list_not_e END_CODE_PHP_TAG HTML           {StartNode*tmp=StartNode::CreateNodeFromHtmlAround(HtmlStmtNode::CreateNode(new string(*$1)), $3, HtmlStmtNode::CreateNode(new string(*$5)));startNode=tmp;$$=tmp;}
+        | START_CODE_PHP_TAG                                                          {StartNode*tmp=StartNode::CreateNode(nullptr);startNode=tmp;$$=tmp;}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG                                         {StartNode*tmp=StartNode::CreateNode(nullptr);startNode=tmp;$$=tmp;}
+        | START_CODE_PHP_TAG END_CODE_PHP_TAG HTML                                    {StartNode*tmp=StartNode::CreateNodeFromHtmlOnly(HtmlStmtNode::CreateNode(new string(*$3)));startNode=tmp;$$=tmp;}
+        | HTML                                                                        {StartNode*tmp=StartNode::CreateNodeFromHtmlOnly(HtmlStmtNode::CreateNode(new string(*$1)));startNode=tmp;$$=tmp;}
         ;
 
 top_stmt_list_not_e: top_stmt                                                         {$$=TopStmtList::CreateNode($1);}                                                                                                           
@@ -311,7 +312,7 @@ do_while_stmt: DO stmt WHILE '(' expr ')' ';'                                   
 stmt:     expr_may_empty ';'                                                          {$$=StmtNode::CreateFromExpr($1);}
         | if_stmt                                                                     {$$=StmtNode::CreateFromIfStmt($1);}
         | switch_stmt                                                                 {$$=StmtNode::CreateFromSwitchStmt($1);}
-        | '{'stmt_list_may_empty'}'                                                   {cout<<"Reduce to stmt from stmt list\n";$$=StmtNode::CreateFromStmtList($2);}
+        | '{'stmt_list_may_empty'}'                                                   {$$=StmtNode::CreateFromStmtList($2);}
         | STATIC static_var_list ';'                                                  {$$=StmtNode::CreateFromStaticVar($2);}
         | GLOBAL global_var_list ';'                                                  {$$=StmtNode::CreateFromGlobalVar($2);}
         | while_stmt                                                                  {$$=StmtNode::CreateFromWhileStmt($1);}
@@ -320,7 +321,7 @@ stmt:     expr_may_empty ';'                                                    
         | foreach_stmt                                                                {$$=StmtNode::CreateFromForEachStmt($1);}
         | CONST const_decl_list_not_e ';'                                             {$$=StmtNode::CreateFromConstDecl($2);}
         | RETURN expr_may_empty ';'                                                   {$$=StmtNode::CreateFromReturnStmt($2);}
-        | html_stmt                                                                   {cout<<"Reduce to stmt from html stmt\n";$$=StmtNode::CreateFromHtmlStmt($1);}
+        | html_stmt                                                                   {$$=StmtNode::CreateFromHtmlStmt($1);}
         | BREAK ';'                                                                   {$$=StmtNode::CreateFromBreakStmt();}
         | T_ECHO expr ';'                                                             {$$=StmtNode::CreateFromTEchoStmt($2);}
         | CONTINUE ';'                                                                {$$=StmtNode::CreateFromContinueStmt();}

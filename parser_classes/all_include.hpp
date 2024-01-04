@@ -1,3 +1,8 @@
+#ifndef ALL_INCLUDE_H
+#define ALL_INCLUDE_H
+
+using namespace std;
+
 #include <string>
 #include <vector>
 
@@ -75,3 +80,5 @@
 #include "Start/StartNode.hpp"
 
 void printTreeGraph(StartNode* node);
+
+#endif

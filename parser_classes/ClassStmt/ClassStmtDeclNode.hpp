@@ -1,3 +1,5 @@
+#ifndef CLASS_STMT_DECL_NODE_H
+#define CLASS_STMT_DECL_NODE_H
 #include "ClassStmtDeclType.cpp"
 #include <string>
 
@@ -19,3 +21,5 @@ public:
 
     std::string* idTag() const;
 };
+
+#endif

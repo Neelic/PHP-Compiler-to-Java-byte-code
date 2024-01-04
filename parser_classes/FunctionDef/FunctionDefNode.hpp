@@ -1,3 +1,6 @@
+#ifndef FUNCTION_DEF_NODE_H
+#define FUNCTION_DEF_NODE_H
+
 #include <string>
 #include "FunctionDefType.cpp"
 
@@ -18,3 +21,5 @@ public:
 
     std::string* idTag() const;
 };
+
+#endif

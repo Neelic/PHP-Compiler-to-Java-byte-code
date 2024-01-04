@@ -185,5 +185,7 @@ public:
 
     static ExprNode *CreateFromGetValueDeclNoParams(GetValueNode *get_value, std::string *id);
 
+    static ExprNode *CreateFromNull();
+
     std::string *idTag() const;
 };

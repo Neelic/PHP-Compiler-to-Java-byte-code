@@ -170,7 +170,8 @@ ExprNode *ExprNode::CreateFromGetValueFieldReference(ExprNode *left, GetValueNod
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValueNode *get_value, ExprNode *get_value_expr) {
+ExprNode *
+ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValueNode *get_value, ExprNode *get_value_expr) {
     auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->get_value = get_value;
@@ -627,7 +628,14 @@ ExprNode *ExprNode::CreateFromInstanceOf(ExprNode *left, ExprNode *right) {
     return tmp;
 }
 
-std::string * ExprNode::idTag() const {
+std::string *ExprNode::idTag() const {
     auto *tmp = new std::string(std::string("Expr") + std::to_string(this->cur_id));
+    return tmp;
+}
+
+ExprNode *ExprNode::CreateFromNull() {
+    auto *tmp = new ExprNode();
+    tmp->exprType = ExprType::null_keyword;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }

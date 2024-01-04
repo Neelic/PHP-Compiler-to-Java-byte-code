@@ -181,4 +181,6 @@ add_executable(PHP_Compiler
         parser.tab.h
         parser.tab.c
         parser_classes/Vector_classes/ElseIfDotList/ElseIfDotList.cpp
-        parser_classes/Vector_classes/ElseIfDotList/ElseIfDotList.h)
+        parser_classes/Vector_classes/ElseIfDotList/ElseIfDotList.h
+        semantic/semantic.h
+        semantic/semantic.cpp)
