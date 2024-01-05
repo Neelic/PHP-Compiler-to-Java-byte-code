@@ -16,8 +16,8 @@ vector<InterfaceStmtDeclNode *> interfaces;
 //Global scope traits
 vector<TraitStmtDeclNode *> traits;
 
-void inspectExpr(ExprNode *node,
-                 bool isInClass = false);
+void inspectExpr(ExprNode *node, vector<ExprNode *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false);
 
 void inspectFunction(FunctionStmtDeclNode *node);
 
@@ -37,7 +37,8 @@ void inspectClassExpr(ClassExprNode *node);
 
 void inspectClassAccessModList(const vector<ClassAccessModList *> &list);
 
-void inspectStmt(StmtNode *node, bool isInClass = false);
+void inspectStmt(StmtNode *node, vector<ExprNode *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false);
 
 bool isDeclaredVariable(string *id, const vector<ExprNode *> &list) {
     if(id == nullptr) return false;
@@ -159,7 +160,7 @@ void inspectGlobalScope(StartNode *node) {
     for (auto *tmp: node->top_stmt_list->vector) {
         switch (tmp->type) {
             case TopStmtType::stmt_top_type:
-                inspectStmt(tmp->stmt);
+                inspectStmt(tmp->stmt, variables, consts, functions);
                 break;
             case TopStmtType::class_top_type:
                 break;
@@ -188,7 +189,9 @@ void inspectFunction(FunctionStmtDeclNode *node) {
     inspectFunctionDef(node->function_def);
     
     for (int i = 0; i < node->stmt_list->vector.size(); i++) {
-        inspectStmt(node->stmt_list->vector[i]);
+        auto tmp1 = vector<ExprNode *>();
+        auto tmp2 = vector<ConstDeclNode *>();
+        inspectStmt(node->stmt_list->vector[i], tmp1, tmp2, functions);
     }
 }
 
@@ -220,7 +223,9 @@ void inspectExprFunc(ExprFuncNode *node) {
         case ExprFuncType::get_value_expr_type:
             break;
         case ExprFuncType::get_value_assign_expr_type:
-            inspectExpr(node->expr);
+            auto tmp1 = vector<ExprNode *>();
+            auto tmp2 = vector<ConstDeclNode *>();
+            inspectExpr(node->expr, tmp1, tmp2, functions);
             break;
     }
 }
@@ -323,12 +328,13 @@ void inspectClassDef(ClassDefNode *node) {
 
 
 //Statements
-void inspectStmt(StmtNode *node, bool isInClass) {
+void inspectStmt(StmtNode *node, vector<ExprNode *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass) {
     if (node == nullptr) return;
 
     switch (node->type) {
         case StmtType::expr:
-            inspectExpr(node->expr_left, isInClass);
+            inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass);
             break;
         case StmtType::for_stmt:
             break;
@@ -341,8 +347,8 @@ void inspectStmt(StmtNode *node, bool isInClass) {
     }
 }
 
-void inspectExpr(ExprNode *node,
-                 bool isInClass) {
+void inspectExpr(ExprNode *node, vector<ExprNode *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass) {
     if (node == nullptr) return;
 
     switch (node->exprType) {
@@ -359,8 +365,8 @@ void inspectExpr(ExprNode *node,
                 variables.push_back(node->right->left);
             }
 
-            inspectExpr(node->left, isInClass);
-            inspectExpr(node->right, isInClass);
+            inspectExpr(node->left,variablesScope, constsScope, functionsScope, isInClass);
+            inspectExpr(node->right,variablesScope, constsScope, functionsScope, isInClass);
             break;
         case ExprType::assign_ref_op:
             break;
