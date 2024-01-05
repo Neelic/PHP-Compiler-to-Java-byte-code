@@ -17,6 +17,8 @@ bool isDeclaredFunction(string *id, const vector<FunctionStmtDeclNode *> &list);
 
 bool isDeclaredClass(string *id, const vector<ClassStmtDeclNode *>& list);
 
+bool isDeclaredTrait(string *id);
+
 bool isStandartType(string *id);
 
 bool isPredeclaredConst(string *id);

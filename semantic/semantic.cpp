@@ -27,6 +27,16 @@ void inspectExprFunc(ExprFuncNode *node);
 
 void inspectGetValueFunc(GetValueFuncNode *node);
 
+void inspectClass(ClassStmtDeclNode *node);
+
+void inspectClassDef(ClassDefNode *node);
+
+void inspectClassStmt(ClassStmtNode *node);
+
+void inspectClassExpr(ClassExprNode *node);
+
+void inspectClassAccessModList(const vector<ClassAccessModList *> &list);
+
 void inspectStmt(StmtNode *node, bool isInClass = false);
 
 bool isDeclaredVariable(string *id, const vector<ExprNode *> &list) {
@@ -69,6 +79,16 @@ bool isDeclaredInterface(string *id, const vector<InterfaceStmtDeclNode *> &list
                       return *var->expr_definition->id == *id;
                   });
 }
+
+bool isDeclaredTrait(string *id){
+    if(id == nullptr) return false;
+
+    return any_of(traits.cbegin(), traits.cend(), 
+                  [&id](auto &var){
+                    return *var->id == *id;
+                  });
+}
+
 // Определяет, является ли id стандартным типом
 bool isStandartType(string *id) {
     if(id == nullptr) return false;
@@ -187,9 +207,8 @@ void inspectFunctionDef(FunctionDefNode *node) {
     }
 
     for (int i = 0; i < node->expr_func_list->vector.size(); i++) {
-        
+        inspectExprFunc(node->expr_func_list->vector[i]);
     }
-
 }
 
 void inspectExprFunc(ExprFuncNode *node) {
@@ -230,8 +249,78 @@ void inspectGetValueFunc(GetValueFuncNode *node) {
                 throw runtime_error(string("Fatal error: Uncaught Error: Class \"" + *node->id_type + "\" not found in " + *file_name));
             break;
     }
-
 }
+
+
+//Classes
+void inspectClass(ClassStmtDeclNode *node) {
+    if (node == nullptr) return;
+
+    if (isDeclaredClass(node->class_def->class_id, classes) || 
+        isDeclaredInterface(node->class_def->class_id, interfaces) || 
+        isDeclaredTrait(node->class_def->class_id))
+        throw runtime_error(string("Fatal error: Cannot declare class " + *node->class_def->class_id + ", because the name is already in use in " + *file_name));
+
+    inspectClassDef(node->class_def);
+
+    for (int i = 0; i < node->class_stmt_list->vector.size(); i++) {
+        inspectClassStmt(node->class_stmt_list->vector[i]);
+    }
+}
+
+void inspectClassDef(ClassDefNode *node) {
+    if(node == nullptr) return;
+
+    switch (node->type){
+        case ClassDefType::class_def_type:
+            break;
+        case ClassDefType::extends_type:
+            //Проверка, является ли наследуемый id объявленным классом
+            if (!isDeclaredClass(node->extend_id, classes)){
+                // Если не является классом, является ли интерфейсом
+                if(isDeclaredInterface(node->extend_id, interfaces))
+                    throw runtime_error(string("Fatal error: Class " + *node->class_id + " cannot extend interface " + *node->extend_id + " in " + *file_name));
+                // Или является ли признаком
+                else if (isDeclaredTrait(node->extend_id))
+                    throw runtime_error(string("Fatal error: Class " + *node->class_id + " cannot extend trait " + *node->extend_id + " in " + *file_name));
+                // Иначе является неопознанным индентификатором
+                else throw runtime_error(string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " + *file_name));
+            }  
+            break;
+        case ClassDefType::implements_type:
+            // Для каждого id в списке 
+            for (int i = 0; i < node->impl_id_list->vector.size(); i++) {
+                // Является ли объявленным интерфейсом
+                if(!isDeclaredInterface(node->impl_id_list->vector[i], interfaces)){
+                    // Если не интерфейс, является ли классом или трейтом
+                    if(isDeclaredClass(node->impl_id_list->vector[i], classes) || isDeclaredTrait(node->impl_id_list->vector[i]))
+                        throw runtime_error(string("Fatal error: " + *node->class_id + " cannot implement " + *node->impl_id_list->vector[i] + " - it is not an interface in " + *file_name));
+                    // Иначе неопознанный индентификатор
+                    else throw runtime_error(string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] + "\" not found in " + *file_name));
+                }
+            }
+            break;
+        case ClassDefType::extends_implements_type:
+            //Проверка extends
+            if (!isDeclaredClass(node->extend_id, classes)){
+                if(isDeclaredInterface(node->extend_id, interfaces))
+                    throw runtime_error(string("Fatal error: Class " + *node->class_id + " cannot extend interface " + *node->extend_id + " in " + *file_name));
+                else if (isDeclaredTrait(node->extend_id))
+                    throw runtime_error(string("Fatal error: Class " + *node->class_id + " cannot extend trait " + *node->extend_id + " in " + *file_name));
+                else throw runtime_error(string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " + *file_name));
+            } 
+            // Проверка includes
+            for (int i = 0; i < node->impl_id_list->vector.size(); i++) {
+                if(!isDeclaredInterface(node->impl_id_list->vector[i], interfaces)){
+                    if(isDeclaredClass(node->impl_id_list->vector[i], classes) || isDeclaredTrait(node->impl_id_list->vector[i]))
+                        throw runtime_error(string("Fatal error: " + *node->class_id + " cannot implement " + *node->impl_id_list->vector[i] + " - it is not an interface in " + *file_name));
+                    else throw runtime_error(string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] + "\" not found in " + *file_name));
+                }
+            }
+            break;
+    }
+}
+
 
 //Statements
 void inspectStmt(StmtNode *node, bool isInClass) {
