@@ -486,7 +486,6 @@ class_stmt: class_expr ';'                                           {$$=ClassSt
         |   function_stmt_decl                                       {$$=ClassStmtNode::CreateFromFunctionStmtDecl(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1);}
         |   function_def ';'                                         {$$=ClassStmtNode::CreateFromFunctionDef(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1);}
         |   USE id_list ';'                                          {$$=ClassStmtNode::CreateFromIdList($2);}
-        |   class_stmt_decl                                          {$$=ClassStmtNode::CreateFromClassStmtDecl($1);}
         ;       
 
 class_expr: class_access_mod_list get_value ID '=' expr              {$$=ClassExprNode::CreateFromGetValueAssign($1, $2, new string(*$3), $5);}

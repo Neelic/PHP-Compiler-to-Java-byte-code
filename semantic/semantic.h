@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "../parser_classes/all_include.hpp"
+#include "classScopeContainer/ClassScopeContainer.hpp"
 
 using namespace std;
 
@@ -26,5 +27,7 @@ bool isPredeclaredConst(string *id);
 bool isPredeclaredVariable(string *id);
 
 void inspectGlobalScope(StartNode* node);
+
+ClassScopeContainer *getClassScopeContainer(ClassStmtDeclNode *node);
 
 #endif //SEMANTIC_H
