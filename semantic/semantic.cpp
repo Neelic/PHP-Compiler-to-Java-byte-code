@@ -15,11 +15,13 @@ vector<ClassStmtDeclNode *> classes; //Здесь и в функциях зам�
 vector<InterfaceStmtDeclNode *> interfaces;
 //Global scope traits
 vector<TraitStmtDeclNode *> traits;
+//Class scope properties
+vector<ClassScopeContainer *> classProperties;
 
 void inspectExpr(ExprNode *node, vector<ExprNode *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false);
 
-void inspectFunction(FunctionStmtDeclNode *node);
+void inspectFunction(FunctionStmtDeclNode *node, ClassStmtDeclNode *parent = nullptr);
 
 void inspectFunctionDef(FunctionDefNode *node);
 
@@ -154,6 +156,17 @@ bool isPredeclaredVariable(string *id) {
            id == new string("argv");
 }
 
+
+// Получить ClassScopeContainer по классу
+ClassScopeContainer *getClassScopeContainer(ClassStmtDeclNode *node) {
+    if(node == nullptr) return;
+
+    for (auto &i : classProperties){
+        if(i->node->class_def->class_id == node->class_def->class_id)
+            return i;
+    }
+}
+
 void inspectGlobalScope(StartNode *node) {
     if (node == nullptr || node->top_stmt_list == nullptr) return;
 
@@ -177,11 +190,13 @@ void inspectGlobalScope(StartNode *node) {
 
 
 //Functions
-void inspectFunction(FunctionStmtDeclNode *node) {
+void inspectFunction(FunctionStmtDeclNode *node, ClassStmtDeclNode *parent = nullptr) {
 
     if (node == nullptr) return;
 
-    if (isDeclaredFunction(node->function_def->func_id, functions))
+    auto parentProperties = getClassScopeContainer(parent);
+
+    if (isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
         throw runtime_error(
                 string("Fatal error: Cannot redeclare " + *node->function_def->func_id + " (previously declared in " +
                        *file_name + ") in " + *file_name));
@@ -218,6 +233,7 @@ void inspectFunctionDef(FunctionDefNode *node) {
     }
 }
 
+// Проверка параметров функции
 void inspectExprFunc(ExprFuncNode *node) {
     if (node == nullptr) return;
 
