@@ -1,156 +1,267 @@
 import java.util.HashMap;
 
-class Value extends Val {
+public class Value {
+    protected TypeValue typeVal;
     private int intVal;
-
     private double floatVal;
-
     private String stringVal;
     private boolean boolVal;
-    private final HashMap<String, Val> arrayVal = new HashMap<>();
-    private int lastArrayIndex = 0;
+    private HashMap<String, Value> arrayVal = null;
+    private ObjValue objVal = null;
+    private int lastArrayIndex = -1;
 
     public Value(int intVal) {
-        typeVal = Type.intVal;
+        typeVal = TypeValue.intVal;
         this.intVal = intVal;
     }
 
     public Value(double floatVal) {
-        typeVal = Type.floatVal;
+        typeVal = TypeValue.floatVal;
         this.floatVal = floatVal;
     }
 
     public Value(String stringVal) {
-        typeVal = Type.stringVal;
+        typeVal = TypeValue.stringVal;
         this.stringVal = stringVal;
     }
 
     public Value(boolean boolVal) {
-        typeVal = Type.boolVal;
+        typeVal = TypeValue.boolVal;
         this.boolVal = boolVal;
     }
 
-    public Value() {
-        typeVal = Type.arrayVal;
+    public Value(HashMap<String, Value> arrayVal) {
+        typeVal = TypeValue.arrayVal;
+        this.arrayVal = arrayVal;
+    }
+
+    public Value(ObjValue objVal) {
+        typeVal = TypeValue.objectVal;
+        this.objVal = objVal;
+    }
+
+    public TypeValue getType() {
+        return typeVal;
     }
 
     public int getInt() {
-        return intVal;
+        if (typeVal == TypeValue.intVal) return intVal;
+        else throw new RuntimeException("Not same type");
     }
 
     public double getFloat() {
-        return floatVal;
+        if (typeVal == TypeValue.floatVal) return floatVal;
+        else throw new RuntimeException("Not same type");
     }
 
     public String getString() {
-        return stringVal;
+        if (typeVal == TypeValue.stringVal) return stringVal;
+        else throw new RuntimeException("Not same type");
     }
 
-    public boolean isBool() {
-        return boolVal;
+    public boolean getBool() {
+        if (typeVal == TypeValue.boolVal) return boolVal;
+        else throw new RuntimeException("Not same type");
     }
 
-    public HashMap<String, Val> getArrayVal() {
-        return arrayVal;
+    public HashMap<String, Value> getArrayVal() {
+        if (typeVal == TypeValue.arrayVal) return arrayVal;
+        else throw new RuntimeException("Not same type");
     }
 
-    public Val add(Val other) {
-        if (typeVal == Type.intVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(intVal + other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(intVal + other.getFloat());
+    public ObjValue getObjVal() {
+        if (typeVal == TypeValue.objectVal) return objVal;
+        else throw new RuntimeException("Not same type");
+    }
+
+    public Value add(Value other) {
+        switch (typeVal) {
+            case intVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(intVal + other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(intVal + other.getFloat());
+                    }
+                }
             }
-        } else if (typeVal == Type.floatVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(floatVal + other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(floatVal + other.getFloat());
+            case floatVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(floatVal + other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(floatVal + other.getFloat());
+                    }
+                }
+            }
+            case stringVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(stringVal + other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(stringVal + other.getFloat());
+                    }
+                    case stringVal -> {
+                        return new Value(stringVal + other.getString());
+                    }
+                }
+            }
+            case boolVal -> {
+                switch (other.getType()) {
+                    case boolVal -> {
+                        return new Value(boolVal | other.getBool());
+                    }
+                    case intVal -> {
+                        return new Value((boolVal ? 1 : 0) + other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(other.getFloat() + (boolVal ? 1 : 0));
+                    }
+                }
             }
         }
 
-        System.out.println();
-        throw new RuntimeException("");
+        throw new RuntimeException(
+                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+                        + this.typeToString()
+                        + " + "
+                        + other.typeToString()
+        );
     }
 
-    public Val sub(Val other) {
-        if (typeVal == Type.intVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(intVal - other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(intVal - other.getFloat());
+    public Value sub(Value other) {
+        switch (typeVal) {
+            case intVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(intVal - other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(intVal - other.getFloat());
+                    }
+                }
             }
-        } else if (typeVal == Type.floatVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(floatVal - other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(floatVal - other.getFloat());
+            case floatVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(floatVal - other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(floatVal - other.getFloat());
+                    }
+                }
             }
         }
 
-        System.out.println();
-        throw new RuntimeException("");
+        throw new RuntimeException(
+                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+                        + this.typeToString()
+                        + " - "
+                        + other.typeToString()
+        );
     }
 
-    public Val mul(Val other) {
-        if (typeVal == Type.intVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(intVal * other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(intVal * other.getFloat());
+    public Value mul(Value other) {
+        switch (typeVal) {
+            case intVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(intVal * other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(intVal * other.getFloat());
+                    }
+                }
             }
-        } else if (typeVal == Type.floatVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(floatVal * other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(floatVal * other.getFloat());
+            case floatVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(floatVal * other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(floatVal * other.getFloat());
+                    }
+                }
             }
         }
 
-        System.out.println();
-        throw new RuntimeException("");
+        throw new RuntimeException(
+                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+                        + this.typeToString()
+                        + " * "
+                        + other.typeToString()
+        );
     }
 
-    public Val div(Val other) {
-        if (typeVal == Type.intVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(intVal / other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(intVal / other.getFloat());
+    public Value div(Value other) {
+        switch (typeVal) {
+            case intVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(intVal / other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(intVal / other.getFloat());
+                    }
+                }
             }
-        } else if (typeVal == Type.floatVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(floatVal / other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(floatVal / other.getFloat());
+            case floatVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(floatVal / other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(floatVal / other.getFloat());
+                    }
+                }
             }
         }
 
-        System.out.println();
-        throw new RuntimeException("");
+        throw new RuntimeException(
+                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+                        + this.typeToString()
+                        + " / "
+                        + other.typeToString()
+        );
     }
 
-    public Val mod(Val other) {
-        if (typeVal == Type.intVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(intVal % other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(intVal % other.getFloat());
+    public Value mod(Value other) {
+        switch (typeVal) {
+            case intVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(intVal % other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(intVal % other.getFloat());
+                    }
+                }
             }
-        } else if (typeVal == Type.floatVal) {
-            if (other.getType() == Type.intVal) {
-                return new Value(floatVal % other.getInt());
-            } else if (other.getType() == Type.floatVal) {
-                return new Value(floatVal % other.getFloat());
+            case floatVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        return new Value(floatVal % other.getInt());
+                    }
+                    case floatVal -> {
+                        return new Value(floatVal % other.getFloat());
+                    }
+                }
             }
         }
 
-        System.out.println();
-        throw new RuntimeException("");
+        throw new RuntimeException(
+                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+                        + this.typeToString()
+                        + " % "
+                        + other.typeToString()
+        );
     }
 
-    public void addToArray(String index, Val other) {
-        if (typeVal != Type.arrayVal) {
+    public void addToArray(String index, Value other) {
+        if (typeVal != TypeValue.arrayVal) {
             throw new RuntimeException("Fatal error: Uncaught Error: cannot use a scalar value as an array");
         }
 
@@ -160,21 +271,20 @@ class Value extends Val {
             int ind = Integer.parseInt(index);
 
             if (ind > lastArrayIndex) lastArrayIndex = ind;
-        } catch (NumberFormatException e) {
-            return;
+        } catch (NumberFormatException ignored) {
         }
     }
 
-    public void addToArray(Val other) {
-        if (typeVal == Type.stringVal) {
+    public void addToArray(Value other) {
+        if (typeVal == TypeValue.stringVal) {
             throw new RuntimeException("Fatal error: Uncaught Error: [] operator not supported for strings");
         }
 
-        addToArray(String.valueOf(++lastArrayIndex), other);
+        addToArray(String.valueOf(lastArrayIndex + 1), other);
     }
 
-    public Val getArrayVal(String index) {
-        if (typeVal != Type.arrayVal && typeVal != Type.stringVal) {
+    public Value getArrayVal(String index) {
+        if (typeVal != TypeValue.arrayVal && typeVal != TypeValue.stringVal) {
             String type = "";
             switch (typeVal) {
                 case intVal -> type = "int";
@@ -182,7 +292,7 @@ class Value extends Val {
                 case floatVal -> type = "float";
             }
             System.out.println("Warning: Trying to access array offset on value of type " + type);
-        } else if (typeVal == Type.stringVal) {
+        } else if (typeVal == TypeValue.stringVal) {
             int ind;
 
             try {
@@ -208,23 +318,47 @@ class Value extends Val {
         return arrayVal.get(index);
     }
 
-    public Val toIntVal() {
+    public Value toIntVal() {
         return null;
     }
 
-    public Val toFloatVal() {
+    public Value toFloatVal() {
         return null;
     }
 
-    public Val toStringVal() {
+    public Value toStringVal() {
         return null;
     }
 
-    public Val toArray() {
+    public Value toArray() {
         return null;
     }
 
-    public Val toObject() {
+    public Value toObject() {
         return null;
+    }
+
+    private String typeToString() {
+        switch (typeVal) {
+            case stringVal -> {
+                return "string";
+            }
+            case intVal -> {
+                return "int";
+            }
+            case floatVal -> {
+                return "float";
+            }
+            case arrayVal -> {
+                return "array";
+            }
+            case boolVal -> {
+                return "bool";
+            }
+            case objectVal -> {
+                return objVal.toString();
+            }
+            default -> throw new RuntimeException("Unknown type");
+        }
     }
 }
