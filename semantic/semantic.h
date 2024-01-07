@@ -28,6 +28,6 @@ bool isPredeclaredVariable(string *id);
 
 void inspectGlobalScope(StartNode* node);
 
-ClassScopeContainer *getClassScopeContainer(ClassStmtDeclNode *node);
+ClassScopeContainer *getClassScopeContainer(string *parentId);
 
 #endif //SEMANTIC_H
