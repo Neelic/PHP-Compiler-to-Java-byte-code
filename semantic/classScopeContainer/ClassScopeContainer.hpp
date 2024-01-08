@@ -12,7 +12,7 @@ class ClassScopeContainer {
 public:
 
   ClassStmtDeclNode *node;
-  vector<ExprNode *> variables;
+  vector<string *> variables;
   vector<ConstDeclNode *> consts;
   vector<FunctionStmtDeclNode *> functions;
 

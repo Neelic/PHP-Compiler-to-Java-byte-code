@@ -4,7 +4,7 @@ vector<string *> sem_errors;
 string *file_name;
 
 //Global scope vars
-vector<ExprNode *> variables;
+vector<string *> variables;
 //Global scope consts
 vector<ConstDeclNode *> consts;
 //Global scope functions
@@ -18,10 +18,10 @@ vector<TraitStmtDeclNode *> traits;
 //Class scope properties
 vector<ClassScopeContainer *> classProperties;
 
-void inspectExpr(ExprNode *node, vector<ExprNode *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
+void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false);
 
-void inspectFunction(FunctionStmtDeclNode *node, ClassStmtDeclNode *parent = nullptr);
+void inspectFunction(FunctionStmtDeclNode *node, string *parentId = nullptr);
 
 void inspectFunctionDef(FunctionDefNode *node);
 
@@ -33,20 +33,22 @@ void inspectClass(ClassStmtDeclNode *node);
 
 void inspectClassDef(ClassDefNode *node);
 
-void inspectClassStmt(ClassStmtNode *node);
+void inspectClassStmt(ClassStmtNode *node, ClassStmtDeclNode *parent = nullptr);
 
-void inspectClassExpr(ClassExprNode *node);
+void inspectClassExpr(ClassExprNode *node, ClassStmtDeclNode *parent = nullptr);
 
-void inspectClassAccessModList(const vector<ClassAccessModList *> &list);
+void inspectClassAccessModList(ClassAccessModList *list);
 
-void inspectStmt(StmtNode *node, vector<ExprNode *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+void inspectConstDecl(ConstDeclNode* node, string *parent_id = nullptr);
+
+void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false);
 
-bool isDeclaredVariable(string *id, const vector<ExprNode *> &list) {
+bool isDeclaredVariable(string *id, const vector<string *> &list) {
     if (id == nullptr) return false;
 
     return any_of(list.cbegin(), list.cend(),
-                  [&id](auto &var) { return *var->id == *id; });
+                  [&id](auto &var) { return *var == *id; });
 }
 
 bool isDeclaredConst(string *id, const vector<ConstDeclNode *> &list) {
@@ -158,11 +160,11 @@ bool isPredeclaredVariable(string *id) {
 
 
 // Получить ClassScopeContainer по классу
-ClassScopeContainer *getClassScopeContainer(ClassStmtDeclNode *node) {
-    if(node == nullptr) return;
+ClassScopeContainer *getClassScopeContainer(string *parentId) {
+    if(parentId == nullptr) return;
 
     for (auto &i : classProperties){
-        if(i->node->class_def->class_id == node->class_def->class_id)
+        if(i->node->class_def->class_id == parentId)
             return i;
     }
 }
@@ -190,23 +192,37 @@ void inspectGlobalScope(StartNode *node) {
 
 
 //Functions
-void inspectFunction(FunctionStmtDeclNode *node, ClassStmtDeclNode *parent = nullptr) {
+void inspectFunction(FunctionStmtDeclNode *node, string *parentId = nullptr) {
 
     if (node == nullptr) return;
 
-    auto parentProperties = getClassScopeContainer(parent);
+    if(parentId != nullptr) {
+        auto parentProperties = getClassScopeContainer(parentId);
 
-    if (isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
-        throw runtime_error(
-                string("Fatal error: Cannot redeclare " + *node->function_def->func_id + " (previously declared in " +
-                       *file_name + ") in " + *file_name));
-
-    functions.push_back(node);
+        if (isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
+            throw runtime_error(
+                    string("Fatal error: Cannot redeclare " + *node->function_def->func_id + " (previously declared in " +
+                            *file_name + ") in " + *file_name));
+        
+        parentProperties->functions.push_back(node);
+    } else {
+        if (isDeclaredFunction(node->function_def->func_id, functions))
+            throw runtime_error(
+                    string("Fatal error: Cannot redeclare " + *node->function_def->func_id + " (previously declared in " +
+                            *file_name + ") in " + *file_name));
+        functions.push_back(node);
+    }
 
     inspectFunctionDef(node->function_def);
 
+    vector<string *> varList; 
+
+    for(auto &tmp: node->function_def->expr_func_list->vector) {
+        varList.push_back(tmp->get_value_func->id_value);
+    }
+
     for (auto & i : node->stmt_list->vector) {
-        auto tmp1 = vector<ExprNode *>();
+        auto tmp1 = varList;
         auto tmp2 = vector<ConstDeclNode *>();
         inspectStmt(i, tmp1, tmp2, functions);
     }
@@ -243,7 +259,7 @@ void inspectExprFunc(ExprFuncNode *node) {
         case ExprFuncType::get_value_expr_type:
             break;
         case ExprFuncType::get_value_assign_expr_type:
-            auto tmp1 = vector<ExprNode *>();
+            auto tmp1 = vector<string *>();
             auto tmp2 = vector<ConstDeclNode *>();
             inspectExpr(node->expr, tmp1, tmp2, functions);
             break;
@@ -295,7 +311,7 @@ void inspectClass(ClassStmtDeclNode *node) {
     inspectClassDef(node->class_def);
 
     for (auto & i : node->class_stmt_list->vector) {
-        inspectClassStmt(i);
+        inspectClassStmt(i, node);
     }
 }
 
@@ -371,6 +387,124 @@ void inspectClassDef(ClassDefNode *node) {
 }
 
 
+void inspectClassStmt(ClassStmtNode *node, ClassStmtDeclNode *parent = nullptr) {
+    if (node == nullptr) return;
+
+    auto parentProperties = getClassScopeContainer(parent->class_def->class_id);
+
+    switch (node->type) {
+        case ClassStmtType::class_expr_stmt_type:
+            inspectClassExpr(node->class_expr);
+            break;
+        case ClassStmtType::function_decl_type:
+            inspectClassAccessModList(node->access_mod);
+            inspectFunction(node->function_stmt_decl, parent->class_def->class_id);
+            parentProperties->functions.push_back(node->function_stmt_decl);
+            break;
+        case ClassStmtType::function_def:
+            
+            inspectClassAccessModList(node->access_mod);
+
+            //Проверяю, есть ли в модификатор abstract, т.к. заголовок функции без тела может быть только абстрактным
+            bool isAbstract = any_of(node->access_mod->vector.cbegin(), node->access_mod->vector.cend(),
+                  [](auto &var) {
+                      return *var->access_mod == ClassAccessMod::abstract_node;
+                  });
+            if(!isAbstract){
+                throw runtime_error(string("Fatal error: Non-abstract method "+ *parent->class_def->class_id +"::"+ *node->function_def->func_id +
+                                           "() must contain body in" + *file_name));
+            }
+
+            // Проверка на переопределение
+            if (isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
+                throw runtime_error(
+                    string("Fatal error: Cannot redeclare "+ *parent->class_def->class_id +"::"+ *node->function_def->func_id +"() in "+ *file_name));
+            
+            //Здесть создаю нод FunctionStmtDecl только с заголовком, чтобы можно было сохранять. В списке функций хранить ноды имеет смысл, я считаю
+            parentProperties->functions.push_back(FunctionStmtDeclNode::CreateNode(node->function_def, nullptr));
+
+            inspectFunctionDef(node->function_def);
+            break;
+        case ClassStmtType::id_list_type:
+            for (auto i: node->id_list->vector){
+                if(!isDeclaredTrait(i)){
+                    if(isDeclaredClass(i, classes) || isDeclaredInterface(i, interfaces))
+                        throw runtime_error(string("Fatal error: " + *parent->class_def->class_id + " cannot use " +
+                                                   *i + " - it is not an trait in " +
+                                                   *file_name));
+                    else throw runtime_error(
+                                string("Fatal error: Trait \"" + *i +
+                                       "\" not found in " + *file_name));
+                }
+            }
+            break;
+    }
+}
+
+void inspectClassExpr(ClassExprNode *node, ClassStmtDeclNode *parent = nullptr) {
+    if (node == nullptr) return;
+
+    auto parentProperties = getClassScopeContainer(parent->class_def->class_id);
+
+    switch (node->type){
+        case ClassExprType::get_value_class_type:
+            inspectClassAccessModList(node->access_mod_list);
+            //Проверка на переопределение будет на рантайме
+            break;
+        case ClassExprType::get_value_assign_class_type:
+            inspectClassAccessModList(node->access_mod_list);
+            //Проверка на переопределение будет на рантайме
+            inspectExpr(node->expr, parentProperties->variables, parentProperties->consts, parentProperties->functions, true);
+            break;
+        case ClassExprType::const_class_type:
+            //TODO: добавить проверку объявления констант
+            break;
+    }
+}
+
+void inspectClassAccessModList(ClassAccessModList *list){
+    if(list == nullptr) return;
+
+    // Здесь пытаюсь проверить спискок модов на дубликаты
+    auto noRepeatList = list->vector;
+
+    sort(noRepeatList.begin(), noRepeatList.end());
+    auto i = unique(noRepeatList.begin(), noRepeatList.end());
+
+    if (i != list->vector.end()){
+        throw runtime_error(string("Fatal error: Multiple access type modifiers are not allowed in " + *file_name));
+    }
+}
+
+
+// Проверка объявления констант
+void inspectConstDecl(ConstDeclNode* node, string *parent_id) {
+    if(node == nullptr) return;
+
+    if(parent_id != nullptr){
+        auto parentProperties = getClassScopeContainer(parent_id);
+
+        if (isDeclaredConst(node->id, parentProperties->consts))
+            sem_errors.push_back(
+                        new string("Warning: Constant " + *node->id + " already defined in " + *file_name));
+        else parentProperties->consts.push_back(node);
+        
+    } else {
+        if(isDeclaredConst(node->id, consts))
+            sem_errors.push_back(
+                        new string("Warning: Constant " + *node->id + " already defined in " + *file_name));
+        else consts.push_back(node);
+    }
+
+    auto tmp1 = vector<string *> ();
+    auto tmp2 = vector<ConstDeclNode *>();
+    auto tmp3 = vector<FunctionStmtDeclNode *>();
+
+    inspectExpr(node->expr, tmp1, tmp2, tmp3, parent_id != nullptr);
+}
+
+
+
 //Statements
 void inspectStmt(StmtNode *node, vector<ExprNode *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass) {
@@ -406,7 +540,7 @@ void inspectExpr(ExprNode *node, vector<ExprNode *> &variablesScope, const vecto
                 sem_errors.push_back(
                         new string("Warning: Undefined variable $" + *node->right->id + " in " + *file_name));
                 node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());
-                variables.push_back(node->right->left);
+                variables.push_back(node->right->left->id);
             }
 
             inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass);
