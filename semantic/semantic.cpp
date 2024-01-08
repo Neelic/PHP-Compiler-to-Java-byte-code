@@ -33,13 +33,21 @@ void inspectClass(ClassStmtDeclNode *node);
 
 void inspectClassDef(ClassDefNode *node);
 
-void inspectClassStmt(ClassStmtNode *node, ClassStmtDeclNode *parent = nullptr);
+void inspectClassStmt(ClassStmtNode *node, string *parentId);
 
-void inspectClassExpr(ClassExprNode *node, ClassStmtDeclNode *parent = nullptr);
+void inspectClassExpr(ClassExprNode *node, string *parentId);
 
 void inspectClassAccessModList(ClassAccessModList *list);
 
 void inspectConstDecl(ConstDeclNode* node, string *parent_id = nullptr);
+
+void inspectInterface(InterfaceStmtDeclNode *node);
+
+void inspectInterfaceDef(InterfaceExprDefNode *node);
+
+void inspectInterfaceStmt(InterfaceStmtNode* node, string *parentId);
+
+void inspectTrait(TraitStmtDeclNode *node);
 
 void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false);
@@ -74,6 +82,15 @@ bool isDeclaredClass(string *id, const vector<ClassStmtDeclNode *> &list) {
                   [&id](auto &var) {
                       return *var->class_def->class_id == *id;
                   });
+}
+
+bool getClass(string *id) {
+    if (id == nullptr) return false;
+
+    for (auto &i : classes){
+        if(i->class_def->class_id == id)
+            return i;
+    }
 }
 
 bool isDeclaredInterface(string *id, const vector<InterfaceStmtDeclNode *> &list) {
@@ -164,7 +181,7 @@ ClassScopeContainer *getClassScopeContainer(string *parentId) {
     if(parentId == nullptr) return;
 
     for (auto &i : classProperties){
-        if(i->node->class_def->class_id == parentId)
+        if(i->id == parentId)
             return i;
     }
 }
@@ -302,6 +319,9 @@ void inspectGetValueFunc(GetValueFuncNode *node) {
 void inspectClass(ClassStmtDeclNode *node) {
     if (node == nullptr) return;
 
+    // Добавляю в глобальный спискок пустой контейнер для хранения свойств и методов класса
+    classProperties.push_back(ClassScopeContainer::CreateContainer(node->class_def->class_id, vector<string *>(), vector<ConstDeclNode *>(), vector<string *>(), vector<string *>(), vector<string *>(), vector<FunctionStmtDeclNode *>()));
+
     if (isDeclaredClass(node->class_def->class_id, classes) ||
         isDeclaredInterface(node->class_def->class_id, interfaces) ||
         isDeclaredTrait(node->class_def->class_id))
@@ -311,12 +331,14 @@ void inspectClass(ClassStmtDeclNode *node) {
     inspectClassDef(node->class_def);
 
     for (auto & i : node->class_stmt_list->vector) {
-        inspectClassStmt(i, node);
+        inspectClassStmt(i, node->class_def->class_id);
     }
 }
 
 void inspectClassDef(ClassDefNode *node) {
     if (node == nullptr) return;
+
+    auto classProps = getClassScopeContainer(node->class_id);
 
     switch (node->type) {
         case ClassDefType::class_def_type:
@@ -336,7 +358,7 @@ void inspectClassDef(ClassDefNode *node) {
                 else throw runtime_error(
                             string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " +
                                    *file_name));
-            }
+            } else classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
             break;
         case ClassDefType::implements_type:
             // Для каждого id в списке 
@@ -353,7 +375,7 @@ void inspectClassDef(ClassDefNode *node) {
                     else throw runtime_error(
                                 string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] +
                                        "\" not found in " + *file_name));
-                }
+                } else classProps->extended.push_back(node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
             }
             break;
         case ClassDefType::extends_implements_type:
@@ -368,7 +390,7 @@ void inspectClassDef(ClassDefNode *node) {
                 else throw runtime_error(
                             string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " +
                                    *file_name));
-            }
+            } else classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
             // Проверка includes
             for (int i = 0; i < node->impl_id_list->vector.size(); i++) {
                 if (!isDeclaredInterface(node->impl_id_list->vector[i], interfaces)) {
@@ -380,25 +402,25 @@ void inspectClassDef(ClassDefNode *node) {
                     else throw runtime_error(
                                 string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] +
                                        "\" not found in " + *file_name));
-                }
+                } else classProps->included.push_back(node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
             }
             break;
     }
 }
 
 
-void inspectClassStmt(ClassStmtNode *node, ClassStmtDeclNode *parent = nullptr) {
+void inspectClassStmt(ClassStmtNode *node, string *parentId) {
     if (node == nullptr) return;
 
-    auto parentProperties = getClassScopeContainer(parent->class_def->class_id);
+    auto parentProperties = getClassScopeContainer(parentId);
 
     switch (node->type) {
         case ClassStmtType::class_expr_stmt_type:
-            inspectClassExpr(node->class_expr);
+            inspectClassExpr(node->class_expr, parentId);
             break;
         case ClassStmtType::function_decl_type:
             inspectClassAccessModList(node->access_mod);
-            inspectFunction(node->function_stmt_decl, parent->class_def->class_id);
+            inspectFunction(node->function_stmt_decl, parentId);
             parentProperties->functions.push_back(node->function_stmt_decl);
             break;
         case ClassStmtType::function_def:
@@ -411,14 +433,14 @@ void inspectClassStmt(ClassStmtNode *node, ClassStmtDeclNode *parent = nullptr) 
                       return *var->access_mod == ClassAccessMod::abstract_node;
                   });
             if(!isAbstract){
-                throw runtime_error(string("Fatal error: Non-abstract method "+ *parent->class_def->class_id +"::"+ *node->function_def->func_id +
+                throw runtime_error(string("Fatal error: Non-abstract method "+ *parentId +"::"+ *node->function_def->func_id +
                                            "() must contain body in" + *file_name));
             }
 
             // Проверка на переопределение
             if (isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
                 throw runtime_error(
-                    string("Fatal error: Cannot redeclare "+ *parent->class_def->class_id +"::"+ *node->function_def->func_id +"() in "+ *file_name));
+                    string("Fatal error: Cannot redeclare "+ *parentId +"::"+ *node->function_def->func_id +"() in "+ *file_name));
             
             //Здесть создаю нод FunctionStmtDecl только с заголовком, чтобы можно было сохранять. В списке функций хранить ноды имеет смысл, я считаю
             parentProperties->functions.push_back(FunctionStmtDeclNode::CreateNode(node->function_def, nullptr));
@@ -429,7 +451,7 @@ void inspectClassStmt(ClassStmtNode *node, ClassStmtDeclNode *parent = nullptr) 
             for (auto i: node->id_list->vector){
                 if(!isDeclaredTrait(i)){
                     if(isDeclaredClass(i, classes) || isDeclaredInterface(i, interfaces))
-                        throw runtime_error(string("Fatal error: " + *parent->class_def->class_id + " cannot use " +
+                        throw runtime_error(string("Fatal error: " + *parentId + " cannot use " +
                                                    *i + " - it is not an trait in " +
                                                    *file_name));
                     else throw runtime_error(
@@ -441,10 +463,10 @@ void inspectClassStmt(ClassStmtNode *node, ClassStmtDeclNode *parent = nullptr) 
     }
 }
 
-void inspectClassExpr(ClassExprNode *node, ClassStmtDeclNode *parent = nullptr) {
+void inspectClassExpr(ClassExprNode *node, string *parentId) {
     if (node == nullptr) return;
 
-    auto parentProperties = getClassScopeContainer(parent->class_def->class_id);
+    auto parentProperties = getClassScopeContainer(parentId);
 
     switch (node->type){
         case ClassExprType::get_value_class_type:
@@ -481,6 +503,8 @@ void inspectClassAccessModList(ClassAccessModList *list){
 void inspectConstDecl(ConstDeclNode* node, string *parent_id) {
     if(node == nullptr) return;
 
+    // Если константа объявлена и в классе, и в одном из трейтов, это будет ошибкой только тогда, когда значения будут разными. Так что наверное проверяем на рантайме
+
     if(parent_id != nullptr){
         auto parentProperties = getClassScopeContainer(parent_id);
 
@@ -503,6 +527,104 @@ void inspectConstDecl(ConstDeclNode* node, string *parent_id) {
     inspectExpr(node->expr, tmp1, tmp2, tmp3, parent_id != nullptr);
 }
 
+
+//Interfaces 
+void inspectInterface(InterfaceStmtDeclNode *node){
+    if(node == nullptr) return;
+
+    classProperties.push_back(ClassScopeContainer::CreateContainer(node->expr_definition->id, 
+                                                                    vector<string *>(), 
+                                                                    vector<ConstDeclNode *>(), 
+                                                                    vector<string *>(), 
+                                                                    vector<string *>(), 
+                                                                    vector<string *>(), 
+                                                                    vector<FunctionStmtDeclNode *>()));
+
+    if(isDeclaredInterface(node->expr_definition->id, interfaces)||
+        isDeclaredClass(node->expr_definition->id, classes) ||
+        isDeclaredTrait(node->expr_definition->id)){
+        throw runtime_error(string("Fatal error: Cannot declare interface " + *node->expr_definition->id + ", because the name is already in use in " + *file_name));
+    }
+    
+    inspectInterfaceDef(node->expr_definition);
+
+    for(auto i: node->stmt_list->vector){
+        inspectInterfaceStmt(i, node->expr_definition->id);
+    }
+    
+}
+
+void inspectInterfaceDef(InterfaceExprDefNode *node){
+    if(node == nullptr) return;
+
+    auto interfaceProps = getClassScopeContainer(node->id);
+
+    if(node->id_extended_list != nullptr){
+
+        for(auto i: node->id_extended_list->vector){
+            if (!isDeclaredInterface(i, interfaces)) {
+                if (isDeclaredClass(i, classes) ||
+                    isDeclaredTrait(i))
+                    throw runtime_error(string("Fatal error: " + *node->id + " cannot implement " +
+                                                *i + " - it is not an interface in " +
+                                                *file_name));
+                else throw runtime_error(
+                            string("Fatal error: Uncaught Error: Interface \"" + *i +
+                                    "\" not found in " + *file_name));
+            } else interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
+            
+            // Проверяю на дубликат в списке интерфейсов
+            for(auto j: interfaceProps->included){
+                if (i == j)
+                    throw runtime_error(string("Fatal error: Interface a cannot implement previously implemented interface " + *i + " in " + *file_name));
+            }
+        }
+    }
+}
+
+void inspectInterfaceStmt(InterfaceStmtNode* node, string *parentId){
+    if(node == nullptr) return;
+
+    if(node->access_mod != nullptr){
+        inspectClassAccessModList(node->access_mod);
+        for(auto i: node->access_mod->vector){
+            if (i->access_mod == ClassAccessMod::abstract_node)
+                throw runtime_error(string("Fatal error: Interface method " + *parentId + "::" + *node->function_def->func_id + "() must not be abstract in " + *file_name));
+        }
+    }
+
+    auto interfaceProps = getClassScopeContainer(parentId);
+
+    if (isDeclaredFunction(node->function_def->func_id, interfaceProps->functions))
+        throw runtime_error(string("Fatal error: Cannot redeclare " + *parentId + "::" + *node->function_def->func_id + "() in " + *file_name));
+    
+    inspectFunctionDef(node->function_def);
+    interfaceProps->functions.push_back(FunctionStmtDeclNode::CreateNode(node->function_def, nullptr));
+}
+
+
+//Traits
+void inspectTrait(TraitStmtDeclNode *node){
+    if(node == nullptr) return;
+
+    classProperties.push_back(ClassScopeContainer::CreateContainer(node->id, 
+                                                                    vector<string *>(), 
+                                                                    vector<ConstDeclNode *>(), 
+                                                                    vector<string *>(), 
+                                                                    vector<string *>(), 
+                                                                    vector<string *>(), 
+                                                                    vector<FunctionStmtDeclNode *>()));
+
+    if(isDeclaredInterface(node->id, interfaces)||
+        isDeclaredClass(node->id, classes) ||
+        isDeclaredTrait(node->id)){
+        throw runtime_error(string("Fatal error: Cannot declare trait " + *node->id + ", because the name is already in use in " + *file_name));
+    }
+
+    for(auto i: node->stmt_list->vector){
+        inspectClassStmt(i, node->id);
+    }
+}
 
 
 //Statements
