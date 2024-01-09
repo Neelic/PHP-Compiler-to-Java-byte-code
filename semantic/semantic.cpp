@@ -19,7 +19,7 @@ vector<TraitStmtDeclNode *> traits;
 vector<ClassScopeContainer *> classProperties;
 
 void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false);
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
 
 void inspectFunction(FunctionStmtDeclNode *node, string *parentId = nullptr);
 
@@ -50,7 +50,33 @@ void inspectInterfaceStmt(InterfaceStmtNode* node, string *parentId);
 void inspectTrait(TraitStmtDeclNode *node);
 
 void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false);
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectIfStmt (IfStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectStaticVar (StaticVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectGlobalVar (GlobalVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectWhileStmt (WhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectDoWhileStmt (DoWhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectForStmt (ForStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectForEachStmt (ForEachStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectHtmlStmt (HtmlStmtNode *node);
 
 bool isDeclaredVariable(string *id, const vector<string *> &list) {
     if (id == nullptr) return false;
@@ -628,21 +654,68 @@ void inspectTrait(TraitStmtDeclNode *node){
 
 
 //Statements
-void inspectStmt(StmtNode *node, vector<ExprNode *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass) {
+void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context = ContextType::noContext) {
     if (node == nullptr) return;
 
     switch (node->type) {
         case StmtType::expr:
-            inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass);
+            inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::for_stmt:
+            inspectForStmt(node->for_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::foreach_stmt:
+            inspectForEachStmt(node->foreach_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::do_while_stmt:
+            inspectDoWhileStmt(node->do_while_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::while_stmt:
+            inspectWhileStmt(node->while_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+        case StmtType::break_stmt:
+            if(context != ContextType::inLoop && context != ContextType::inSwitch)
+                throw runtime_error(string("Fatal error: 'break' not in the 'loop' or 'switch' context in " + *file_name));
+            break;
+        case StmtType::const_decl:
+            for (auto i: node->const_decl->vector){
+                inspectConstDecl(i);
+            }
+            break;
+        case StmtType::continue_stmt:
+            if(context != ContextType::inLoop && context != ContextType::inSwitch)
+                throw runtime_error(string("Fatal error: 'break' not in the 'loop' or 'switch' context in " + *file_name));
+            break;
+        case StmtType::global_var:
+            for (auto i: node->global_var->vector){
+                inspectGlobalVar(i, variablesScope, constsScope, functionsScope, isInClass, context);
+            }
+            break;
+        case StmtType::html_stmt:
+            inspectHtmlStmt(node->html_stmt);
+            break;
+        case StmtType::if_stmt:
+            inspectIfStmt(node->if_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+        case StmtType::return_stmt:
+            inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+        case StmtType::static_var:
+            for (auto i: node->static_var->vector){
+                inspectStaticVar(i, variablesScope, constsScope, functionsScope, isInClass, context);
+            }
+            break;
+        case StmtType::stmt_list:
+            for (auto i: node->stmtList->vector){
+                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
+            }
+            break;
+        case StmtType::switch_stmt:
+            inspectSwitchStmt(node->switch_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+        case StmtType::t_echo_stmt:
+            // Подозреваю, имеет смысл смотреть на семантике
             break;
     }
 }
