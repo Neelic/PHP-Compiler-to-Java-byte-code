@@ -123,6 +123,7 @@ public class Value {
     }
 
     public Value concat(Value other) {
+        if (other == null) other = new Value((ObjValue) null);
         return addValue(other.toStringVal(), true);
     }
 
@@ -661,6 +662,7 @@ public class Value {
     }
 
     public Value getArrayVal(Value index) {
+        if (index == null) index = new Value((ObjValue) null);
         return getArrayVal(index.toStringVal().getString());
     }
 
