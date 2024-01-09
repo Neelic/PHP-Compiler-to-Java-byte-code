@@ -10,6 +10,7 @@ public class Value {
     private HashMap<String, Value> arrayVal = null;
     private ObjValue objVal = null;
     private int lastArrayIndex = -1;
+    private boolean isRef = false;
 
     public Value(int intVal) {
         typeVal = TypeValue.intVal;
@@ -22,7 +23,7 @@ public class Value {
     }
 
     public Value(String stringVal) {
-        typeVal = TypeValue.stringVal;
+        typeVal = stringVal == null ? TypeValue.nullVal : TypeValue.stringVal;
         this.stringVal = stringVal;
     }
 
@@ -32,12 +33,12 @@ public class Value {
     }
 
     public Value(HashMap<String, Value> arrayVal) {
-        typeVal = TypeValue.arrayVal;
+        typeVal = arrayVal == null ? TypeValue.nullVal : TypeValue.arrayVal;
         this.arrayVal = arrayVal;
     }
 
     public Value(ObjValue objVal) {
-        typeVal = TypeValue.objectVal;
+        typeVal = objVal == null ? TypeValue.nullVal : TypeValue.objectVal;
         this.objVal = objVal;
     }
 
@@ -75,8 +76,33 @@ public class Value {
         else throw new RuntimeException("Not same type");
     }
 
+    public boolean isRef() {
+        return isRef;
+    }
+
+    public void setRef(boolean isRef) {
+        this.isRef = isRef;
+    }
+
+    public void setRef(int isRef) {
+        this.isRef = isRef > 0;
+    }
+
+    public void setArrayVal(HashMap<String, Value> arrayVal) {
+        if (arrayVal == null) setNullVal();
+        this.arrayVal = arrayVal;
+    }
+
+    public void setObjVal(ObjValue objVal) {
+        if (objVal == null) setNullVal();
+        this.objVal = objVal;
+    }
+
+    public void setNullVal() {
+        typeVal = TypeValue.nullVal;
+    }
+
     public Value add(Value other) {
-        if (other == null) return null;
         return addValue(other, false);
     }
 
@@ -88,14 +114,48 @@ public class Value {
         return addValue(new Value(other), false);
     }
 
+    public Value add(String other) {
+        return addValue(new Value(other), false);
+    }
+
+    public Value add(ObjValue other) {
+        return addValue(new Value(other), false);
+    }
+
     public Value concat(Value other) {
-        if (other == null) return null;
         return addValue(other.toStringVal(), true);
     }
 
     public Value concat(String other) {
-        if (other == null) return null;
-        return addValue(new Value(other), false);
+        return addValue(new Value(other), true);
+    }
+
+    public Value concat(int other) {
+        return addValue((new Value(other)).toStringVal(), true);
+    }
+
+    public Value concat(double other) {
+        return addValue((new Value(other)).toStringVal(), true);
+    }
+
+    public Value concat(ObjValue other) {
+        return addValue((new Value(other)).toStringVal(), true);
+    }
+
+    public Value concatTo(String other) {
+        return (new Value(other)).toStringVal().addValue(this, true);
+    }
+
+    public Value concatTo(int other) {
+        return (new Value(other)).toStringVal().addValue(this, true);
+    }
+
+    public Value concatTo(double other) {
+        return (new Value(other)).toStringVal().addValue(this, true);
+    }
+
+    public Value concatTo(ObjValue other) {
+        return (new Value(other)).toStringVal().addValue(this, true);
     }
 
     private Value addValue(Value other, boolean isConcat) {
@@ -103,20 +163,65 @@ public class Value {
             case intVal -> {
                 switch (other.getType()) {
                     case intVal -> {
-                        return new Value(intVal + other.getInt());
+                        if (!isRef()) return new Value(intVal + other.getInt());
+
+                        intVal += other.getInt();
+                        return this;
                     }
                     case floatVal -> {
-                        return new Value(intVal + other.getFloat());
+                        if (!isRef()) return new Value(intVal + other.getFloat());
+
+                        typeVal = TypeValue.floatVal;
+                        floatVal = intVal + other.getInt();
+                        return this;
+                    }
+                    case boolVal -> {
+                        if (!isRef()) return new Value(intVal + (other.getBool() ? 1 : 0));
+
+                        intVal += other.getBool() ? 1 : 0;
+                        return this;
+                    }
+                    case nullVal -> {
+                        if (!isRef()) return new Value(intVal);
+
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return addValue(newVal, isConcat);
                     }
                 }
             }
             case floatVal -> {
                 switch (other.getType()) {
                     case intVal -> {
-                        return new Value(floatVal + other.getInt());
+                        if (!isRef()) return new Value(floatVal + other.getInt());
+
+                        floatVal += other.getInt();
+                        return this;
                     }
                     case floatVal -> {
-                        return new Value(floatVal + other.getFloat());
+                        if (!isRef()) return new Value(floatVal + other.getFloat());
+
+                        floatVal += other.getFloat();
+                        return this;
+                    }
+                    case boolVal -> {
+                        if (!isRef()) return new Value(floatVal - (other.getBool() ? 1 : 0));
+
+                        floatVal -= other.getBool() ? 1 : 0;
+                        return this;
+                    }
+                    case nullVal -> {
+                        if (!isRef()) return new Value(floatVal);
+
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return addValue(newVal, isConcat);
                     }
                 }
             }
@@ -124,64 +229,215 @@ public class Value {
                 if (isConcat) {
                     switch (other.getType()) {
                         case intVal -> {
-                            return new Value(stringVal + other.getInt());
+                            if (!isRef()) return new Value(stringVal + other.getInt());
+
+                            stringVal += other.getInt();
+                            return this;
                         }
                         case floatVal -> {
-                            return new Value(stringVal + other.getFloat());
+                            if (!isRef()) return new Value(stringVal + other.getFloat());
+
+                            stringVal += other.getFloat();
+                            return this;
+                        }
+                        case boolVal -> {
+                            if (!isRef()) return new Value(stringVal + (other.getBool() ? 1 : 0));
+
+                            stringVal += other.getBool() ? 1 : 0;
+                            return this;
                         }
                         case stringVal -> {
-                            return new Value(stringVal + other.getString());
+                            if (!isRef()) return new Value(stringVal + other.getString());
+
+                            stringVal += other.getString();
+                            return this;
                         }
+                        case nullVal -> {
+                            if (!isRef()) return new Value(stringVal);
+
+                            return this;
+                        }
+                    }
+                } else {
+                    Value newVal = this.toFloatVal();
+
+                    if (newVal.getType() != TypeValue.nullVal) {
+                        try {
+                            Double.parseDouble(stringVal);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Warning: A non numeric value encountered");
+                        }
+
+                        return addValue(newVal, false);
                     }
                 }
             }
             case boolVal -> {
                 switch (other.getType()) {
                     case boolVal -> {
-                        return new Value((boolVal ? 1 : 0) + (other.getBool() ? 1 : 0));
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) + (other.getBool() ? 1 : 0));
+
+                        typeVal = TypeValue.intVal;
+                        intVal = (boolVal ? 1 : 0) + (other.getBool() ? 1 : 0);
+                        return this;
                     }
                     case intVal -> {
-                        return new Value((boolVal ? 1 : 0) + other.getInt());
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) + other.getInt());
+
+                        typeVal = TypeValue.intVal;
+                        intVal = (boolVal ? 1 : 0) + other.getInt();
+                        return this;
                     }
                     case floatVal -> {
-                        return new Value((boolVal ? 1 : 0) + other.getFloat());
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) + other.getFloat());
+
+                        typeVal = TypeValue.floatVal;
+                        floatVal = (boolVal ? 1 : 0) + other.getFloat();
+                        return this;
+                    }
+                    case nullVal -> {
+                        if (!isRef()) return new Value((boolVal ? 1 : 0));
+
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return addValue(newVal, isConcat);
                     }
                 }
             }
+            case nullVal -> {
+                return this.toIntVal().addValue(other, isConcat);
+            }
         }
 
-        System.out.println(
+        throw new RuntimeException(
                 "Fatal error: Uncaught TypeError: Unsupported operand types: "
                         + this.typeToString()
                         + " + "
                         + other.typeToString()
         );
-        System.exit(1);
-        return null;
     }
 
     public Value sub(Value other) {
-        if (other == null) return null;
+        if (other == null) other = new Value((ObjValue) null);
 
         switch (typeVal) {
             case intVal -> {
                 switch (other.getType()) {
                     case intVal -> {
-                        return new Value(intVal - other.getInt());
+                        if (!isRef()) return new Value(intVal - other.getInt());
+
+                        intVal -= other.getInt();
+                        return this;
                     }
                     case floatVal -> {
-                        return new Value(intVal - other.getFloat());
+                        if (!isRef()) return new Value(intVal - other.getFloat());
+
+                        typeVal = TypeValue.floatVal;
+                        floatVal = intVal - other.getFloat();
+                        return this;
+                    }
+                    case boolVal -> {
+                        if (!isRef()) return new Value(intVal - (other.getBool() ? 1 : 0));
+
+                        intVal -= (other.getBool() ? 1 : 0);
+                        return this;
+                    }
+                    case nullVal -> {
+                        if (!isRef()) return new Value(intVal);
+
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return sub(newVal);
                     }
                 }
             }
             case floatVal -> {
                 switch (other.getType()) {
                     case intVal -> {
-                        return new Value(floatVal - other.getInt());
+                        if (!isRef()) return new Value(floatVal - other.getInt());
+
+                        floatVal -= other.getInt();
+                        return this;
                     }
                     case floatVal -> {
-                        return new Value(floatVal - other.getFloat());
+                        if (!isRef()) return new Value(floatVal - other.getFloat());
+
+                        floatVal -= other.getFloat();
+                        return this;
                     }
+                    case boolVal -> {
+                        if (!isRef()) return new Value(floatVal - (other.getBool() ? 1 : 0));
+
+                        floatVal -= (other.getBool() ? 1 : 0);
+                        return this;
+                    }
+                    case nullVal -> {
+                        if (!isRef()) return new Value(floatVal);
+
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return sub(newVal);
+                    }
+                }
+            }
+            case boolVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) - other.getInt());
+
+                        typeVal = TypeValue.intVal;
+                        intVal = (boolVal ? 1 : 0) - other.getInt();
+                        return this;
+                    }
+                    case floatVal -> {
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) - other.getFloat());
+
+                        typeVal = TypeValue.floatVal;
+                        floatVal = (boolVal ? 1 : 0) - other.getFloat();
+                        return this;
+                    }
+                    case boolVal -> {
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) - (other.getBool() ? 1 : 0));
+
+                        typeVal = TypeValue.intVal;
+                        intVal = (boolVal ? 1 : 0) - (other.getBool() ? 1 : 0);
+                        return this;
+                    }
+                    case nullVal -> {
+                        if (!isRef()) return new Value((boolVal ? 1 : 0));
+
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return sub(newVal);
+                    }
+                }
+            }
+            case nullVal -> {
+                return this.toIntVal().sub(other);
+            }
+            case stringVal -> {
+                Value newVal = this.toFloatVal();
+
+                if (newVal.getType() != TypeValue.nullVal) {
+                    try {
+                        Double.parseDouble(stringVal);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Warning: A non numeric value encountered");
+                    }
+
+                    return sub(newVal);
                 }
             }
         }
@@ -373,13 +629,7 @@ public class Value {
 
     public Value getArrayVal(String index) {
         if (typeVal != TypeValue.arrayVal && typeVal != TypeValue.stringVal) {
-            String type = "";
-            switch (typeVal) {
-                case intVal -> type = "int";
-                case boolVal -> type = "bool";
-                case floatVal -> type = "float";
-            }
-            System.out.println("Warning: Trying to access array offset on value of type " + type);
+            System.out.println("Warning: Trying to access array offset on value of type " + typeToString());
         } else if (typeVal == TypeValue.stringVal) {
             int ind;
 
@@ -387,7 +637,7 @@ public class Value {
                 ind = Integer.parseInt(index);
             } catch (NumberFormatException e) {
                 System.out.println("Warning: String offset cast occurred");
-                return null;
+                return new Value((ObjValue) null);
             }
 
             try {
@@ -401,7 +651,7 @@ public class Value {
 
         if (index == null) index = "";
 
-        if (!arrayVal.containsKey(index)) return null;
+        if (!arrayVal.containsKey(index)) return new Value((ObjValue) null);
 
         return arrayVal.get(index);
     }
@@ -424,7 +674,7 @@ public class Value {
                         Integer.parseInt(charNumber);
                         result.append(charNumber);
                     } catch (NumberFormatException e) {
-                        if (result.isEmpty()) return new Value(0);
+                        if (result.isEmpty()) return new Value((ObjValue) null);
                     }
                 }
 
@@ -445,6 +695,9 @@ public class Value {
             case objectVal -> {
                 return new Value(1);
             }
+            case nullVal -> {
+                return new Value(0);
+            }
             default -> throw new RuntimeException("Unknown type");
         }
     }
@@ -454,20 +707,27 @@ public class Value {
             case stringVal -> {
                 StringBuilder result = new StringBuilder();
                 boolean hasDot = false;
+                boolean hasNumberAfterDot = false;
                 for (int i = 0; i < stringVal.length(); i++) {
                     try {
                         String charSym = String.valueOf(stringVal.charAt(i));
 
                         if (!hasDot && charSym.equals(".")) hasDot = true;
-                        else Integer.parseInt(charSym);
+                        else {
+                            Integer.parseInt(charSym);
+
+                            if (hasDot) hasNumberAfterDot = true;
+                        }
 
                         result.append(charSym);
                     } catch (NumberFormatException e) {
-                        if (result.isEmpty()) return new Value(0);
+                        if (result.isEmpty()) return new Value((ObjValue) null);
                     }
                 }
 
-                return new Value(Double.parseDouble(result.toString()));
+                return hasNumberAfterDot
+                        ? new Value(Double.parseDouble(result.toString()))
+                        : new Value(Integer.parseInt(result.toString()));
             }
             case intVal -> {
                 return new Value((double) intVal);
@@ -476,13 +736,16 @@ public class Value {
                 return this;
             }
             case arrayVal -> {
-                return arrayVal.isEmpty() ? new Value(0) : new Value(1);
+                return arrayVal.isEmpty() ? new Value(0.) : new Value(1.);
             }
             case boolVal -> {
-                return new Value((boolVal ? 1 : 0));
+                return new Value((boolVal ? 1. : 0.));
             }
             case objectVal -> {
-                return new Value(1);
+                return new Value(1.);
+            }
+            case nullVal -> {
+                return new Value(0.);
             }
             default -> throw new RuntimeException("Unknown type");
         }
@@ -509,6 +772,9 @@ public class Value {
             case objectVal -> {
                 return new Value(objVal.__toString());
             }
+            case nullVal -> {
+                return new Value(String.valueOf(0));
+            }
             default -> throw new RuntimeException("Unknown type");
         }
     }
@@ -532,6 +798,9 @@ public class Value {
             }
             case objectVal -> {
                 return new Value(objVal.__getValues());
+            }
+            case nullVal -> {
+                return new Value(new HashMap<>());
             }
             default -> throw new RuntimeException("Unknown type");
         }
@@ -560,6 +829,9 @@ public class Value {
             }
             case objectVal -> {
                 return objVal.getClass().toString();
+            }
+            case nullVal -> {
+                return "null";
             }
             default -> throw new RuntimeException("Unknown type");
         }

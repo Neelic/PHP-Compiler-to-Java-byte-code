@@ -5,4 +5,5 @@ public enum TypeValue {
     arrayVal,
     boolVal,
     objectVal,
+    nullVal,
 }
