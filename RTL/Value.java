@@ -4,7 +4,7 @@ import java.util.Map;
 public class Value {
     protected TypeValue typeVal;
     private int intVal;
-    private double floatVal;
+    private float floatVal;
     private String stringVal;
     private boolean boolVal;
     private HashMap<String, Value> arrayVal = null;
@@ -17,7 +17,7 @@ public class Value {
         this.intVal = intVal;
     }
 
-    public Value(double floatVal) {
+    public Value(float floatVal) {
         typeVal = TypeValue.floatVal;
         this.floatVal = floatVal;
     }
@@ -51,7 +51,7 @@ public class Value {
         else throw new RuntimeException("Not same type");
     }
 
-    public double getFloat() {
+    public float getFloat() {
         if (typeVal == TypeValue.floatVal) return floatVal;
         else throw new RuntimeException("Not same type");
     }
@@ -110,7 +110,7 @@ public class Value {
         return addValue(new Value(other), false);
     }
 
-    public Value add(double other) {
+    public Value add(float other) {
         return addValue(new Value(other), false);
     }
 
@@ -135,7 +135,7 @@ public class Value {
         return addValue((new Value(other)).toStringVal(), true);
     }
 
-    public Value concat(double other) {
+    public Value concat(float other) {
         return addValue((new Value(other)).toStringVal(), true);
     }
 
@@ -151,7 +151,7 @@ public class Value {
         return (new Value(other)).toStringVal().addValue(this, true);
     }
 
-    public Value concatTo(double other) {
+    public Value concatTo(float other) {
         return (new Value(other)).toStringVal().addValue(this, true);
     }
 
@@ -264,7 +264,7 @@ public class Value {
 
                     if (newVal.getType() != TypeValue.nullVal) {
                         try {
-                            Double.parseDouble(stringVal);
+                            Float.parseFloat(stringVal);
                         } catch (NumberFormatException e) {
                             System.out.println("Warning: A non numeric value encountered");
                         }
@@ -455,7 +455,7 @@ public class Value {
         return (new Value(other)).sub(this);
     }
 
-    public Value subFrom(double other) {
+    public Value subFrom(float other) {
         return (new Value(other)).sub(this);
     }
 
@@ -503,7 +503,7 @@ public class Value {
         return mul(new Value(other));
     }
 
-    public Value mul(double other) {
+    public Value mul(float other) {
         return mul(new Value(other));
     }
 
@@ -551,7 +551,7 @@ public class Value {
         return div(new Value(other));
     }
 
-    public Value div(double other) {
+    public Value div(float other) {
         return div(new Value(other));
     }
 
@@ -599,7 +599,7 @@ public class Value {
         return mod(new Value(other));
     }
 
-    public Value mod(double other) {
+    public Value mod(float other) {
         return mod(new Value(other));
     }
 
@@ -728,26 +728,26 @@ public class Value {
                 }
 
                 return hasNumberAfterDot
-                        ? new Value(Double.parseDouble(result.toString()))
+                        ? new Value(Float.parseFloat(result.toString()))
                         : new Value(Integer.parseInt(result.toString()));
             }
             case intVal -> {
-                return new Value((double) intVal);
+                return new Value((float) intVal);
             }
             case floatVal -> {
                 return this;
             }
             case arrayVal -> {
-                return arrayVal.isEmpty() ? new Value(0.) : new Value(1.);
+                return arrayVal.isEmpty() ? new Value(0f) : new Value(1f);
             }
             case boolVal -> {
-                return new Value((boolVal ? 1. : 0.));
+                return new Value((boolVal ? 1f : 0f));
             }
             case objectVal -> {
-                return new Value(1.);
+                return new Value(1f);
             }
             case nullVal -> {
-                return new Value(0.);
+                return new Value(0f);
             }
             default -> throw new RuntimeException("Unknown type");
         }
