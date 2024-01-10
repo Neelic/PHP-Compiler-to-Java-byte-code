@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include "../parser_classes/all_include.hpp"
 #include "classScopeContainer/ClassScopeContainer.hpp"
+#include "contextType/ContextType.cpp"
 
 using namespace std;
 
