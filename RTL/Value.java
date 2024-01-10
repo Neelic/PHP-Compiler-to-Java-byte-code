@@ -126,6 +126,10 @@ public class Value {
         return addValue(new Value(other), false);
     }
 
+    public Value add(HashMap<String, Value> other) {
+        return addValue(new Value(other), false);
+    }
+
     public Value concat(Value other) {
         if (other == null) other = new Value((ObjValue) null);
         return addValue(other.toStringVal(), true);
@@ -151,6 +155,10 @@ public class Value {
         return addValue((new Value(other)).toStringVal(), true);
     }
 
+    public Value concat(HashMap<String, Value> other) {
+        return addValue((new Value(other)).toStringVal(), true);
+    }
+
     public Value concatTo(String other) {
         return (new Value(other)).toStringVal().addValue(this, true);
     }
@@ -168,6 +176,10 @@ public class Value {
     }
 
     public Value concatTo(ObjValue other) {
+        return (new Value(other)).toStringVal().addValue(this, true);
+    }
+
+    public Value concatTo(HashMap<String, Value> other) {
         return (new Value(other)).toStringVal().addValue(this, true);
     }
 
@@ -467,11 +479,9 @@ public class Value {
         return sub(new Value(other));
     }
 
-
     public Value sub(float other) {
         return sub(new Value(other));
     }
-
 
     public Value sub(String other) {
         return sub(new Value(other));
@@ -482,6 +492,10 @@ public class Value {
     }
 
     public Value sub(ObjValue other) {
+        return sub(new Value(other));
+    }
+
+    public Value sub(HashMap<String, Value> other) {
         return sub(new Value(other));
     }
 
@@ -502,6 +516,10 @@ public class Value {
     }
 
     public Value subFrom(ObjValue other) {
+        return (new Value(other)).sub(this);
+    }
+
+    public Value subFrom(HashMap<String, Value> other) {
         return (new Value(other)).sub(this);
     }
 
@@ -637,6 +655,10 @@ public class Value {
     }
 
     public Value mul(ObjValue other) {
+        return mul(new Value(other));
+    }
+
+    public Value mul(HashMap<String, Value> other) {
         return mul(new Value(other));
     }
 
@@ -787,6 +809,10 @@ public class Value {
         return div(new Value(other));
     }
 
+    public Value div(HashMap<String, Value> other) {
+        return div(new Value(other));
+    }
+
     public Value divFrom(int other) {
         return (new Value(other).div(this));
     }
@@ -799,12 +825,15 @@ public class Value {
         return (new Value(other).div(this));
     }
 
-
     public Value divFrom(boolean other) {
         return (new Value(other).div(this));
     }
 
     public Value divFrom(ObjValue other) {
+        return (new Value(other).div(this));
+    }
+
+    public Value divFrom(HashMap<String, Value> other) {
         return (new Value(other).div(this));
     }
 
@@ -941,6 +970,46 @@ public class Value {
 
     public Value mod(float other) {
         return mod(new Value(other));
+    }
+
+    public Value mod(String other) {
+        return mod(new Value(other));
+    }
+
+    public Value mod(boolean other) {
+        return mod(new Value(other));
+    }
+
+    public Value mod(ObjValue other) {
+        return mod(new Value(other));
+    }
+
+    public Value mod(HashMap<String, Value> other) {
+        return mod(new Value(other));
+    }
+
+    public Value modFrom(int other) {
+        return (new Value(other)).mod(this);
+    }
+
+    public Value modFrom(float other) {
+        return (new Value(other)).mod(this);
+    }
+
+    public Value modFrom(String other) {
+        return (new Value(other)).mod(this);
+    }
+
+    public Value modFrom(boolean other) {
+        return (new Value(other)).mod(this);
+    }
+
+    public Value modFrom(ObjValue other) {
+        return (new Value(other)).mod(this);
+    }
+
+    public Value modFrom(HashMap<String, Value> other) {
+        return (new Value(other)).mod(this);
     }
 
     public void addToArray(String index, Value other) {
