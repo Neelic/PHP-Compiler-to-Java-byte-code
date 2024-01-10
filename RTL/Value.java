@@ -48,32 +48,32 @@ public class Value {
 
     public int getInt() {
         if (typeVal == TypeValue.intVal) return intVal;
-        else throw new RuntimeException("Not same type");
+        else throw new FatalError("Not same type");
     }
 
     public float getFloat() {
         if (typeVal == TypeValue.floatVal) return floatVal;
-        else throw new RuntimeException("Not same type");
+        else throw new FatalError("Not same type");
     }
 
     public String getString() {
         if (typeVal == TypeValue.stringVal) return stringVal;
-        else throw new RuntimeException("Not same type");
+        else throw new FatalError("Not same type");
     }
 
     public boolean getBool() {
         if (typeVal == TypeValue.boolVal) return boolVal;
-        else throw new RuntimeException("Not same type");
+        else throw new FatalError("Not same type");
     }
 
     public HashMap<String, Value> getArrayVal() {
         if (typeVal == TypeValue.arrayVal) return arrayVal;
-        else throw new RuntimeException("Not same type");
+        else throw new FatalError("Not same type");
     }
 
     public ObjValue getObjVal() {
         if (typeVal == TypeValue.objectVal) return objVal;
-        else throw new RuntimeException("Not same type");
+        else throw new FatalError("Not same type");
     }
 
     public boolean isRef() {
@@ -118,6 +118,10 @@ public class Value {
         return addValue(new Value(other), false);
     }
 
+    public Value add(boolean other) {
+        return addValue(new Value(other), false);
+    }
+
     public Value add(ObjValue other) {
         return addValue(new Value(other), false);
     }
@@ -139,6 +143,10 @@ public class Value {
         return addValue((new Value(other)).toStringVal(), true);
     }
 
+    public Value concat(boolean other) {
+        return addValue((new Value(other)).toStringVal(), true);
+    }
+
     public Value concat(ObjValue other) {
         return addValue((new Value(other)).toStringVal(), true);
     }
@@ -152,6 +160,10 @@ public class Value {
     }
 
     public Value concatTo(float other) {
+        return (new Value(other)).toStringVal().addValue(this, true);
+    }
+
+    public Value concatTo(boolean other) {
         return (new Value(other)).toStringVal().addValue(this, true);
     }
 
@@ -313,8 +325,8 @@ public class Value {
             }
         }
 
-        throw new RuntimeException(
-                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+        throw new FatalError(
+                "Uncaught TypeError: Unsupported operand types: "
                         + this.typeToString()
                         + " + "
                         + other.typeToString()
@@ -433,7 +445,7 @@ public class Value {
 
                 if (newVal.getType() != TypeValue.nullVal) {
                     try {
-                        Double.parseDouble(stringVal);
+                        Float.parseFloat(stringVal);
                     } catch (NumberFormatException e) {
                         System.out.println("Warning: A non numeric value encountered");
                     }
@@ -443,12 +455,34 @@ public class Value {
             }
         }
 
-        throw new RuntimeException(
-                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+        throw new FatalError(
+                "Uncaught TypeError: Unsupported operand types: "
                         + this.typeToString()
                         + " - "
                         + other.typeToString()
         );
+    }
+
+    public Value sub(int other) {
+        return sub(new Value(other));
+    }
+
+
+    public Value sub(float other) {
+        return sub(new Value(other));
+    }
+
+
+    public Value sub(String other) {
+        return sub(new Value(other));
+    }
+
+    public Value sub(boolean other) {
+        return sub(new Value(other));
+    }
+
+    public Value sub(ObjValue other) {
+        return sub(new Value(other));
     }
 
     public Value subFrom(int other) {
@@ -456,6 +490,18 @@ public class Value {
     }
 
     public Value subFrom(float other) {
+        return (new Value(other)).sub(this);
+    }
+
+    public Value subFrom(String other) {
+        return (new Value(other)).sub(this);
+    }
+
+    public Value subFrom(boolean other) {
+        return (new Value(other)).sub(this);
+    }
+
+    public Value subFrom(ObjValue other) {
         return (new Value(other)).sub(this);
     }
 
@@ -474,6 +520,17 @@ public class Value {
                     case boolVal -> {
                         return new Value(intVal * other.toIntVal().getInt());
                     }
+                    case nullVal -> {
+                        if (!isRef()) return new Value(0);
+
+                        intVal = 0;
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return mul(newVal);
+                    }
                 }
             }
             case floatVal -> {
@@ -487,12 +544,76 @@ public class Value {
                     case boolVal -> {
                         return new Value(floatVal * other.toFloatVal().getFloat());
                     }
+                    case nullVal -> {
+                        if (!isRef()) return new Value(0);
+
+                        floatVal = 0;
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return mul(newVal);
+                    }
+                }
+            }
+            case boolVal -> {
+                switch (other.getType()) {
+                    case intVal -> {
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) * other.getInt());
+
+                        typeVal = TypeValue.intVal;
+                        intVal = (boolVal ? 1 : 0) * other.getInt();
+                        return this;
+                    }
+                    case floatVal -> {
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) * other.getFloat());
+
+                        typeVal = TypeValue.floatVal;
+                        floatVal = (boolVal ? 1 : 0) * other.getFloat();
+                        return this;
+                    }
+                    case boolVal -> {
+                        if (!isRef()) return new Value((boolVal ? 1 : 0) * (other.getBool() ? 1 : 0));
+
+                        typeVal = TypeValue.intVal;
+                        intVal = (boolVal ? 1 : 0) * (other.getBool() ? 1 : 0);
+                        return this;
+                    }
+                    case nullVal -> {
+                        if (!isRef()) return new Value(0);
+
+                        typeVal = TypeValue.intVal;
+                        intVal = 0;
+                        return this;
+                    }
+                    case stringVal -> {
+                        Value newVal = other.toFloatVal();
+
+                        if (newVal.typeVal != TypeValue.nullVal) return sub(newVal);
+                    }
+                }
+            }
+            case nullVal -> {
+                return this.toIntVal().mul(other);
+            }
+            case stringVal -> {
+                Value newVal = this.toFloatVal();
+
+                if (newVal.getType() != TypeValue.nullVal) {
+                    try {
+                        Float.parseFloat(stringVal);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Warning: A non numeric value encountered");
+                    }
+
+                    return mul(newVal);
                 }
             }
         }
 
-        throw new RuntimeException(
-                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+        throw new FatalError(
+                "Uncaught TypeError: Unsupported operand types: "
                         + this.typeToString()
                         + " * "
                         + other.typeToString()
@@ -507,40 +628,139 @@ public class Value {
         return mul(new Value(other));
     }
 
+    public Value mul(boolean other) {
+        return mul(new Value(other));
+    }
+
+    public Value mul(String other) {
+        return mul(new Value(other));
+    }
+
+    public Value mul(ObjValue other) {
+        return mul(new Value(other));
+    }
+
     public Value div(Value other) {
         if (other == null) return null;
 
-        switch (typeVal) {
-            case intVal -> {
-                switch (other.getType()) {
-                    case intVal -> {
-                        return new Value(intVal / other.getInt());
+        try {
+            switch (typeVal) {
+                case intVal -> {
+                    switch (other.getType()) {
+                        case intVal -> {
+                            return new Value(intVal / other.getInt());
+                        }
+                        case floatVal -> {
+                            return new Value(intVal / other.getFloat());
+                        }
+                        case boolVal -> {
+                            return new Value(intVal / other.toIntVal().getInt());
+                        }
+                        case nullVal -> {
+                            return new Value(intVal / 0);
+                        }
+                        case stringVal -> {
+                            Value newVal = other.toFloatVal();
+
+                            if (newVal.typeVal != TypeValue.nullVal) return div(newVal);
+                        }
                     }
-                    case floatVal -> {
-                        return new Value(intVal / other.getFloat());
+                }
+                case floatVal -> {
+                    switch (other.getType()) {
+                        case intVal -> {
+                            return new Value(floatVal / other.getInt());
+                        }
+                        case floatVal -> {
+                            return new Value(floatVal / other.getFloat());
+                        }
+                        case boolVal -> {
+                            return new Value(floatVal / other.toFloatVal().getFloat());
+                        }
+                        case nullVal -> {
+                            return new Value(1 / 0);
+                        }
+                        case stringVal -> {
+                            Value newVal = other.toFloatVal();
+
+                            if (newVal.typeVal != TypeValue.nullVal) return div(newVal);
+                        }
                     }
-                    case boolVal -> {
-                        return new Value(intVal / other.toIntVal().getInt());
+                }
+                case boolVal -> {
+                    switch (other.getType()) {
+                        case intVal -> {
+                            if (!isRef()) return new Value((boolVal ? 1 : 0) / other.getInt());
+
+                            typeVal = TypeValue.intVal;
+                            intVal = (boolVal ? 1 : 0) / other.getInt();
+                            return this;
+                        }
+                        case floatVal -> {
+                            if (!isRef()) return new Value((boolVal ? 1 : 0) / other.getFloat());
+
+                            typeVal = TypeValue.floatVal;
+                            floatVal = (boolVal ? 1 : 0) / other.getFloat();
+                            return this;
+                        }
+                        case boolVal -> {
+                            if (!isRef()) return new Value((boolVal ? 1 : 0) / (other.getBool() ? 1 : 0));
+
+                            typeVal = TypeValue.intVal;
+                            intVal = (boolVal ? 1 : 0) / (other.getBool() ? 1 : 0);
+                            return this;
+                        }
+                        case nullVal -> {
+                            if (!isRef()) return new Value(1 / 0);
+                        }
+                        case stringVal -> {
+                            Value newVal = other.toFloatVal();
+
+                            if (newVal.typeVal != TypeValue.nullVal) return div(newVal);
+                        }
+                    }
+                }
+                case nullVal -> {
+                    switch (other.getType()) {
+                        case intVal -> {
+                            return new Value(0 / other.getInt());
+                        }
+                        case floatVal -> {
+                            return new Value(0 / other.getFloat());
+                        }
+                        case boolVal -> {
+                            return new Value(0 / (other.getBool() ? 1 : 0));
+                        }
+                        case nullVal -> {
+                            return new Value(0 / 0);
+                        }
+                        case stringVal -> {
+                            Value newVal = other.toFloatVal();
+
+                            if (newVal.typeVal != TypeValue.nullVal) return div(newVal);
+                        }
+                    }
+                }
+                case stringVal -> {
+                    Value newVal = this.toFloatVal();
+
+                    if (newVal.getType() != TypeValue.nullVal) {
+                        try {
+                            Float.parseFloat(stringVal);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Warning: A non numeric value encountered");
+                        }
+
+                        return div(newVal);
                     }
                 }
             }
-            case floatVal -> {
-                switch (other.getType()) {
-                    case intVal -> {
-                        return new Value(floatVal / other.getInt());
-                    }
-                    case floatVal -> {
-                        return new Value(floatVal / other.getFloat());
-                    }
-                    case boolVal -> {
-                        return new Value(floatVal / other.toFloatVal().getFloat());
-                    }
-                }
-            }
+        } catch (ArithmeticException e) {
+            throw new FatalError("Uncaught DivisionByZeroError: Division by zero");
         }
 
-        throw new RuntimeException(
-                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+        throw new FatalError(
+                "Uncaught TypeError: Unsupported operand types: "
                         + this.typeToString()
                         + " / "
                         + other.typeToString()
@@ -555,40 +775,160 @@ public class Value {
         return div(new Value(other));
     }
 
+    public Value div(String other) {
+        return div(new Value(other));
+    }
+
+    public Value div(boolean other) {
+        return div(new Value(other));
+    }
+
+    public Value div(ObjValue other) {
+        return div(new Value(other));
+    }
+
+    public Value divFrom(int other) {
+        return (new Value(other).div(this));
+    }
+
+    public Value divFrom(float other) {
+        return (new Value(other).div(this));
+    }
+
+    public Value divFrom(String other) {
+        return (new Value(other).div(this));
+    }
+
+
+    public Value divFrom(boolean other) {
+        return (new Value(other).div(this));
+    }
+
+    public Value divFrom(ObjValue other) {
+        return (new Value(other).div(this));
+    }
+
     public Value mod(Value other) {
         if (other == null) return null;
 
-        switch (typeVal) {
-            case intVal -> {
-                switch (other.getType()) {
-                    case intVal -> {
-                        return new Value(intVal % other.getInt());
+        try {
+            switch (typeVal) {
+                case intVal -> {
+                    switch (other.getType()) {
+                        case intVal -> {
+                            return new Value(intVal % other.getInt());
+                        }
+                        case floatVal -> {
+                            return new Value(intVal % other.getFloat());
+                        }
+                        case boolVal -> {
+                            return new Value(intVal % other.toIntVal().getInt());
+                        }
+                        case nullVal -> {
+                            return new Value(intVal % 0);
+                        }
+                        case stringVal -> {
+                            Value newVal = other.toFloatVal();
+
+                            if (newVal.typeVal != TypeValue.nullVal) return mul(newVal);
+                        }
                     }
-                    case floatVal -> {
-                        return new Value(intVal % other.getFloat());
+                }
+                case floatVal -> {
+                    switch (other.getType()) {
+                        case intVal -> {
+                            return new Value(floatVal % other.getInt());
+                        }
+                        case floatVal -> {
+                            return new Value(floatVal % other.getFloat());
+                        }
+                        case boolVal -> {
+                            return new Value(floatVal % other.toFloatVal().getFloat());
+                        }
+                        case nullVal -> {
+                            return new Value(floatVal % 0);
+                        }
+                        case stringVal -> {
+                            Value newVal = other.toFloatVal();
+
+                            if (newVal.typeVal != TypeValue.nullVal) return mul(newVal);
+                        }
                     }
-                    case boolVal -> {
-                        return new Value(intVal % other.toIntVal().getInt());
+                }
+                case boolVal -> {
+                    switch (other.getType()) {
+                        case intVal -> {
+                            if (!isRef()) return new Value((boolVal ? 1 : 0) % other.getInt());
+
+                            typeVal = TypeValue.intVal;
+                            intVal = (boolVal ? 1 : 0) % other.getInt();
+                            return this;
+                        }
+                        case floatVal -> {
+                            if (!isRef()) return new Value((boolVal ? 1 : 0) % other.getFloat());
+
+                            typeVal = TypeValue.floatVal;
+                            floatVal = (boolVal ? 1 : 0) % other.getFloat();
+                            return this;
+                        }
+                        case boolVal -> {
+                            if (!isRef()) return new Value((boolVal ? 1 : 0) % (other.getBool() ? 1 : 0));
+
+                            typeVal = TypeValue.intVal;
+                            intVal = (boolVal ? 1 : 0) % (other.getBool() ? 1 : 0);
+                            return this;
+                        }
+                        case nullVal -> {
+                            if (!isRef()) return new Value(1 % 0);
+                        }
+                        case stringVal -> {
+                            Value newVal = other.toFloatVal();
+
+                            if (newVal.typeVal != TypeValue.nullVal) return mod(newVal);
+                        }
+                    }
+                }
+                case nullVal -> {
+                    switch (other.getType()) {
+                        case intVal -> {
+                            return new Value(0 % other.getInt());
+                        }
+                        case floatVal -> {
+                            return new Value(0 % other.getFloat());
+                        }
+                        case boolVal -> {
+                            return new Value(0 % (other.getBool() ? 1 : 0));
+                        }
+                        case nullVal -> {
+                            return new Value(0 % 0);
+                        }
+                        case stringVal -> {
+                            Value newVal = other.toFloatVal();
+
+                            if (newVal.typeVal != TypeValue.nullVal) return mod(newVal);
+                        }
+                    }
+                }
+                case stringVal -> {
+                    Value newVal = this.toFloatVal();
+
+                    if (newVal.getType() != TypeValue.nullVal) {
+                        try {
+                            Float.parseFloat(stringVal);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Warning: A non numeric value encountered");
+                        }
+
+                        return mod(newVal);
                     }
                 }
             }
-            case floatVal -> {
-                switch (other.getType()) {
-                    case intVal -> {
-                        return new Value(floatVal % other.getInt());
-                    }
-                    case floatVal -> {
-                        return new Value(floatVal % other.getFloat());
-                    }
-                    case boolVal -> {
-                        return new Value(floatVal % other.toFloatVal().getFloat());
-                    }
-                }
-            }
+        } catch (ArithmeticException e) {
+            throw new FatalError("Uncaught DivisionByZeroError: Modulo by zero");
         }
 
-        throw new RuntimeException(
-                "Fatal error: Uncaught TypeError: Unsupported operand types: "
+        throw new FatalError(
+                "Uncaught TypeError: Unsupported operand types: "
                         + this.typeToString()
                         + " % "
                         + other.typeToString()
@@ -607,7 +947,7 @@ public class Value {
         if (other == null || index == null) return;
 
         if (typeVal != TypeValue.arrayVal) {
-            throw new RuntimeException("Fatal error: Uncaught Error: cannot use a scalar value as an array");
+            throw new FatalError("Uncaught Error: cannot use a scalar value as an array");
         }
 
         arrayVal.put(index, other);
@@ -622,7 +962,7 @@ public class Value {
 
     public void addToArray(Value other) {
         if (typeVal == TypeValue.stringVal) {
-            throw new RuntimeException("Fatal error: Uncaught Error: [] operator not supported for strings");
+            throw new FatalError("Uncaught Error: [] operator not supported for strings");
         }
 
         addToArray(String.valueOf(lastArrayIndex + 1), other);
@@ -700,7 +1040,7 @@ public class Value {
             case nullVal -> {
                 return new Value(0);
             }
-            default -> throw new RuntimeException("Unknown type");
+            default -> throw new FatalError("Unknown type");
         }
     }
 
@@ -749,7 +1089,7 @@ public class Value {
             case nullVal -> {
                 return new Value(0f);
             }
-            default -> throw new RuntimeException("Unknown type");
+            default -> throw new FatalError("Unknown type");
         }
     }
 
@@ -777,7 +1117,7 @@ public class Value {
             case nullVal -> {
                 return new Value(String.valueOf(0));
             }
-            default -> throw new RuntimeException("Unknown type");
+            default -> throw new FatalError("Unknown type");
         }
     }
 
@@ -804,7 +1144,7 @@ public class Value {
             case nullVal -> {
                 return new Value(new HashMap<>());
             }
-            default -> throw new RuntimeException("Unknown type");
+            default -> throw new FatalError("Unknown type");
         }
     }
 
@@ -835,7 +1175,7 @@ public class Value {
             case nullVal -> {
                 return "null";
             }
-            default -> throw new RuntimeException("Unknown type");
+            default -> throw new FatalError("Unknown type");
         }
     }
 }
