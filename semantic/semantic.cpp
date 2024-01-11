@@ -55,7 +55,10 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
 void inspectIfStmt (IfStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
 
-void inspectElseIfStmt (ElseIfDotList *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
+void inspectCaseDefaultStmt (CaseDefaultStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
 
 void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
@@ -765,6 +768,54 @@ void inspectIfStmt (IfStmtNode *node, vector<string *> &variablesScope, vector<C
     }
 
 }
+
+
+//SwitchStmt
+void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
+{
+    if(node == nullptr) return;
+
+    inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
+
+    switch(node->type){
+        case SwitchStmtType::just_switch:
+            break;
+        case SwitchStmtType::switch_default:
+            for(auto i: node->defaultStmtList->vector){
+                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
+            }
+            break;
+        case SwitchStmtType::switch_default_endswitch:
+            for(auto i: node->defaultStmtList->vector){
+                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
+            }
+            break;
+    }
+
+}
+
+void inspectCaseDefaultStmt (CaseDefaultStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
+{
+    if (node == nullptr) return;
+
+    for (auto i: node->stmtList->vector){
+        inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
+    }
+
+    switch (node->type) {
+        case CaseDefaultType::case_stmt:
+            inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+        case CaseDefaultType::default_stmt:
+            break;
+        case CaseDefaultType::finally_stmt:
+            break;
+    }
+
+}
+
 
 void inspectExpr(ExprNode *node, vector<ExprNode *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass) {
