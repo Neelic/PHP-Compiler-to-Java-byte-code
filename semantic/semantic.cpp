@@ -55,6 +55,9 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
 void inspectIfStmt (IfStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
 
+void inspectElseIfStmt (ElseIfDotList *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+
 void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
 
@@ -718,6 +721,49 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
             // Подозреваю, имеет смысл смотреть на семантике
             break;
     }
+}
+
+
+//If statement
+void inspectIfStmt (IfStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
+{
+    if(node == nullptr) return;
+
+    inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
+
+    switch(node->type){
+        case IfStmtType::only_if:
+            inspectStmt(node->stmt_main, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            break;
+        case IfStmtType::if_else:
+            inspectStmt(node->stmt_main, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            inspectStmt(node->stmt_else, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            break;
+        case IfStmtType::end_if:
+            for(auto i: node->stmtListMain->vector){
+                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            }
+            break;
+        case IfStmtType::if_else_endif:
+            for(auto i: node->stmtListMain->vector){
+                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            }
+            for(auto i: node->stmtListElse->vector){
+                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            }
+            break;
+        case IfStmtType::if_else_list_endif:
+            for(auto i: node->stmtListMain->vector){
+                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            }
+            if(node->listElse != nullptr)
+                for(auto i: node->listElse->vector){
+                    inspectIfStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+                }
+            break;
+    }
+
 }
 
 void inspectExpr(ExprNode *node, vector<ExprNode *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
