@@ -233,11 +233,13 @@ void inspectGlobalScope(StartNode *node) {
                 inspectStmt(tmp->stmt, variables, consts, functions);
                 break;
             case TopStmtType::class_top_type:
+                inspectClass(tmp->class_stmt_decl);
                 break;
             case TopStmtType::function_top_type:
                 inspectFunction(tmp->func_stmt_decl);
                 break;
             case TopStmtType::interface_top_type:
+                inspectInterface(tmp->interface_stmt_decl);
                 break;
             case TopStmtType::trait_top_type:
                 break;
@@ -1022,9 +1024,41 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass);
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass);
             break;
-        case ExprType::class_field_by_ref_op:
-            //TODO добавить еще подобных кейз случаев
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
+        case ExprType::class_inst_field_ref_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::classInstRef);
+            break;
+        case ExprType::class_inst_field_by_ref_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::classInstRef);
+            break;
+        case ExprType::class_inst_field_by_expr_ref:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::classInstRef);
+            break;
+        case ExprType::class_method_ref_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::classInstRef);
+            break;
+        case ExprType::class_method_by_ref_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::classInstRef);
+            break;
+        case ExprType::class_inst_field_ref_dots_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::staticRef);
+            break;
+        case ExprType::class_inst_field_by_expr_ref_dots_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::staticRef);
+            break;
+        case ExprType::class_inst_method_by_ref_op_dots:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::staticRef);
+            break;
+        case ExprType::class_inst_get_value_method_by_ref_op_dots:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::staticRef);
             break;
         case ExprType::this_keyword:
             if (!isInClass)

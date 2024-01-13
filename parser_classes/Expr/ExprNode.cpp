@@ -165,7 +165,7 @@ ExprNode *ExprNode::CreateFromGetValueFieldReference(ExprNode *left, GetValueNod
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->id = id;
-    tmp->exprType = ExprType::class_inst_field_ref_op;
+    tmp->exprType = ExprType::class_inst_field_by_ref_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
@@ -176,7 +176,7 @@ ExprNode::CreateFromGetValueWithExprReference(ExprNode *left, GetValueNode *get_
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->right = get_value_expr;
-    tmp->exprType = ExprType::class_inst_field_by_ref_op;
+    tmp->exprType = ExprType::class_inst_field_by_expr_ref;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
@@ -198,23 +198,23 @@ ExprNode *ExprNode::CreateFromGetValueMethodReference(ExprNode *left, GetValueNo
     tmp->id = id;
     tmp->get_value = get_value;
     tmp->listParams = listParams;
-    tmp->exprType = ExprType::class_method_ref_op;
-    tmp->cur_id = ExprNode::GLOBAL_ID++;
-    return tmp;
-}
-
-ExprNode *ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id,
-                                                              ExprNode *get_value_expr, ExprList *listParams) {
-    auto *tmp = new ExprNode();
-    tmp->left = left;
-    tmp->id = id;
-    tmp->get_value = get_value;
-    tmp->right = get_value_expr;
-    tmp->listParams = listParams;
     tmp->exprType = ExprType::class_method_by_ref_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
+
+//ExprNode *ExprNode::CreateFromGetValueWithExprMethodReference(ExprNode *left, GetValueNode *get_value, std::string *id,
+//                                                              ExprNode *get_value_expr, ExprList *listParams) {
+//    auto *tmp = new ExprNode();
+//    tmp->left = left;
+//    tmp->id = id;
+//    tmp->get_value = get_value;
+//    tmp->right = get_value_expr;
+//    tmp->listParams = listParams;
+//    tmp->exprType = ExprType::class_method_by_ref_op;
+//    tmp->cur_id = ExprNode::GLOBAL_ID++;
+//    return tmp;
+//}
 
 // Quarter Dot
 ExprNode *ExprNode::CreateFromFieldReferenceDots(ExprNode *left, std::string *id) {
@@ -231,7 +231,7 @@ ExprNode *ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode *left, GetValu
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->id = id;
-    tmp->exprType = ExprType::class_inst_field_ref_dots_op;
+    tmp->exprType = ExprType::class_inst_field_by_ref_dots_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
@@ -242,7 +242,7 @@ ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode *left, GetValueNode *
     tmp->left = left;
     tmp->get_value = get_value;
     tmp->right = get_value_expr;
-    tmp->exprType = ExprType::class_inst_field_by_ref_dots_op;
+    tmp->exprType = ExprType::class_inst_field_by_expr_ref_dots_op;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
@@ -252,7 +252,7 @@ ExprNode *ExprNode::CreateFromMethodReferenceDots(ExprNode *left, std::string *i
     tmp->left = left;
     tmp->id = id;
     tmp->listParams = list;
-    tmp->exprType = ExprType::class_inst_method_by_ref_op;
+    tmp->exprType = ExprType::class_inst_method_by_ref_op_dots;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
@@ -264,7 +264,7 @@ ExprNode *ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode *left, GetVal
     tmp->get_value = get_value;
     tmp->id = id;
     tmp->listParams = listParams;
-    tmp->exprType = ExprType::class_inst_get_value_method_by_ref_op;
+    tmp->exprType = ExprType::class_inst_get_value_method_by_ref_op_dots;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }

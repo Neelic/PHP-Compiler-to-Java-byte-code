@@ -568,14 +568,14 @@ void printExpr(ExprNode *node, string *parentId, string *arrowLabel) {
             printExpr(node->left, node->idTag(), new string("left"));
             printExpr(node->right, node->idTag(), new string("right"));
             break;
-        case ExprType::class_inst_method_by_ref_op:
+        case ExprType::class_inst_method_by_ref_op_dots:
             GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
             printExpr(node->left, node->idTag(), new string("left"));
             printStringValueNode(node->id, node->idTag(), new string("right"));
             if (node->listParams != nullptr)
                 printExprList(node->listParams, node->idTag());
             break;
-        case ExprType::class_inst_get_value_method_by_ref_op:
+        case ExprType::class_inst_get_value_method_by_ref_op_dots:
             GRAPH_STR += *node->idTag() + " [label=\"::\"];\n";
             if (node->get_value != nullptr)
                 printGetValue(node->get_value, node->idTag());
