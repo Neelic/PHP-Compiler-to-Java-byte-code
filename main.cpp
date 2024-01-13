@@ -5,7 +5,6 @@
 
 extern StartNode *startNode;
 extern string *file_name;
-extern vector<string *> sem_errors;
 
 extern int lexer_main(FILE *file);
 
@@ -30,11 +29,6 @@ int main(int argc, char *argv[]) {
 
     try {
         inspectGlobalScope(startNode);
-
-        //Warnings
-        for (auto *error: sem_errors) {
-            cout << error << endl;
-        }
     } catch (const runtime_error &error) {
         //Fatal errors
         cout << error.what() << endl;

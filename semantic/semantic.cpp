@@ -1,6 +1,5 @@
 #include "semantic.h"
 
-vector<string *> sem_errors;
 string *file_name;
 
 //Global scope vars
@@ -570,14 +569,12 @@ void inspectConstDecl(ConstDeclNode *node, string *parent_id) {
         auto parentProperties = getClassScopeContainer(parent_id);
 
         if (isDeclaredConst(node->id, parentProperties->consts))
-            sem_errors.push_back(
-                    new string("Warning: Constant " + *node->id + " already defined in " + *file_name));
+            cout << "Warning: Constant " << *node->id << " already defined in " << *file_name << endl;
         else parentProperties->consts.push_back(node);
 
     } else {
         if (isDeclaredConst(node->id, consts))
-            sem_errors.push_back(
-                    new string("Warning: Constant " + *node->id + " already defined in " + *file_name));
+            cout << "Warning: Constant " << *node->id << " already defined in " << *file_name << endl;
         else consts.push_back(node);
     }
 
@@ -740,7 +737,9 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
             }
             break;
         case StmtType::html_stmt:
-            inspectHtmlStmt(node->html_stmt);
+            node->type = StmtType::t_echo_stmt;
+            node->expr_right = ExprNode::CreateFromStringValue(node->html_stmt->html);
+            inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::if_stmt:
             inspectIfStmt(node->if_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
@@ -762,7 +761,8 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
             inspectSwitchStmt(node->switch_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::t_echo_stmt:
-            // Подозреваю, имеет смысл смотреть на семантике
+            node->expr_right = ExprNode::CreateFromStringCast(node->expr_right);
+            inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
     }
 }
@@ -876,8 +876,7 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
                 throw runtime_error(string("Fatal error: Cannot re-assign $this in " + *file_name));
             //if use right-side variable is not declared
             if (node->right->exprType == ExprType::variable && !isDeclaredVariable(node->right->id, variables)) {
-                sem_errors.push_back(
-                        new string("Warning: Undefined variable $" + *node->right->id + " in " + *file_name));
+                cout << "Warning: Undefined variable $" << *node->right->id << " in " << *file_name << endl;
                 node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());
                 variables.push_back(node->right->left->id);
             }
@@ -886,14 +885,27 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass);
             break;
         case ExprType::assign_ref_op:
+            if (*node->left->id == "this" && node->get_value != nullptr && node->get_value->count == 1)
+                //Throw fatal error
+                throw runtime_error(string("Fatal error: Cannot re-assign $this in " + *file_name));
+            //if use right-side variable is not declared
+            if (node->right->exprType == ExprType::variable && !isDeclaredVariable(node->right->id, variables)) {
+                cout << "Warning: Undefined variable $" << *node->right->id << " in " << *file_name << endl;
+                node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());
+                variables.push_back(node->right->left->id);
+            }
+
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass);
+            inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass);
             break;
         case ExprType::class_field_by_ref_op:
             //TODO добавить еще подобных кейз случаев
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case ExprType::this_keyword:
             if (!isInClass)
-                sem_errors.push_back(new string(
-                        "Fatal error: Uncaught error: Using $this when in not in object context in " + *file_name));
+                throw runtime_error(
+                        "Fatal error: Uncaught error: Using $this when in not in object context in " + *file_name);
             break;
     }
 }

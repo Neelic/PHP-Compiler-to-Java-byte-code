@@ -155,9 +155,9 @@ StmtNode *StmtNode::CreateFromBreakStmt() {
     return tmp;
 }
 
-StmtNode *StmtNode::CreateFromTEchoStmt(ExprNode *expr_left) {
+StmtNode *StmtNode::CreateFromTEchoStmt(ExprNode *expr_right) {
     auto *tmp = new StmtNode();
-    tmp->expr_left = expr_left;
+    tmp->expr_right = expr_right;
     tmp->type = StmtType::t_echo_stmt;
     tmp->cur_id = StmtNode::GLOBAL_ID++;
     return tmp;

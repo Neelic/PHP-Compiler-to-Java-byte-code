@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 #include <stdexcept>
 #include "../parser_classes/all_include.hpp"
 #include "classScopeContainer/ClassScopeContainer.hpp"
@@ -11,13 +12,13 @@
 
 using namespace std;
 
-bool isDeclaredVariable(string *id, const vector<ExprNode *>& list);
+bool isDeclaredVariable(string *id, const vector<ExprNode *> &list);
 
-bool isDeclaredConst(string *id, const vector<ConstDeclNode *>& list);
+bool isDeclaredConst(string *id, const vector<ConstDeclNode *> &list);
 
 bool isDeclaredFunction(string *id, const vector<FunctionStmtDeclNode *> &list);
 
-bool isDeclaredClass(string *id, const vector<ClassStmtDeclNode *>& list);
+bool isDeclaredClass(string *id, const vector<ClassStmtDeclNode *> &list);
 
 bool isDeclaredTrait(string *id);
 
@@ -27,7 +28,7 @@ bool isPredeclaredConst(string *id);
 
 bool isPredeclaredVariable(string *id);
 
-void inspectGlobalScope(StartNode* node);
+void inspectGlobalScope(StartNode *node);
 
 ClassScopeContainer *getClassScopeContainer(string *parentId);
 
