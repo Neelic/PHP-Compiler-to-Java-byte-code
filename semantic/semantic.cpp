@@ -274,6 +274,7 @@ void inspectFunction(FunctionStmtDeclNode *node, string *parentId) {
 
     vector<string *> varList;
 
+    varList.reserve(node->function_def->expr_func_list->vector.size());
     for (auto &tmp: node->function_def->expr_func_list->vector) {
         varList.push_back(tmp->get_value_func->id_value);
     }
@@ -425,7 +426,7 @@ void inspectClassDef(ClassDefNode *node) {
                         throw runtime_error(
                                 string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] +
                                        "\" not found in " + *file_name));
-                } else
+                } else if (classProps != nullptr)
                     classProps->extended.push_back(
                             node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
             }
@@ -443,7 +444,8 @@ void inspectClassDef(ClassDefNode *node) {
                     throw runtime_error(
                             string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " +
                                    *file_name));
-            } else classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
+            } else if (classProps != nullptr)
+                classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
             // Проверка includes
             for (int i = 0; i < node->impl_id_list->vector.size(); i++) {
                 if (!isDeclaredInterface(node->impl_id_list->vector[i], interfaces)) {
@@ -456,7 +458,7 @@ void inspectClassDef(ClassDefNode *node) {
                         throw runtime_error(
                                 string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] +
                                        "\" not found in " + *file_name));
-                } else
+                } else if (classProps != nullptr)
                     classProps->included.push_back(
                             node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
             }
@@ -496,8 +498,8 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId) {
             }
 
             // Проверка на переопределение
-            if (parentProperties != nullptr &&
-                isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
+            if (parentProperties == nullptr) throw length_error("null error");
+            if (isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
                 throw runtime_error(
                         string("Fatal error: Cannot redeclare " + *parentId + "::" + *node->function_def->func_id +
                                "() in " + *file_name));
@@ -638,8 +640,8 @@ void inspectInterfaceDef(InterfaceExprDefNode *node) {
                             string("Fatal error: Uncaught Error: Interface \"" + *i +
                                    "\" not found in " + *file_name));
             } else {
-                if (interfaceProps != nullptr)
-                    interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
+                if (interfaceProps == nullptr) throw length_error("null error");
+                interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
             }
 
             // Проверяю на дубликат в списке интерфейсов
@@ -667,6 +669,8 @@ void inspectInterfaceStmt(InterfaceStmtNode *node, string *parentId) {
     }
 
     auto interfaceProps = getClassScopeContainer(parentId);
+
+    if (interfaceProps == nullptr) throw length_error("null error");
 
     if (isDeclaredFunction(node->function_def->func_id, interfaceProps->functions))
         throw runtime_error(
