@@ -404,7 +404,12 @@ void inspectClassDef(ClassDefNode *node) {
                     throw runtime_error(
                             string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " +
                                    *file_name));
-            } else classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
+            } else {
+                if (classProps != nullptr) {
+                    classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
+                }
+            }
+
             break;
         case ClassDefType::implements_type:
             // Для каждого id в списке 
@@ -534,9 +539,11 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
             break;
         case ClassExprType::get_value_assign_class_type:
             inspectClassAccessModList(node->access_mod_list);
-            //Проверка на переопределение будет на рантайме
-            inspectExpr(node->expr, parentProperties->variables, parentProperties->consts, parentProperties->functions,
-                        true);
+            if (parentProperties != nullptr) {
+                //Проверка на переопределение будет на рантайме
+                inspectExpr(node->expr, parentProperties->variables, parentProperties->consts, parentProperties->functions,
+                            true);
+            }
             break;
         case ClassExprType::const_class_type:
             //TODO: добавить проверку объявления констант
@@ -631,7 +638,10 @@ void inspectInterfaceDef(InterfaceExprDefNode *node) {
                     throw runtime_error(
                             string("Fatal error: Uncaught Error: Interface \"" + *i +
                                    "\" not found in " + *file_name));
-            } else interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
+            } else {
+                if(interfaceProps != nullptr)
+                    interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
+            }
 
             // Проверяю на дубликат в списке интерфейсов
             for (auto j: interfaceProps->included) {
@@ -817,7 +827,6 @@ void inspectIfStmt(IfStmtNode *node, vector<string *> &variablesScope, vector<Co
 
 }
 
-
 //SwitchStmt
 void inspectSwitchStmt(SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                        vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
@@ -830,12 +839,12 @@ void inspectSwitchStmt(SwitchStmtNode *node, vector<string *> &variablesScope, v
             break;
         case SwitchStmtType::switch_default:
             for (auto i: node->defaultStmtList->vector) {
-                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
+                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inSwitch);
             }
             break;
         case SwitchStmtType::switch_default_endswitch:
             for (auto i: node->defaultStmtList->vector) {
-                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
+                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inSwitch);
             }
             break;
     }
@@ -848,7 +857,7 @@ void inspectCaseDefaultStmt(CaseDefaultStmtNode *node, vector<string *> &variabl
     if (node == nullptr) return;
 
     for (auto i: node->stmtList->vector) {
-        inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
+        inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inSwitch);
     }
 
     switch (node->type) {
@@ -864,6 +873,118 @@ void inspectCaseDefaultStmt(CaseDefaultStmtNode *node, vector<string *> &variabl
 }
 
 
+//For statement
+void inspectForStmt (ForStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
+{
+    if(node == nullptr) return;
+
+    // Создаю список для переменных внутри цикла
+    auto forVariableScope = variablesScope;
+
+    inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, context);
+
+    // Добавляю переменную, объявленную в заголовке цикла
+    forVariableScope.push_back(node->expr_left->id);
+
+    inspectExpr(node->expr_central, variablesScope, constsScope, functionsScope, isInClass, context);
+
+    inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, context);
+
+    switch(node->type){
+        case ForStmtType::for_stmt_type:
+            inspectStmt(node->stmt, forVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            break;
+        case ForStmtType::for_end_stmt_type:
+            for(auto i: node->stmtList->vector){
+                inspectStmt(i, forVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            }
+            break;
+    }
+}
+
+
+//For each statement
+void inspectForEachStmt (ForEachStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
+{
+    if(node == nullptr) return;
+
+    // Cписок для переменных внутри цикла
+    auto foreachVariableScope = variablesScope;
+
+    inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+
+    inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+
+    // Добавляю переменную, объявленную в заголовке цикла
+    foreachVariableScope.push_back(node->expr_right->id);
+
+    switch(node->type){
+        case ForEachStmtType::foreach_stmt_type:
+            inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            break;
+        case ForEachStmtType::foreach_r_double_arrow_stmt_type:
+            foreachVariableScope.push_back(node->id);
+            inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            break;
+        case ForEachStmtType::foreach_r_double_arrow_pointer_stmt_type:
+            foreachVariableScope.push_back(node->id);
+            inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            break;
+        case ForEachStmtType::end_foreach_stmt_type:
+            for(auto i: node->stmtList){
+                inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            }
+            break;
+        case ForEachStmtType::end_foreach_r_double_arrow_stmt_type:
+            foreachVariableScope.push_back(node->id);
+            for(auto i: node->stmtList){
+                inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            }
+            break;
+        case ForEachStmtType::end_foreach_r_double_arrow_pointer_stmt_type:
+            foreachVariableScope.push_back(node->id);
+            for(auto i: node->stmtList){
+                inspectStmt(i, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            }
+            break;
+    }
+}
+
+
+// While statement
+void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                      ContextType context = ContextType::noContext){
+    if (node == nullptr) return;
+
+    inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
+
+    switch (node->type) {
+        case WhileStmtType::while_stmt_type:
+            inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            break;
+        case WhileStmtType::end_while_stmt_type:
+            for (auto i: node->stmtList){
+                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            }
+            break;
+    }
+}
+
+void inspectDoWhileStmt(DoWhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                        vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                        ContextType context = ContextType::noContext){
+    if (node == nullptr) return;
+
+    inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
+
+    inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+}
+
+
+//Expression
 void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
