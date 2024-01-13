@@ -90,8 +90,6 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
                         vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
                         ContextType context = ContextType::noContext);
 
-void inspectHtmlStmt(HtmlStmtNode *node);
-
 bool isDeclaredVariable(string *id, const vector<string *> &list) {
     if (id == nullptr) return false;
 
@@ -541,7 +539,8 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
             inspectClassAccessModList(node->access_mod_list);
             if (parentProperties != nullptr) {
                 //Проверка на переопределение будет на рантайме
-                inspectExpr(node->expr, parentProperties->variables, parentProperties->consts, parentProperties->functions,
+                inspectExpr(node->expr, parentProperties->variables, parentProperties->consts,
+                            parentProperties->functions,
                             true);
             }
             break;
@@ -639,7 +638,7 @@ void inspectInterfaceDef(InterfaceExprDefNode *node) {
                             string("Fatal error: Uncaught Error: Interface \"" + *i +
                                    "\" not found in " + *file_name));
             } else {
-                if(interfaceProps != nullptr)
+                if (interfaceProps != nullptr)
                     interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
             }
 
@@ -839,12 +838,14 @@ void inspectSwitchStmt(SwitchStmtNode *node, vector<string *> &variablesScope, v
             break;
         case SwitchStmtType::switch_default:
             for (auto i: node->defaultStmtList->vector) {
-                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inSwitch);
+                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass,
+                                       ContextType::inSwitch);
             }
             break;
         case SwitchStmtType::switch_default_endswitch:
             for (auto i: node->defaultStmtList->vector) {
-                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inSwitch);
+                inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass,
+                                       ContextType::inSwitch);
             }
             break;
     }
@@ -874,10 +875,9 @@ void inspectCaseDefaultStmt(CaseDefaultStmtNode *node, vector<string *> &variabl
 
 
 //For statement
-void inspectForStmt (ForStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
-{
-    if(node == nullptr) return;
+void inspectForStmt(ForStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                    vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
+    if (node == nullptr) return;
 
     // Создаю список для переменных внутри цикла
     auto forVariableScope = variablesScope;
@@ -891,12 +891,12 @@ void inspectForStmt (ForStmtNode *node, vector<string *> &variablesScope, vector
 
     inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, context);
 
-    switch(node->type){
+    switch (node->type) {
         case ForStmtType::for_stmt_type:
             inspectStmt(node->stmt, forVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForStmtType::for_end_stmt_type:
-            for(auto i: node->stmtList->vector){
+            for (auto i: node->stmtList->vector) {
                 inspectStmt(i, forVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
             break;
@@ -905,10 +905,9 @@ void inspectForStmt (ForStmtNode *node, vector<string *> &variablesScope, vector
 
 
 //For each statement
-void inspectForEachStmt (ForEachStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
-{
-    if(node == nullptr) return;
+void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                        vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
+    if (node == nullptr) return;
 
     // Cписок для переменных внутри цикла
     auto foreachVariableScope = variablesScope;
@@ -920,7 +919,7 @@ void inspectForEachStmt (ForEachStmtNode *node, vector<string *> &variablesScope
     // Добавляю переменную, объявленную в заголовке цикла
     foreachVariableScope.push_back(node->expr_right->id);
 
-    switch(node->type){
+    switch (node->type) {
         case ForEachStmtType::foreach_stmt_type:
             inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
@@ -933,19 +932,21 @@ void inspectForEachStmt (ForEachStmtNode *node, vector<string *> &variablesScope
             inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForEachStmtType::end_foreach_stmt_type:
-            for(auto i: node->stmtList){
-                inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            for (auto i: node->stmtList->vector) {
+                inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass,
+                            ContextType::inLoop);
             }
             break;
         case ForEachStmtType::end_foreach_r_double_arrow_stmt_type:
             foreachVariableScope.push_back(node->id);
-            for(auto i: node->stmtList){
-                inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            for (auto i: node->stmtList->vector) {
+                inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass,
+                            ContextType::inLoop);
             }
             break;
         case ForEachStmtType::end_foreach_r_double_arrow_pointer_stmt_type:
             foreachVariableScope.push_back(node->id);
-            for(auto i: node->stmtList){
+            for (auto i: node->stmtList->vector) {
                 inspectStmt(i, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
             break;
@@ -955,8 +956,7 @@ void inspectForEachStmt (ForEachStmtNode *node, vector<string *> &variablesScope
 
 // While statement
 void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
-                      ContextType context = ContextType::noContext){
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
@@ -966,7 +966,7 @@ void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vec
             inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case WhileStmtType::end_while_stmt_type:
-            for (auto i: node->stmtList){
+            for (auto i: node->stmtList->vector) {
                 inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
             break;
@@ -974,8 +974,7 @@ void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vec
 }
 
 void inspectDoWhileStmt(DoWhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                        vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
-                        ContextType context = ContextType::noContext){
+                        vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
