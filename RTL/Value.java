@@ -1190,6 +1190,30 @@ public class Value {
         }
     }
 
+    public Value toBoolVal() {
+        switch (typeVal) {
+            case stringVal, arrayVal -> {
+                return this.toFloatVal().toBoolVal();
+            }
+            case intVal -> {
+                return new Value(intVal != 0);
+            }
+            case floatVal -> {
+                return new Value(floatVal != 0);
+            }
+            case boolVal -> {
+                return this;
+            }
+            case objectVal -> {
+                return null;
+            }
+            case nullVal -> {
+                return new Value(false);
+            }
+            default -> throw new FatalError("Unknown type");
+        }
+    }
+
     public Value toArray() {
         switch (typeVal) {
             case stringVal -> {
