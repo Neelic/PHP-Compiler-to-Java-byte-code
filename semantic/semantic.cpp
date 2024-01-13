@@ -989,6 +989,38 @@ void inspectDoWhileStmt(DoWhileStmtNode *node, vector<string *> &variablesScope,
 }
 
 
+// Static variables
+void inspectStaticVar(StaticVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                      ContextType context = ContextType::noContext) {
+    if (node == nullptr) return;
+
+    if (isDeclaredVariable(node->id, variables)) {
+        variables.push_back(node->id);
+    }
+
+    switch (node->type) {
+        case StaticVarType::var:
+            break;
+        case StaticVarType::var_assign:
+            inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+    }
+}
+
+
+// Global variables
+void inspectGlobalVar(GlobalVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                      ContextType context = ContextType::noContext) {
+    if (node == nullptr) return;
+
+    if (isDeclaredVariable(node->id, variables)) {
+        variables.push_back(node->id);
+    }
+
+}
+
 //Expression
 void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
