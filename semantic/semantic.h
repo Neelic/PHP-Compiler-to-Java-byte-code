@@ -12,7 +12,7 @@
 
 using namespace std;
 
-bool isDeclaredVariable(string *id, const vector<ExprNode *> &list);
+bool isDeclaredVariable(string *id, const vector<string *> &list);
 
 bool isDeclaredConst(string *id, const vector<ConstDeclNode *> &list);
 
