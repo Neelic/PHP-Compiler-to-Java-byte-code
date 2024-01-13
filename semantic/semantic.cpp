@@ -19,7 +19,8 @@ vector<TraitStmtDeclNode *> traits;
 vector<ClassScopeContainer *> classProperties;
 
 void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                 ContextType context = ContextType::noContext);
 
 void inspectFunction(FunctionStmtDeclNode *node, string *parentId = nullptr);
 
@@ -39,50 +40,58 @@ void inspectClassExpr(ClassExprNode *node, string *parentId);
 
 void inspectClassAccessModList(ClassAccessModList *list);
 
-void inspectConstDecl(ConstDeclNode* node, string *parent_id = nullptr);
+void inspectConstDecl(ConstDeclNode *node, string *parent_id = nullptr);
 
 void inspectInterface(InterfaceStmtDeclNode *node);
 
 void inspectInterfaceDef(InterfaceExprDefNode *node);
 
-void inspectInterfaceStmt(InterfaceStmtNode* node, string *parentId);
+void inspectInterfaceStmt(InterfaceStmtNode *node, string *parentId);
 
 void inspectTrait(TraitStmtDeclNode *node);
 
 void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                 ContextType context = ContextType::noContext);
 
-void inspectIfStmt (IfStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectIfStmt(IfStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                   vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                   ContextType context = ContextType::noContext);
 
-void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectSwitchStmt(SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                       vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                       ContextType context = ContextType::noContext);
 
-void inspectCaseDefaultStmt (CaseDefaultStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectCaseDefaultStmt(CaseDefaultStmtNode *node, vector<string *> &variablesScope,
+                            vector<ConstDeclNode *> &constsScope,
+                            vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                            ContextType context = ContextType::noContext);
 
-void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectStaticVar(StaticVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                      ContextType context = ContextType::noContext);
 
-void inspectStaticVar (StaticVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectGlobalVar(GlobalVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                      ContextType context = ContextType::noContext);
 
-void inspectGlobalVar (GlobalVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                      ContextType context = ContextType::noContext);
 
-void inspectWhileStmt (WhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectDoWhileStmt(DoWhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                        vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                        ContextType context = ContextType::noContext);
 
-void inspectDoWhileStmt (DoWhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectForStmt(ForStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                    vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                    ContextType context = ContextType::noContext);
 
-void inspectForStmt (ForStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
+void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                        vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                        ContextType context = ContextType::noContext);
 
-void inspectForEachStmt (ForEachStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext);
-
-void inspectHtmlStmt (HtmlStmtNode *node);
+void inspectHtmlStmt(HtmlStmtNode *node);
 
 bool isDeclaredVariable(string *id, const vector<string *> &list) {
     if (id == nullptr) return false;
@@ -119,8 +128,8 @@ bool isDeclaredClass(string *id, const vector<ClassStmtDeclNode *> &list) {
 bool getClass(string *id) {
     if (id == nullptr) return false;
 
-    for (auto &i : classes){
-        if(i->class_def->class_id == id)
+    for (auto &i: classes) {
+        if (i->class_def->class_id == id)
             return i;
     }
 }
@@ -210,10 +219,10 @@ bool isPredeclaredVariable(string *id) {
 
 // Получить ClassScopeContainer по классу
 ClassScopeContainer *getClassScopeContainer(string *parentId) {
-    if(parentId == nullptr) return;
+    if (parentId == nullptr) return nullptr;
 
-    for (auto &i : classProperties){
-        if(i->id == parentId)
+    for (auto &i: classProperties) {
+        if (i->id == parentId)
             return i;
     }
 }
@@ -241,36 +250,38 @@ void inspectGlobalScope(StartNode *node) {
 
 
 //Functions
-void inspectFunction(FunctionStmtDeclNode *node, string *parentId = nullptr) {
+void inspectFunction(FunctionStmtDeclNode *node, string *parentId) {
 
     if (node == nullptr) return;
 
-    if(parentId != nullptr) {
+    if (parentId != nullptr) {
         auto parentProperties = getClassScopeContainer(parentId);
 
         if (isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
             throw runtime_error(
-                    string("Fatal error: Cannot redeclare " + *node->function_def->func_id + " (previously declared in " +
-                            *file_name + ") in " + *file_name));
-        
+                    string("Fatal error: Cannot redeclare " + *node->function_def->func_id +
+                           " (previously declared in " +
+                           *file_name + ") in " + *file_name));
+
         parentProperties->functions.push_back(node);
     } else {
         if (isDeclaredFunction(node->function_def->func_id, functions))
             throw runtime_error(
-                    string("Fatal error: Cannot redeclare " + *node->function_def->func_id + " (previously declared in " +
-                            *file_name + ") in " + *file_name));
+                    string("Fatal error: Cannot redeclare " + *node->function_def->func_id +
+                           " (previously declared in " +
+                           *file_name + ") in " + *file_name));
         functions.push_back(node);
     }
 
     inspectFunctionDef(node->function_def);
 
-    vector<string *> varList; 
+    vector<string *> varList;
 
-    for(auto &tmp: node->function_def->expr_func_list->vector) {
+    for (auto &tmp: node->function_def->expr_func_list->vector) {
         varList.push_back(tmp->get_value_func->id_value);
     }
 
-    for (auto & i : node->stmt_list->vector) {
+    for (auto &i: node->stmt_list->vector) {
         auto tmp1 = varList;
         auto tmp2 = vector<ConstDeclNode *>();
         inspectStmt(i, tmp1, tmp2, functions);
@@ -293,7 +304,7 @@ void inspectFunctionDef(FunctionDefNode *node) {
             break;
     }
 
-    for (auto & i : node->expr_func_list->vector) {
+    for (auto &i: node->expr_func_list->vector) {
         inspectExprFunc(i);
     }
 }
@@ -352,7 +363,10 @@ void inspectClass(ClassStmtDeclNode *node) {
     if (node == nullptr) return;
 
     // Добавляю в глобальный спискок пустой контейнер для хранения свойств и методов класса
-    classProperties.push_back(ClassScopeContainer::CreateContainer(node->class_def->class_id, vector<string *>(), vector<ConstDeclNode *>(), vector<string *>(), vector<string *>(), vector<string *>(), vector<FunctionStmtDeclNode *>()));
+    classProperties.push_back(ClassScopeContainer::CreateContainer(node->class_def->class_id, vector<string *>(),
+                                                                   vector<ConstDeclNode *>(), vector<string *>(),
+                                                                   vector<string *>(), vector<string *>(),
+                                                                   vector<FunctionStmtDeclNode *>()));
 
     if (isDeclaredClass(node->class_def->class_id, classes) ||
         isDeclaredInterface(node->class_def->class_id, interfaces) ||
@@ -362,7 +376,7 @@ void inspectClass(ClassStmtDeclNode *node) {
 
     inspectClassDef(node->class_def);
 
-    for (auto & i : node->class_stmt_list->vector) {
+    for (auto &i: node->class_stmt_list->vector) {
         inspectClassStmt(i, node->class_def->class_id);
     }
 }
@@ -387,7 +401,8 @@ void inspectClassDef(ClassDefNode *node) {
                     throw runtime_error(string("Fatal error: Class " + *node->class_id + " cannot extend trait " +
                                                *node->extend_id + " in " + *file_name));
                     // Иначе является неопознанным индентификатором
-                else throw runtime_error(
+                else
+                    throw runtime_error(
                             string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " +
                                    *file_name));
             } else classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
@@ -404,10 +419,13 @@ void inspectClassDef(ClassDefNode *node) {
                                                    *node->impl_id_list->vector[i] + " - it is not an interface in " +
                                                    *file_name));
                         // Иначе неопознанный индентификатор
-                    else throw runtime_error(
+                    else
+                        throw runtime_error(
                                 string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] +
                                        "\" not found in " + *file_name));
-                } else classProps->extended.push_back(node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
+                } else
+                    classProps->extended.push_back(
+                            node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
             }
             break;
         case ClassDefType::extends_implements_type:
@@ -419,7 +437,8 @@ void inspectClassDef(ClassDefNode *node) {
                 else if (isDeclaredTrait(node->extend_id))
                     throw runtime_error(string("Fatal error: Class " + *node->class_id + " cannot extend trait " +
                                                *node->extend_id + " in " + *file_name));
-                else throw runtime_error(
+                else
+                    throw runtime_error(
                             string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " +
                                    *file_name));
             } else classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
@@ -431,10 +450,13 @@ void inspectClassDef(ClassDefNode *node) {
                         throw runtime_error(string("Fatal error: " + *node->class_id + " cannot implement " +
                                                    *node->impl_id_list->vector[i] + " - it is not an interface in " +
                                                    *file_name));
-                    else throw runtime_error(
+                    else
+                        throw runtime_error(
                                 string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] +
                                        "\" not found in " + *file_name));
-                } else classProps->included.push_back(node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
+                } else
+                    classProps->included.push_back(
+                            node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
             }
             break;
     }
@@ -445,6 +467,7 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId) {
     if (node == nullptr) return;
 
     auto parentProperties = getClassScopeContainer(parentId);
+    bool isAbstract = false;
 
     switch (node->type) {
         case ClassStmtType::class_expr_stmt_type:
@@ -453,40 +476,45 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId) {
         case ClassStmtType::function_decl_type:
             inspectClassAccessModList(node->access_mod);
             inspectFunction(node->function_stmt_decl, parentId);
-            parentProperties->functions.push_back(node->function_stmt_decl);
+            if (parentProperties != nullptr) parentProperties->functions.push_back(node->function_stmt_decl);
             break;
         case ClassStmtType::function_def:
-            
+
             inspectClassAccessModList(node->access_mod);
 
             //Проверяю, есть ли в модификатор abstract, т.к. заголовок функции без тела может быть только абстрактным
-            bool isAbstract = any_of(node->access_mod->vector.cbegin(), node->access_mod->vector.cend(),
-                  [](auto &var) {
-                      return *var->access_mod == ClassAccessMod::abstract_node;
-                  });
-            if(!isAbstract){
-                throw runtime_error(string("Fatal error: Non-abstract method "+ *parentId +"::"+ *node->function_def->func_id +
-                                           "() must contain body in" + *file_name));
+            isAbstract = any_of(node->access_mod->vector.cbegin(), node->access_mod->vector.cend(),
+                                [](auto &var) {
+                                    return var->access_mod == ClassAccessMod::abstract_node;
+                                });
+            if (!isAbstract) {
+                throw runtime_error(
+                        string("Fatal error: Non-abstract method " + *parentId + "::" + *node->function_def->func_id +
+                               "() must contain body in" + *file_name));
             }
 
             // Проверка на переопределение
-            if (isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
+            if (parentProperties != nullptr &&
+                isDeclaredFunction(node->function_def->func_id, parentProperties->functions))
                 throw runtime_error(
-                    string("Fatal error: Cannot redeclare "+ *parentId +"::"+ *node->function_def->func_id +"() in "+ *file_name));
-            
+                        string("Fatal error: Cannot redeclare " + *parentId + "::" + *node->function_def->func_id +
+                               "() in " + *file_name));
+
             //Здесть создаю нод FunctionStmtDecl только с заголовком, чтобы можно было сохранять. В списке функций хранить ноды имеет смысл, я считаю
-            parentProperties->functions.push_back(FunctionStmtDeclNode::CreateNode(node->function_def, nullptr));
+            if (parentProperties != nullptr)
+                parentProperties->functions.push_back(FunctionStmtDeclNode::CreateNode(node->function_def, nullptr));
 
             inspectFunctionDef(node->function_def);
             break;
         case ClassStmtType::id_list_type:
-            for (auto i: node->id_list->vector){
-                if(!isDeclaredTrait(i)){
-                    if(isDeclaredClass(i, classes) || isDeclaredInterface(i, interfaces))
+            for (auto i: node->id_list->vector) {
+                if (!isDeclaredTrait(i)) {
+                    if (isDeclaredClass(i, classes) || isDeclaredInterface(i, interfaces))
                         throw runtime_error(string("Fatal error: " + *parentId + " cannot use " +
                                                    *i + " - it is not an trait in " +
                                                    *file_name));
-                    else throw runtime_error(
+                    else
+                        throw runtime_error(
                                 string("Fatal error: Trait \"" + *i +
                                        "\" not found in " + *file_name));
                 }
@@ -500,7 +528,7 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
 
     auto parentProperties = getClassScopeContainer(parentId);
 
-    switch (node->type){
+    switch (node->type) {
         case ClassExprType::get_value_class_type:
             inspectClassAccessModList(node->access_mod_list);
             //Проверка на переопределение будет на рантайме
@@ -508,7 +536,8 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
         case ClassExprType::get_value_assign_class_type:
             inspectClassAccessModList(node->access_mod_list);
             //Проверка на переопределение будет на рантайме
-            inspectExpr(node->expr, parentProperties->variables, parentProperties->consts, parentProperties->functions, true);
+            inspectExpr(node->expr, parentProperties->variables, parentProperties->consts, parentProperties->functions,
+                        true);
             break;
         case ClassExprType::const_class_type:
             //TODO: добавить проверку объявления констант
@@ -516,8 +545,8 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
     }
 }
 
-void inspectClassAccessModList(ClassAccessModList *list){
-    if(list == nullptr) return;
+void inspectClassAccessModList(ClassAccessModList *list) {
+    if (list == nullptr) return;
 
     // Здесь пытаюсь проверить спискок модов на дубликаты
     auto noRepeatList = list->vector;
@@ -525,34 +554,34 @@ void inspectClassAccessModList(ClassAccessModList *list){
     sort(noRepeatList.begin(), noRepeatList.end());
     auto i = unique(noRepeatList.begin(), noRepeatList.end());
 
-    if (i != list->vector.end()){
+    if (i != list->vector.end()) {
         throw runtime_error(string("Fatal error: Multiple access type modifiers are not allowed in " + *file_name));
     }
 }
 
 
 // Проверка объявления констант
-void inspectConstDecl(ConstDeclNode* node, string *parent_id) {
-    if(node == nullptr) return;
+void inspectConstDecl(ConstDeclNode *node, string *parent_id) {
+    if (node == nullptr) return;
 
     // Если константа объявлена и в классе, и в одном из трейтов, это будет ошибкой только тогда, когда значения будут разными. Так что наверное проверяем на рантайме
 
-    if(parent_id != nullptr){
+    if (parent_id != nullptr) {
         auto parentProperties = getClassScopeContainer(parent_id);
 
         if (isDeclaredConst(node->id, parentProperties->consts))
             sem_errors.push_back(
-                        new string("Warning: Constant " + *node->id + " already defined in " + *file_name));
+                    new string("Warning: Constant " + *node->id + " already defined in " + *file_name));
         else parentProperties->consts.push_back(node);
-        
+
     } else {
-        if(isDeclaredConst(node->id, consts))
+        if (isDeclaredConst(node->id, consts))
             sem_errors.push_back(
-                        new string("Warning: Constant " + *node->id + " already defined in " + *file_name));
+                    new string("Warning: Constant " + *node->id + " already defined in " + *file_name));
         else consts.push_back(node);
     }
 
-    auto tmp1 = vector<string *> ();
+    auto tmp1 = vector<string *>();
     auto tmp2 = vector<ConstDeclNode *>();
     auto tmp3 = vector<FunctionStmtDeclNode *>();
 
@@ -561,99 +590,109 @@ void inspectConstDecl(ConstDeclNode* node, string *parent_id) {
 
 
 //Interfaces 
-void inspectInterface(InterfaceStmtDeclNode *node){
-    if(node == nullptr) return;
+void inspectInterface(InterfaceStmtDeclNode *node) {
+    if (node == nullptr) return;
 
-    classProperties.push_back(ClassScopeContainer::CreateContainer(node->expr_definition->id, 
-                                                                    vector<string *>(), 
-                                                                    vector<ConstDeclNode *>(), 
-                                                                    vector<string *>(), 
-                                                                    vector<string *>(), 
-                                                                    vector<string *>(), 
-                                                                    vector<FunctionStmtDeclNode *>()));
+    classProperties.push_back(ClassScopeContainer::CreateContainer(node->expr_definition->id,
+                                                                   vector<string *>(),
+                                                                   vector<ConstDeclNode *>(),
+                                                                   vector<string *>(),
+                                                                   vector<string *>(),
+                                                                   vector<string *>(),
+                                                                   vector<FunctionStmtDeclNode *>()));
 
-    if(isDeclaredInterface(node->expr_definition->id, interfaces)||
+    if (isDeclaredInterface(node->expr_definition->id, interfaces) ||
         isDeclaredClass(node->expr_definition->id, classes) ||
-        isDeclaredTrait(node->expr_definition->id)){
-        throw runtime_error(string("Fatal error: Cannot declare interface " + *node->expr_definition->id + ", because the name is already in use in " + *file_name));
+        isDeclaredTrait(node->expr_definition->id)) {
+        throw runtime_error(string("Fatal error: Cannot declare interface " + *node->expr_definition->id +
+                                   ", because the name is already in use in " + *file_name));
     }
-    
+
     inspectInterfaceDef(node->expr_definition);
 
-    for(auto i: node->stmt_list->vector){
+    for (auto i: node->stmt_list->vector) {
         inspectInterfaceStmt(i, node->expr_definition->id);
     }
-    
+
 }
 
-void inspectInterfaceDef(InterfaceExprDefNode *node){
-    if(node == nullptr) return;
+void inspectInterfaceDef(InterfaceExprDefNode *node) {
+    if (node == nullptr) return;
 
     auto interfaceProps = getClassScopeContainer(node->id);
 
-    if(node->id_extended_list != nullptr){
+    if (node->id_extended_list != nullptr) {
 
-        for(auto i: node->id_extended_list->vector){
+        for (auto i: node->id_extended_list->vector) {
             if (!isDeclaredInterface(i, interfaces)) {
                 if (isDeclaredClass(i, classes) ||
                     isDeclaredTrait(i))
                     throw runtime_error(string("Fatal error: " + *node->id + " cannot implement " +
-                                                *i + " - it is not an interface in " +
-                                                *file_name));
-                else throw runtime_error(
+                                               *i + " - it is not an interface in " +
+                                               *file_name));
+                else
+                    throw runtime_error(
                             string("Fatal error: Uncaught Error: Interface \"" + *i +
-                                    "\" not found in " + *file_name));
+                                   "\" not found in " + *file_name));
             } else interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
-            
+
             // Проверяю на дубликат в списке интерфейсов
-            for(auto j: interfaceProps->included){
+            for (auto j: interfaceProps->included) {
                 if (i == j)
-                    throw runtime_error(string("Fatal error: Interface a cannot implement previously implemented interface " + *i + " in " + *file_name));
+                    throw runtime_error(
+                            string("Fatal error: Interface a cannot implement previously implemented interface " + *i +
+                                   " in " + *file_name));
             }
         }
     }
 }
 
-void inspectInterfaceStmt(InterfaceStmtNode* node, string *parentId){
-    if(node == nullptr) return;
+void inspectInterfaceStmt(InterfaceStmtNode *node, string *parentId) {
+    if (node == nullptr) return;
 
-    if(node->access_mod != nullptr){
+    if (node->access_mod != nullptr) {
         inspectClassAccessModList(node->access_mod);
-        for(auto i: node->access_mod->vector){
+        for (auto i: node->access_mod->vector) {
             if (i->access_mod == ClassAccessMod::abstract_node)
-                throw runtime_error(string("Fatal error: Interface method " + *parentId + "::" + *node->function_def->func_id + "() must not be abstract in " + *file_name));
+                throw runtime_error(
+                        string("Fatal error: Interface method " + *parentId + "::" + *node->function_def->func_id +
+                               "() must not be abstract in " + *file_name));
         }
     }
 
     auto interfaceProps = getClassScopeContainer(parentId);
 
     if (isDeclaredFunction(node->function_def->func_id, interfaceProps->functions))
-        throw runtime_error(string("Fatal error: Cannot redeclare " + *parentId + "::" + *node->function_def->func_id + "() in " + *file_name));
-    
+        throw runtime_error(
+                string("Fatal error: Cannot redeclare " + *parentId + "::" + *node->function_def->func_id + "() in " +
+                       *file_name));
+
     inspectFunctionDef(node->function_def);
     interfaceProps->functions.push_back(FunctionStmtDeclNode::CreateNode(node->function_def, nullptr));
 }
 
 
 //Traits
-void inspectTrait(TraitStmtDeclNode *node){
-    if(node == nullptr) return;
+void inspectTrait(TraitStmtDeclNode *node) {
+    if (node == nullptr) return;
 
-    classProperties.push_back(ClassScopeContainer::CreateContainer(node->id, 
-                                                                    vector<string *>(), 
-                                                                    vector<ConstDeclNode *>(), 
-                                                                    vector<string *>(), 
-                                                                    vector<string *>(), 
-                                                                    vector<string *>(), 
-                                                                    vector<FunctionStmtDeclNode *>()));
+    classProperties.push_back(ClassScopeContainer::CreateContainer(node->id,
+                                                                   vector<string *>(),
+                                                                   vector<ConstDeclNode *>(),
+                                                                   vector<string *>(),
+                                                                   vector<string *>(),
+                                                                   vector<string *>(),
+                                                                   vector<FunctionStmtDeclNode *>()));
 
-    if(isDeclaredInterface(node->id, interfaces)||
+    if (isDeclaredInterface(node->id, interfaces) ||
         isDeclaredClass(node->id, classes) ||
-        isDeclaredTrait(node->id)){
-        throw runtime_error(string("Fatal error: Cannot declare trait " + *node->id + ", because the name is already in use in " + *file_name));
+        isDeclaredTrait(node->id)) {
+        throw runtime_error(
+                string("Fatal error: Cannot declare trait " + *node->id + ", because the name is already in use in " +
+                       *file_name));
     }
 
-    for(auto i: node->stmt_list->vector){
+    for (auto i: node->stmt_list->vector) {
         inspectClassStmt(i, node->id);
     }
 }
@@ -661,7 +700,7 @@ void inspectTrait(TraitStmtDeclNode *node){
 
 //Statements
 void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context = ContextType::noContext) {
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
     switch (node->type) {
@@ -681,20 +720,22 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
             inspectWhileStmt(node->while_stmt, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::break_stmt:
-            if(context != ContextType::inLoop && context != ContextType::inSwitch)
-                throw runtime_error(string("Fatal error: 'break' not in the 'loop' or 'switch' context in " + *file_name));
+            if (context != ContextType::inLoop && context != ContextType::inSwitch)
+                throw runtime_error(
+                        string("Fatal error: 'break' not in the 'loop' or 'switch' context in " + *file_name));
             break;
         case StmtType::const_decl:
-            for (auto i: node->const_decl->vector){
+            for (auto i: node->const_decl->vector) {
                 inspectConstDecl(i);
             }
             break;
         case StmtType::continue_stmt:
-            if(context != ContextType::inLoop && context != ContextType::inSwitch)
-                throw runtime_error(string("Fatal error: 'break' not in the 'loop' or 'switch' context in " + *file_name));
+            if (context != ContextType::inLoop && context != ContextType::inSwitch)
+                throw runtime_error(
+                        string("Fatal error: 'break' not in the 'loop' or 'switch' context in " + *file_name));
             break;
         case StmtType::global_var:
-            for (auto i: node->global_var->vector){
+            for (auto i: node->global_var->vector) {
                 inspectGlobalVar(i, variablesScope, constsScope, functionsScope, isInClass, context);
             }
             break;
@@ -708,12 +749,12 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
             inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::static_var:
-            for (auto i: node->static_var->vector){
+            for (auto i: node->static_var->vector) {
                 inspectStaticVar(i, variablesScope, constsScope, functionsScope, isInClass, context);
             }
             break;
         case StmtType::stmt_list:
-            for (auto i: node->stmtList->vector){
+            for (auto i: node->stmtList->vector) {
                 inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
             }
             break;
@@ -728,41 +769,48 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
 
 
 //If statement
-void inspectIfStmt (IfStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
-{
-    if(node == nullptr) return;
+void inspectIfStmt(IfStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                   vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
+    if (node == nullptr) return;
 
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
 
-    switch(node->type){
+    switch (node->type) {
         case IfStmtType::only_if:
-            inspectStmt(node->stmt_main, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            inspectStmt(node->stmt_main, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::inIf);
             break;
         case IfStmtType::if_else:
-            inspectStmt(node->stmt_main, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
-            inspectStmt(node->stmt_else, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            inspectStmt(node->stmt_main, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::inIf);
+            inspectStmt(node->stmt_else, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::inIf);
             break;
         case IfStmtType::end_if:
-            for(auto i: node->stmtListMain->vector){
-                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            for (auto i: node->stmtListMain->vector) {
+                inspectStmt(i, variablesScope, constsScope, functionsScope,
+                            isInClass, ContextType::inIf);
             }
             break;
         case IfStmtType::if_else_endif:
-            for(auto i: node->stmtListMain->vector){
-                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            for (auto i: node->stmtListMain->vector) {
+                inspectStmt(i, variablesScope, constsScope, functionsScope,
+                            isInClass, ContextType::inIf);
             }
-            for(auto i: node->stmtListElse->vector){
-                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            for (auto i: node->stmtListElse->vector) {
+                inspectStmt(i, variablesScope, constsScope, functionsScope,
+                            isInClass, ContextType::inIf);
             }
             break;
         case IfStmtType::if_else_list_endif:
-            for(auto i: node->stmtListMain->vector){
-                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            for (auto i: node->stmtListMain->vector) {
+                inspectStmt(i, variablesScope, constsScope, functionsScope,
+                            isInClass, ContextType::inIf);
             }
-            if(node->listElse != nullptr)
-                for(auto i: node->listElse->vector){
-                    inspectIfStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inIf);
+            if (node->listElse != nullptr)
+                for (auto i: node->listElse->vector) {
+                    inspectIfStmt(i, variablesScope, constsScope, functionsScope,
+                                  isInClass, ContextType::inIf);
                 }
             break;
     }
@@ -771,23 +819,22 @@ void inspectIfStmt (IfStmtNode *node, vector<string *> &variablesScope, vector<C
 
 
 //SwitchStmt
-void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
-{
-    if(node == nullptr) return;
+void inspectSwitchStmt(SwitchStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
+                       vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
+    if (node == nullptr) return;
 
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
 
-    switch(node->type){
+    switch (node->type) {
         case SwitchStmtType::just_switch:
             break;
         case SwitchStmtType::switch_default:
-            for(auto i: node->defaultStmtList->vector){
+            for (auto i: node->defaultStmtList->vector) {
                 inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
             }
             break;
         case SwitchStmtType::switch_default_endswitch:
-            for(auto i: node->defaultStmtList->vector){
+            for (auto i: node->defaultStmtList->vector) {
                 inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
             }
             break;
@@ -795,12 +842,12 @@ void inspectSwitchStmt (SwitchStmtNode *node, vector<string *> &variablesScope, 
 
 }
 
-void inspectCaseDefaultStmt (CaseDefaultStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false, ContextType context = ContextType::noContext)
-{
+void inspectCaseDefaultStmt(CaseDefaultStmtNode *node, vector<string *> &variablesScope,
+                            vector<ConstDeclNode *> &constsScope, vector<FunctionStmtDeclNode *> &functionsScope,
+                            bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
-    for (auto i: node->stmtList->vector){
+    for (auto i: node->stmtList->vector) {
         inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
     }
 
@@ -817,8 +864,8 @@ void inspectCaseDefaultStmt (CaseDefaultStmtNode *node, vector<string *> &variab
 }
 
 
-void inspectExpr(ExprNode *node, vector<ExprNode *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
-                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass) {
+void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
+                 vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
     switch (node->exprType) {
