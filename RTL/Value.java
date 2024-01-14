@@ -1079,10 +1079,14 @@ public class Value {
         switch (typeVal) {
             case stringVal -> {
                 StringBuilder result = new StringBuilder();
+                boolean hasMinus = false;
                 for (int i = 0; i < stringVal.length(); i++) {
                     try {
-                        String charNumber = String.valueOf(stringVal.charAt(i));
-                        Integer.parseInt(charNumber);
+                        char charNumber = stringVal.charAt(i);
+
+                        if (!hasMinus && charNumber == '-') hasMinus = true;
+                        else Integer.parseInt(String.valueOf(charNumber));
+
                         result.append(charNumber);
                     } catch (NumberFormatException e) {
                         if (result.isEmpty()) return new Value((ObjValue) null);
@@ -1117,15 +1121,17 @@ public class Value {
         switch (typeVal) {
             case stringVal -> {
                 StringBuilder result = new StringBuilder();
+                boolean hasMinus = false;
                 boolean hasDot = false;
                 boolean hasNumberAfterDot = false;
                 for (int i = 0; i < stringVal.length(); i++) {
                     try {
-                        String charSym = String.valueOf(stringVal.charAt(i));
+                        char charSym = stringVal.charAt(i);
 
-                        if (!hasDot && charSym.equals(".")) hasDot = true;
+                        if (!hasMinus && charSym == '-') hasMinus = true;
+                        else if (!hasDot && charSym == '.') hasDot = true;
                         else {
-                            Integer.parseInt(charSym);
+                            Integer.parseInt(String.valueOf(charSym));
 
                             if (hasDot) hasNumberAfterDot = true;
                         }
@@ -1205,7 +1211,7 @@ public class Value {
                 return this;
             }
             case objectVal -> {
-                return null;
+                return new Value(true);
             }
             case nullVal -> {
                 return new Value(false);
