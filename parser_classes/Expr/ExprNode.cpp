@@ -550,7 +550,7 @@ ExprNode *ExprNode::CreateFromGetArrayVal(ExprNode *left, ExprNode *right) {
     auto *tmp = new ExprNode();
     tmp->left = left;
     tmp->right = right;
-    tmp->exprType = ExprType::get_value_array;
+    tmp->exprType = ExprType::get_array_val;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }
@@ -584,14 +584,6 @@ ExprNode *ExprNode::CreateFromNewDecl(std::string *id, ExprList *listParams) {
     return tmp;
 }
 
-ExprNode *ExprNode::CreateFromNewDeclNoParams(std::string *id) {
-    auto *tmp = new ExprNode();
-    tmp->id = id;
-    tmp->exprType = ExprType::new_decl_no_params;
-    tmp->cur_id = ExprNode::GLOBAL_ID++;
-    return tmp;
-}
-
 ExprNode *ExprNode::CreateFromNewDeclNoId(ExprNode *left) {
     auto *tmp = new ExprNode();
     tmp->left = left;
@@ -606,15 +598,6 @@ ExprNode *ExprNode::CreateFromGetValueDecl(GetValueNode *get_value, std::string 
     tmp->id = id;
     tmp->listParams = listParams;
     tmp->exprType = ExprType::new_get_value_decl;
-    tmp->cur_id = ExprNode::GLOBAL_ID++;
-    return tmp;
-}
-
-ExprNode *ExprNode::CreateFromGetValueDeclNoParams(GetValueNode *get_value, std::string *id) {
-    auto *tmp = new ExprNode();
-    tmp->get_value = get_value;
-    tmp->id = id;
-    tmp->exprType = ExprType::new_get_value_decl_no_params;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }

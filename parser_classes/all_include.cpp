@@ -742,7 +742,7 @@ void printExpr(ExprNode *node, string *parentId, string *arrowLabel) {
             printExpr(node->right, node->idTag(), new string(""));
             break;
             //Array op
-        case ExprType::get_value_array:
+        case ExprType::get_array_val:
             GRAPH_STR += *node->idTag() + " [label=\" Expr \"];\n";
             printExpr(node->left, node->idTag(), new string("left"));
             printExpr(node->right, node->idTag(), new string("right"));

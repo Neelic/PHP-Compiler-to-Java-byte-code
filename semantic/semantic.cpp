@@ -91,6 +91,10 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
                         vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
                         ContextType context = ContextType::noContext);
 
+void inspectExprList(ExprList *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
+                     vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
+                     ContextType context = ContextType::noContext);
+
 bool isDeclaredVariable(string *id, const vector<string *> &list) {
     if (id == nullptr) return false;
 
@@ -1025,26 +1029,11 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
     if (node == nullptr) return;
 
     switch (node->exprType) {
-        case ExprType::assign_op:
-        case ExprType::assign_ref_op:
-            if (*node->left->id == "this" && node->get_value != nullptr && node->get_value->count == 1)
-                //Throw fatal error
-                throw runtime_error(string("Fatal error: Cannot re-assign $this in " + *file_name));
-            //if use right-side variable is not declared
-            if (node->right->exprType == ExprType::variable && !isDeclaredVariable(node->right->id, variables)) {
-                cout << "Warning: Undefined variable $" << *node->right->id << " in " << *file_name << endl;
-                node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());
-                variables.push_back(node->right->left->id);
-            }
-
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass);
-            inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass);
-            break;
-        case ExprType::class_inst_field_ref_op:
-        case ExprType::class_inst_field_by_ref_op:
-        case ExprType::class_inst_field_by_expr_ref:
         case ExprType::class_method_ref_op:
         case ExprType::class_method_by_ref_op:
+        case ExprType::class_inst_field_by_expr_ref:
+        case ExprType::class_inst_field_ref_op:
+        case ExprType::class_inst_field_by_ref_op:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::classInstRef);
             break;
@@ -1064,13 +1053,48 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
                 node->id = new string(currentObjectName);
             }
             break;
+        case ExprType::assign_op:
+        case ExprType::assign_ref_op:
+            if (*node->left->id == "this" && node->get_value != nullptr && node->get_value->count == 1)
+                //Throw fatal error
+                throw runtime_error(string("Fatal error: Cannot re-assign $this in " + *file_name));
+            //if use right-side variable is not declared
+            if (node->right->exprType == ExprType::variable && !isDeclaredVariable(node->right->id, variables)) {
+                cout << "Warning: Undefined variable $" << *node->right->id << " in " << *file_name << endl;
+                node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());
+                variables.push_back(node->right->left->id);
+            } else if (node->left->exprType == ExprType::get_array_val) {
+                node->exprType = set_array_val;
+                auto tmp = node->left;
+                node->left = tmp->left;
+                node->central = tmp->right;
+                delete tmp;
+                inspectExpr(node->central, variablesScope, constsScope, functionsScope, isInClass, context);
+            }
         case ExprType::plus_op:
         case ExprType::minus_op:
         case ExprType::mult_op:
         case ExprType::div_op:
         case ExprType::mod_op:
+        case ExprType::pow_op:
+        case ExprType::instance_of:
+        case ExprType::concat_op:
+        case ExprType::bool_more:
+        case ExprType::bool_less:
+        case ExprType::bool_and:
+        case ExprType::bool_equal:
+        case ExprType::bool_equal_strict:
+        case ExprType::bool_equal_more:
+        case ExprType::bool_equal_less:
+        case ExprType::logic_and:
+        case ExprType::logic_or:
+        case ExprType::logic_xor:
+        case ExprType::call_func:
+        case ExprType::new_decl:
+        case ExprType::new_decl_no_id:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
+            inspectExprList(node->listParams, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case ExprType::u_minus_op:
         case ExprType::u_plus_op:
@@ -1080,8 +1104,22 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
         case ExprType::string_cast:
         case ExprType::array_cast:
         case ExprType::object_cast:
+        case ExprType::bool_not:
+        case ExprType::clone_op:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
+        case ExprType::ref_op:
+            inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
 
+    }
+}
+
+void inspectExprList(ExprList *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
+                     vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
+    if (node == nullptr) return;
+
+    for (auto tmp : node->vector) {
+        inspectExpr(tmp, variablesScope, constsScope, functionsScope, isInClass, context);
     }
 }

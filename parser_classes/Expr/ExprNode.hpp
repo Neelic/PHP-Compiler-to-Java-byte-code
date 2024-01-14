@@ -17,14 +17,13 @@ public:
     ExprType exprType;
     int int_val;
     float float_val;
-    std::string *string_val;
-    std::string *com_string_val;
-    std::string *id;
-    GetValueNode *get_value;
-    ExprNode *left;
-    ExprNode *right;
-    ExprNode *central;
-    ExprList *listParams;
+    std::string *string_val = nullptr;
+    std::string *id = nullptr;
+    GetValueNode *get_value = nullptr;
+    ExprNode *left = nullptr;
+    ExprNode *right = nullptr;
+    ExprNode *central = nullptr;
+    ExprList *listParams = nullptr;
 
     static ExprNode *CreateFromId(std::string *id);
 
