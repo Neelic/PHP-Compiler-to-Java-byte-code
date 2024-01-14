@@ -5,7 +5,7 @@ int ExprNode::GLOBAL_ID = 0;
 ExprNode *ExprNode::CreateFromId(std::string *id) {
     auto *tmp = new ExprNode();
     tmp->id = id;
-    tmp->exprType = constant;
+    tmp->exprType = id_type;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }

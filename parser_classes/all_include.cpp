@@ -483,7 +483,7 @@ void printExpr(ExprNode *node, string *parentId, string *arrowLabel) {
             printGetValue(node->get_value, node->idTag());
             printStringValueNode(node->id, node->idTag(), new string(""));
             break;
-        case ExprType::constant:
+        case ExprType::id_type:
             cout << GRAPH_STR.size() << " from constant" << "\n";
             GRAPH_STR += *node->idTag() + " [label=\"" + *node->id + "\"];\n";
             break;

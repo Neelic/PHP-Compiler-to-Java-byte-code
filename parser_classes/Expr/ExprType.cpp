@@ -8,7 +8,7 @@ enum ExprType
     self_keyword,
     parent_keyword,
     variable,
-    constant,
+    id_type,
     assign_op,
     assign_ref_op,
     int_cast,

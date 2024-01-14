@@ -1,6 +1,7 @@
 #include "semantic.h"
 
 string *file_name;
+string currentObjectName;
 
 //Global scope vars
 vector<string *> variables;
@@ -361,6 +362,7 @@ void inspectGetValueFunc(GetValueFuncNode *node) {
 //Classes
 void inspectClass(ClassStmtDeclNode *node) {
     if (node == nullptr) return;
+    currentObjectName = *node->class_def->class_id;
 
     // Добавляю в глобальный спискок пустой контейнер для хранения свойств и методов класса
     classProperties.push_back(ClassScopeContainer::CreateContainer(node->class_def->class_id, vector<string *>(),
@@ -379,6 +381,8 @@ void inspectClass(ClassStmtDeclNode *node) {
     for (auto &i: node->class_stmt_list->vector) {
         inspectClassStmt(i, node->class_def->class_id);
     }
+
+    currentObjectName = "";
 }
 
 void inspectClassDef(ClassDefNode *node) {
@@ -507,8 +511,7 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId) {
                                "() in " + *file_name));
 
             //Здесть создаю нод FunctionStmtDecl только с заголовком, чтобы можно было сохранять. В списке функций хранить ноды имеет смысл, я считаю
-            if (parentProperties != nullptr)
-                parentProperties->functions.push_back(FunctionStmtDeclNode::CreateNode(node->function_def, nullptr));
+            parentProperties->functions.push_back(FunctionStmtDeclNode::CreateNode(node->function_def, nullptr));
 
             inspectFunctionDef(node->function_def);
             break;
@@ -930,9 +933,6 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
             inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForEachStmtType::foreach_r_double_arrow_stmt_type:
-            foreachVariableScope.push_back(node->id);
-            inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
-            break;
         case ForEachStmtType::foreach_r_double_arrow_pointer_stmt_type:
             foreachVariableScope.push_back(node->id);
             inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
@@ -1026,20 +1026,6 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
 
     switch (node->exprType) {
         case ExprType::assign_op:
-            //if re-assign $this
-            if (*node->left->id == "this" && node->get_value != nullptr && node->get_value->count == 1)
-                //Throw fatal error
-                throw runtime_error(string("Fatal error: Cannot re-assign $this in " + *file_name));
-            //if use right-side variable is not declared
-            if (node->right->exprType == ExprType::variable && !isDeclaredVariable(node->right->id, variables)) {
-                cout << "Warning: Undefined variable $" << *node->right->id << " in " << *file_name << endl;
-                node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());
-                variables.push_back(node->right->left->id);
-            }
-
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass);
-            inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass);
-            break;
         case ExprType::assign_ref_op:
             if (*node->left->id == "this" && node->get_value != nullptr && node->get_value->count == 1)
                 //Throw fatal error
@@ -1055,37 +1041,15 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass);
             break;
         case ExprType::class_inst_field_ref_op:
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
-                        isInClass, ContextType::classInstRef);
-            break;
         case ExprType::class_inst_field_by_ref_op:
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
-                        isInClass, ContextType::classInstRef);
-            break;
         case ExprType::class_inst_field_by_expr_ref:
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
-                        isInClass, ContextType::classInstRef);
-            break;
         case ExprType::class_method_ref_op:
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
-                        isInClass, ContextType::classInstRef);
-            break;
         case ExprType::class_method_by_ref_op:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::classInstRef);
             break;
         case ExprType::class_inst_field_ref_dots_op:
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
-                        isInClass, ContextType::staticRef);
-            break;
         case ExprType::class_inst_field_by_expr_ref_dots_op:
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
-                        isInClass, ContextType::staticRef);
-            break;
-        case ExprType::class_inst_method_by_ref_op_dots:
-            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
-                        isInClass, ContextType::staticRef);
-            break;
         case ExprType::class_inst_get_value_method_by_ref_op_dots:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::staticRef);
@@ -1094,6 +1058,30 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             if (!isInClass)
                 throw runtime_error(
                         "Fatal error: Uncaught error: Using $this when in not in object context in " + *file_name);
+        case ExprType::self_keyword:
+            if (context == ContextType::staticRef && !currentObjectName.empty()) {
+                node->exprType = ExprType::id_type;
+                node->id = new string(currentObjectName);
+            }
             break;
+        case ExprType::plus_op:
+        case ExprType::minus_op:
+        case ExprType::mult_op:
+        case ExprType::div_op:
+        case ExprType::mod_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
+            inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+        case ExprType::u_minus_op:
+        case ExprType::u_plus_op:
+        case ExprType::int_cast:
+        case ExprType::float_cast:
+        case ExprType::bool_cast:
+        case ExprType::string_cast:
+        case ExprType::array_cast:
+        case ExprType::object_cast:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+
     }
 }
