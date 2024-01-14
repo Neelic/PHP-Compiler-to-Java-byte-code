@@ -991,8 +991,7 @@ void inspectDoWhileStmt(DoWhileStmtNode *node, vector<string *> &variablesScope,
 
 // Static variables
 void inspectStaticVar(StaticVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
-                      ContextType context = ContextType::noContext) {
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
     if (isDeclaredVariable(node->id, variables)) {
@@ -1011,8 +1010,7 @@ void inspectStaticVar(StaticVarNode *node, vector<string *> &variablesScope, vec
 
 // Global variables
 void inspectGlobalVar(GlobalVarNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
-                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass = false,
-                      ContextType context = ContextType::noContext) {
+                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
     if (isDeclaredVariable(node->id, variables)) {
