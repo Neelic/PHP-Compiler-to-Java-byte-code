@@ -279,7 +279,7 @@ void inspectFunction(FunctionStmtDeclNode *node, string *parentId) {
 
     inspectFunctionDef(node->function_def);
 
-    vector<string *> varList;
+    vector < string * > varList;
 
     varList.reserve(node->function_def->expr_func_list->vector.size());
     for (auto &tmp: node->function_def->expr_func_list->vector) {
@@ -289,7 +289,8 @@ void inspectFunction(FunctionStmtDeclNode *node, string *parentId) {
     for (auto &i: node->stmt_list->vector) {
         auto tmp1 = varList;
         auto tmp2 = vector<ConstDeclNode *>();
-        inspectStmt(i, tmp1, tmp2, functions);
+        inspectStmt(i, tmp1, tmp2, functions, (parentId != nullptr),
+                    inFunction); // Если parent id не пуст, значит, в классе.
     }
 }
 
@@ -751,7 +752,7 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
         case StmtType::continue_stmt:
             if (context != ContextType::inLoop && context != ContextType::inSwitch)
                 throw runtime_error(
-                        string("Fatal error: 'break' not in the 'loop' or 'switch' context in " + *file_name));
+                        string("Fatal error: 'continue' not in the 'loop' or 'switch' context in " + *file_name));
             break;
         case StmtType::global_var:
             for (auto i: node->global_var->vector) {
@@ -892,13 +893,9 @@ void inspectForStmt(ForStmtNode *node, vector<string *> &variablesScope, vector<
                     vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
-    // Создаю список для переменных внутри цикла
-    auto forVariableScope = variablesScope;
-
     inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, context);
 
-    // Добавляю переменную, объявленную в заголовке цикла
-    forVariableScope.push_back(node->expr_left->id);
+    //Убрал доп массив, потому что не нужен, думал, что как в си, переменные внутри цикла снаружи быть не могут, а они глобальные
 
     inspectExpr(node->expr_central, variablesScope, constsScope, functionsScope, isInClass, context);
 
@@ -906,11 +903,11 @@ void inspectForStmt(ForStmtNode *node, vector<string *> &variablesScope, vector<
 
     switch (node->type) {
         case ForStmtType::for_stmt_type:
-            inspectStmt(node->stmt, forVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForStmtType::for_end_stmt_type:
             for (auto i: node->stmtList->vector) {
-                inspectStmt(i, forVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
             break;
     }
@@ -922,42 +919,38 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
                         vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
-    // Cписок для переменных внутри цикла
-    auto foreachVariableScope = variablesScope;
-
     inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
 
     inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
 
-    // Добавляю переменную, объявленную в заголовке цикла
-    foreachVariableScope.push_back(node->expr_right->id);
+    //Убрал доп массив, потому что не нужен, думал, что как в си, переменные внутри цикла снаружи быть не могут, а они могут
 
     switch (node->type) {
         case ForEachStmtType::foreach_stmt_type:
-            inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForEachStmtType::foreach_r_double_arrow_stmt_type:
         case ForEachStmtType::foreach_r_double_arrow_pointer_stmt_type:
             foreachVariableScope.push_back(node->id);
-            inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+            inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForEachStmtType::end_foreach_stmt_type:
             for (auto i: node->stmtList->vector) {
-                inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass,
+                inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass,
                             ContextType::inLoop);
             }
             break;
         case ForEachStmtType::end_foreach_r_double_arrow_stmt_type:
             foreachVariableScope.push_back(node->id);
             for (auto i: node->stmtList->vector) {
-                inspectStmt(node->stmt, foreachVariableScope, constsScope, functionsScope, isInClass,
+                inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass,
                             ContextType::inLoop);
             }
             break;
         case ForEachStmtType::end_foreach_r_double_arrow_pointer_stmt_type:
             foreachVariableScope.push_back(node->id);
             for (auto i: node->stmtList->vector) {
-                inspectStmt(i, foreachVariableScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+                inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
             break;
     }
