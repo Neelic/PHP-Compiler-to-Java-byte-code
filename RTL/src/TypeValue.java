@@ -1,3 +1,5 @@
+package RTL;
+
 public enum TypeValue {
     stringVal,
     intVal,

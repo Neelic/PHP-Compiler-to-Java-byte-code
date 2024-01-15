@@ -1,3 +1,5 @@
+package RTL;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -290,7 +292,7 @@ public class Value {
                         try {
                             Float.parseFloat(stringVal);
                         } catch (NumberFormatException e) {
-                            System.out.println("Warning: A non numeric value encountered");
+                            System.out.println("\nWarning: A non numeric value encountered");
                         }
 
                         return addValue(newVal, false);
@@ -459,7 +461,7 @@ public class Value {
                     try {
                         Float.parseFloat(stringVal);
                     } catch (NumberFormatException e) {
-                        System.out.println("Warning: A non numeric value encountered");
+                        System.out.println("\nWarning: A non numeric value encountered");
                     }
 
                     return sub(newVal);
@@ -622,7 +624,7 @@ public class Value {
                     try {
                         Float.parseFloat(stringVal);
                     } catch (NumberFormatException e) {
-                        System.out.println("Warning: A non numeric value encountered");
+                        System.out.println("\nWarning: A non numeric value encountered");
                     }
 
                     return mul(newVal);
@@ -770,7 +772,7 @@ public class Value {
                         try {
                             Float.parseFloat(stringVal);
                         } catch (NumberFormatException e) {
-                            System.out.println("Warning: A non numeric value encountered");
+                            System.out.println("\nWarning: A non numeric value encountered");
                         }
 
                         return div(newVal);
@@ -945,7 +947,7 @@ public class Value {
                         try {
                             Float.parseFloat(stringVal);
                         } catch (NumberFormatException e) {
-                            System.out.println("Warning: A non numeric value encountered");
+                            System.out.println("\nWarning: A non numeric value encountered");
                         }
 
                         return mod(newVal);
@@ -1039,14 +1041,14 @@ public class Value {
 
     public Value getArrayVal(String index) {
         if (typeVal != TypeValue.arrayVal && typeVal != TypeValue.stringVal) {
-            System.out.println("Warning: Trying to access array offset on value of type " + typeToString());
+            System.out.println("\nWarning: Trying to access array offset on value of type " + typeToString());
         } else if (typeVal == TypeValue.stringVal) {
             int ind;
 
             try {
                 ind = Integer.parseInt(index);
             } catch (NumberFormatException e) {
-                System.out.println("Warning: String offset cast occurred");
+                System.out.println("\nWarning: String offset cast occurred");
                 return new Value((ObjValue) null);
             }
 
@@ -1054,7 +1056,7 @@ public class Value {
                 if (ind < 0) return new Value(String.valueOf(stringVal.charAt(stringVal.length() + ind)));
                 else return new Value(String.valueOf(stringVal.charAt(ind)));
             } catch (IndexOutOfBoundsException e) {
-                System.out.println("Warning: Uninitialized string offset " + ind);
+                System.out.println("\nWarning: Uninitialized string offset " + ind);
                 return null;
             }
         }
@@ -1180,7 +1182,7 @@ public class Value {
                 return new Value(String.valueOf(floatVal));
             }
             case arrayVal -> {
-                System.out.println("Warning: Array to string conversion");
+                System.out.println("\nWarning: Array to string conversion");
                 return new Value("Array");
             }
             case boolVal -> {
