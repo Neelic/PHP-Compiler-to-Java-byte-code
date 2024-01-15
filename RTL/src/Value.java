@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Value {
-    protected TypeValue typeVal;
+    private TypeValue typeVal;
     private int intVal;
     private float floatVal;
     private String stringVal;

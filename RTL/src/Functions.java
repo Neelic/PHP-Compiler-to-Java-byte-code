@@ -1,6 +1,6 @@
 package RTL;
 
-class Functions {
+public class Functions {
     public static void echo(Value value) {
         if (value == null) return;
         System.out.print(value.toStringVal().getString());

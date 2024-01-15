@@ -1,6 +1,6 @@
 package RTL;
 
-public enum TypeValue {
+enum TypeValue {
     stringVal,
     intVal,
     floatVal,
