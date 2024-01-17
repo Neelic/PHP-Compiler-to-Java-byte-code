@@ -339,12 +339,7 @@ public class Value {
             }
         }
 
-        throw new FatalError(
-                "Uncaught TypeError: Unsupported operand types: "
-                        + this.typeToString()
-                        + " + "
-                        + other.typeToString()
-        );
+        throw new FatalError("Uncaught TypeError: Unsupported operand types: " + this.typeToString() + " + " + other.typeToString());
     }
 
     public Value sub(Value other) {
@@ -469,12 +464,7 @@ public class Value {
             }
         }
 
-        throw new FatalError(
-                "Uncaught TypeError: Unsupported operand types: "
-                        + this.typeToString()
-                        + " - "
-                        + other.typeToString()
-        );
+        throw new FatalError("Uncaught TypeError: Unsupported operand types: " + this.typeToString() + " - " + other.typeToString());
     }
 
     public Value sub(int other) {
@@ -632,12 +622,7 @@ public class Value {
             }
         }
 
-        throw new FatalError(
-                "Uncaught TypeError: Unsupported operand types: "
-                        + this.typeToString()
-                        + " * "
-                        + other.typeToString()
-        );
+        throw new FatalError("Uncaught TypeError: Unsupported operand types: " + this.typeToString() + " * " + other.typeToString());
     }
 
     public Value mul(int other) {
@@ -783,12 +768,7 @@ public class Value {
             throw new FatalError("Uncaught DivisionByZeroError: Division by zero");
         }
 
-        throw new FatalError(
-                "Uncaught TypeError: Unsupported operand types: "
-                        + this.typeToString()
-                        + " / "
-                        + other.typeToString()
-        );
+        throw new FatalError("Uncaught TypeError: Unsupported operand types: " + this.typeToString() + " / " + other.typeToString());
     }
 
     public Value div(int other) {
@@ -958,12 +938,7 @@ public class Value {
             throw new FatalError("Uncaught DivisionByZeroError: Modulo by zero");
         }
 
-        throw new FatalError(
-                "Uncaught TypeError: Unsupported operand types: "
-                        + this.typeToString()
-                        + " % "
-                        + other.typeToString()
-        );
+        throw new FatalError("Uncaught TypeError: Unsupported operand types: " + this.typeToString() + " % " + other.typeToString());
     }
 
     public Value mod(int other) {
@@ -1144,9 +1119,7 @@ public class Value {
                     }
                 }
 
-                return hasNumberAfterDot
-                        ? new Value(Float.parseFloat(result.toString()))
-                        : new Value(Integer.parseInt(result.toString()));
+                return hasNumberAfterDot ? new Value(Float.parseFloat(result.toString())) : new Value(Integer.parseInt(result.toString()));
             }
             case intVal -> {
                 return new Value((float) intVal);
@@ -1278,5 +1251,254 @@ public class Value {
             }
             default -> throw new FatalError("Unknown type");
         }
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Value otherValue)) return false;
+
+        switch (typeVal) {
+            case stringVal -> {
+                return stringVal.equals(otherValue.toStringVal().getString());
+            }
+            case intVal -> {
+                switch (otherValue.getType()) {
+                    case intVal, floatVal, boolVal, nullVal, objectVal -> {
+                        return intVal == otherValue.toFloatVal().getFloat();
+                    }
+                    case stringVal -> {
+                        return this.toStringVal().getString().equals(otherValue.getString());
+                    }
+                    case arrayVal -> {
+                        return false;
+                    }
+                }
+            }
+            case floatVal -> {
+                switch (otherValue.getType()) {
+                    case intVal, floatVal, boolVal, nullVal, objectVal -> {
+                        return floatVal == otherValue.toFloatVal().getFloat();
+                    }
+                    case stringVal -> {
+                        return this.toStringVal().getString().equals(otherValue.getString());
+                    }
+                    case arrayVal -> {
+                        return this.toObject().equals(otherValue.toObject());
+                    }
+                }
+            }
+            case arrayVal -> {
+                switch (otherValue.getType()) {
+                    case arrayVal -> {
+                        return arrayVal.equals(otherValue.arrayVal);
+                    }
+                    case intVal, floatVal, stringVal, objectVal -> {
+                        return this.toObject().equals(otherValue.toObject());
+                    }
+                    case nullVal, boolVal -> {
+                        return arrayVal.isEmpty() == !otherValue.toBoolVal().getBool();
+                    }
+                }
+            }
+            case boolVal, nullVal -> {
+                return this.toIntVal().equals(otherValue);
+            }
+            case objectVal -> {
+                switch (otherValue.getType()) {
+                    case objectVal -> {
+                        return objVal.getClass() == otherValue.getObjVal().getClass();
+                    }
+                    case intVal, floatVal, arrayVal, boolVal, nullVal -> {
+                        if (otherValue.getType() != TypeValue.nullVal
+                                || otherValue.getType() != TypeValue.boolVal
+                                || otherValue.getType() != TypeValue.arrayVal) {
+                            System.out.println(
+                                    "\nNotice: Object of class "
+                                            + objVal.getClass()
+                                            + " could not be converted to "
+                                            + otherValue.typeToString());
+                        }
+
+                        return this.equals(otherValue.toObject());
+                    }
+                    case stringVal -> {
+                        try {
+                            return objVal.__toString().equals(otherValue.getString());
+                        } catch (FatalError error) {
+                            return this.equals(otherValue.toObject());
+                        }
+                    }
+                }
+            }
+            default -> throw new FatalError("Unexpected value: " + typeVal);
+        }
+
+        return false;
+    }
+
+    public boolean equals(int other) {
+        return this.equals(new Value(other));
+    }
+
+    public boolean equals(float other) {
+        return this.equals(new Value(other));
+    }
+
+    public boolean equals(boolean other) {
+        return this.equals(new Value(other));
+    }
+
+    public boolean equals(String other) {
+        return this.equals(new Value(other));
+    }
+
+    public boolean equals(HashMap<String, Value> other) {
+        return this.equals(new Value(other));
+    }
+
+    public boolean equals(ObjValue other) {
+        return this.equals(new Value(other));
+    }
+
+    public boolean equalsStrict(Value other) {
+        if (other == null || typeVal != other.getType()) return false;
+        if (typeVal == TypeValue.objectVal && typeVal == other.getType()) return objVal.equals(other.getObjVal());
+
+        return equals(other);
+    }
+
+    public boolean equalsStrict(int other) {
+        return equals(new Value(other));
+    }
+
+    public boolean equalsStrict(float other) {
+        return equals(new Value(other));
+    }
+
+    public boolean equalsStrict(boolean other) {
+        return equals(new Value(other));
+    }
+
+    public boolean equalsStrict(String other) {
+        return equals(new Value(other));
+    }
+
+    public boolean equalsStrict(HashMap<String, Value> other) {
+        return equals(new Value(other));
+    }
+
+    public boolean equalsStrict(ObjValue other) {
+        return equals(new Value(other));
+    }
+
+    public boolean more(Value other) {
+        switch (typeVal) {
+            case intVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal -> {
+                        return intVal > other.toFloatVal().getFloat();
+                    }
+                    case stringVal -> {
+                        Value otherFloat = other.toFloatVal();
+                        if (otherFloat.getType() == TypeValue.nullVal) return false;
+
+                        return intVal > otherFloat.toFloatVal().getFloat();
+                    }
+                    case arrayVal -> {
+                        return false;
+                    }
+                    case objectVal -> {
+                        System.out.println(
+                                "\nNotice: Object of class "
+                                        + other.getObjVal().getClass()
+                                        + " could not be converted to "
+                                        + typeToString());
+                        return intVal > 1;
+                    }
+                }
+            }
+            case floatVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal -> {
+                        return floatVal > other.toFloatVal().getFloat();
+                    }
+                    case stringVal -> {
+                        Value otherFloat = other.toFloatVal();
+                        if (otherFloat.getType() == TypeValue.nullVal) return false;
+
+                        return floatVal > otherFloat.toFloatVal().getFloat();
+                    }
+                    case arrayVal -> {
+                        return false;
+                    }
+                    case objectVal -> {
+                        System.out.println(
+                                "\nNotice: Object of class "
+                                        + other.getObjVal().getClass()
+                                        + " could not be converted to "
+                                        + typeToString());
+                        return floatVal > 1;
+                    }
+                }
+            }
+            case boolVal, nullVal -> {
+                return this.toFloatVal().more(other);
+            }
+            case stringVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal -> {
+                        Value thisFloat = toFloatVal();
+                        if (thisFloat.getType() == TypeValue.nullVal) return true;
+
+                        return thisFloat.toFloatVal().getFloat() > other.toFloatVal().getFloat();
+                    }
+                    case objectVal, arrayVal -> {
+                        return false;
+                    }
+                    case stringVal -> {
+                        return stringVal.compareTo(other.getString()) > 0;
+                    }
+                }
+            }
+            case arrayVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal, stringVal -> {
+                        return true;
+                    }
+                    case arrayVal -> {
+                        return arrayVal.size() > other.getArrayVal().size();
+                    }
+                    case objectVal -> {
+                        return false;
+                    }
+                }
+            }
+            case objectVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal -> {
+                        System.out.println(
+                                "\nNotice: Object of class "
+                                        + objVal.getClass()
+                                        + " could not be converted to "
+                                        + other.typeToString());
+                        return (new Value(1)).more(other);
+                    }
+                    case stringVal -> {
+                        try {
+                            return objVal.__toString().compareTo(other.getString()) > 0;
+                        } catch (FatalError error) {
+                            return (new Value(1)).more(other);
+                        }
+                    }
+                    case arrayVal -> {
+                        return true;
+                    }
+                    case objectVal -> {
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
