@@ -1501,4 +1501,164 @@ public class Value {
         }
         return false;
     }
+
+    public boolean more(int other) {
+        return more(new Value(other));
+    }
+
+    public boolean more(float other) {
+        return more(new Value(other));
+    }
+
+    public boolean more(boolean other) {
+        return more(new Value(other));
+    }
+
+    public boolean more(String other) {
+        return more(new Value(other));
+    }
+
+    public boolean more(ObjValue other) {
+        return more(new Value(other));
+    }
+
+    public boolean more(HashMap<String, Value> other) {
+        return more(new Value(other));
+    }
+
+    public boolean less(Value other) {
+        switch (typeVal) {
+            case intVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal -> {
+                        return intVal < other.toFloatVal().getFloat();
+                    }
+                    case stringVal -> {
+                        Value otherFloat = other.toFloatVal();
+                        if (otherFloat.getType() == TypeValue.nullVal) return false;
+
+                        return intVal < otherFloat.toFloatVal().getFloat();
+                    }
+                    case arrayVal -> {
+                        return false;
+                    }
+                    case objectVal -> {
+                        System.out.println(
+                                "\nNotice: Object of class "
+                                        + other.getObjVal().getClass()
+                                        + " could not be converted to "
+                                        + typeToString());
+                        return intVal < 1;
+                    }
+                }
+            }
+            case floatVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal -> {
+                        return floatVal < other.toFloatVal().getFloat();
+                    }
+                    case stringVal -> {
+                        Value otherFloat = other.toFloatVal();
+                        if (otherFloat.getType() == TypeValue.nullVal) return true;
+
+                        return floatVal < otherFloat.toFloatVal().getFloat();
+                    }
+                    case arrayVal -> {
+                        return true;
+                    }
+                    case objectVal -> {
+                        System.out.println(
+                                "\nNotice: Object of class "
+                                        + other.getObjVal().getClass()
+                                        + " could not be converted to "
+                                        + typeToString());
+                        return floatVal < 1;
+                    }
+                }
+            }
+            case boolVal, nullVal -> {
+                return this.toFloatVal().less(other);
+            }
+            case stringVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal -> {
+                        Value thisFloat = toFloatVal();
+                        if (thisFloat.getType() == TypeValue.nullVal) return false;
+
+                        return thisFloat.toFloatVal().getFloat() < other.toFloatVal().getFloat();
+                    }
+                    case objectVal, arrayVal -> {
+                        return true;
+                    }
+                    case stringVal -> {
+                        return stringVal.compareTo(other.getString()) < 0;
+                    }
+                }
+            }
+            case arrayVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal, stringVal -> {
+                        return false;
+                    }
+                    case arrayVal -> {
+                        return arrayVal.size() < other.getArrayVal().size();
+                    }
+                    case objectVal -> {
+                        return true;
+                    }
+                }
+            }
+            case objectVal -> {
+                switch (other.getType()) {
+                    case intVal, floatVal, boolVal, nullVal -> {
+                        System.out.println(
+                                "\nNotice: Object of class "
+                                        + objVal.getClass()
+                                        + " could not be converted to "
+                                        + other.typeToString());
+                        return (new Value(1)).less(other);
+                    }
+                    case stringVal -> {
+                        try {
+                            return objVal.__toString().compareTo(other.getString()) < 0;
+                        } catch (FatalError error) {
+                            return (new Value(1)).less(other);
+                        }
+                    }
+                    case arrayVal -> {
+                        return false;
+                    }
+                    case objectVal -> {
+                        return true;
+                    }
+                }
+            }
+            default -> throw new FatalError("Unknown type");
+        }
+        return false;
+    }
+
+    public boolean less(int other) {
+        return less(new Value(other));
+    }
+
+    public boolean less(float other) {
+        return less(new Value(other));
+    }
+
+    public boolean less(boolean other) {
+        return less(new Value(other));
+    }
+
+    public boolean less(String other) {
+        return less(new Value(other));
+    }
+
+    public boolean less(ObjValue other) {
+        return less(new Value(other));
+    }
+
+    public boolean less(HashMap<String, Value> other) {
+        return less(new Value(other));
+    }
 }
