@@ -263,7 +263,6 @@ top_stmt: stmt                                                                  
         ;
 
 get_value: '$'                                                                        {$$=GetValueNode::CreateNode();}
-        |  get_value '$'                                                              {$1->count+=1;$$=$1;}
         ;
 
 if_stmt:  IF '(' expr ')' stmt                                                        {$$=IfStmtNode::CreateFromIfStmt($3, $5);}
@@ -366,24 +365,16 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | BOOL_CAST expr                                             {$$=ExprNode::CreateFromBoolCast($2);}
         | expr R_ARROW ID                                            {$$=ExprNode::CreateFromFieldReference($1, new string(*$3));}
         | expr R_ARROW get_value ID                                  {$$=ExprNode::CreateFromGetValueFieldReference($1, $3, new string(*$4));}
-        | expr R_ARROW get_value '{' expr '}'                        {$$=ExprNode::CreateFromGetValueWithExprReference($1, $3, $5);}
         | expr R_ARROW ID '(' expr_list ')'                          {$$=ExprNode::CreateFromMethodReference($1, new string(*$3), $5);}
-        | expr R_ARROW get_value ID '(' expr_list ')'                {$$=ExprNode::CreateFromGetValueMethodReference($1, $3, new string(*$4), $6);}
         | expr QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots($1, new string(*$3));}
         | expr QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots($1, $3, new string(*$4));}
-        | expr QUARTER_DOT get_value '{' expr '}'                    {$$=ExprNode::CreateFromGetValueWithExprReferenceDots($1, $3, $5);}
         | expr QUARTER_DOT ID '(' expr_list ')'                      {$$=ExprNode::CreateFromMethodReferenceDots($1, new string(*$3), $5);}
-        | expr QUARTER_DOT get_value ID '(' expr_list ')'            {$$=ExprNode::CreateFromGetValueMethodReferenceDots($1, $3, new string(*$4), $6);}
         | SELF QUARTER_DOT ID                                        {$$=ExprNode::CreateFromFieldReferenceDots(ExprNode::CreateFromSelfKeyword(), new string(*$3));}
         | SELF QUARTER_DOT get_value ID                              {$$=ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, new string(*$4));}
-        | SELF QUARTER_DOT get_value '{' expr '}'                    {$$=ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, $5);}
         | SELF QUARTER_DOT ID '(' expr_list ')'                      {$$=ExprNode::CreateFromMethodReferenceDots(ExprNode::CreateFromSelfKeyword(), new string(*$3), $5);}
-        | SELF QUARTER_DOT get_value ID '(' expr_list ')'            {$$=ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode::CreateFromSelfKeyword(), $3, new string(*$4), $6);}
         | PARENT QUARTER_DOT ID                                      {$$=ExprNode::CreateFromFieldReferenceDots(ExprNode::CreateFromParentKeyword(), new string(*$3));}
         | PARENT QUARTER_DOT get_value ID                            {$$=ExprNode::CreateFromGetValueFieldReferenceDots(ExprNode::CreateFromParentKeyword(), $3, new string(*$4));}
-        | PARENT QUARTER_DOT get_value '{' expr '}'                  {$$=ExprNode::CreateFromGetValueWithExprReferenceDots(ExprNode::CreateFromParentKeyword(), $3, $5);}
         | PARENT QUARTER_DOT ID '(' expr_list ')'                    {$$=ExprNode::CreateFromMethodReferenceDots(ExprNode::CreateFromParentKeyword(), new string(*$3), $5);}
-        | PARENT QUARTER_DOT get_value ID '(' expr_list ')'          {$$=ExprNode::CreateFromGetValueMethodReferenceDots(ExprNode::CreateFromParentKeyword(), $3, new string(*$4), $6);}
         | '(' expr ')'                                               {$$=$2;}
         | expr INSTANCE_OF expr                                      {$$=ExprNode::CreateFromInstanceOf($1, $3);}
         | expr '-' expr                                              {$$=ExprNode::CreateFromSubtraction($1, $3);}
@@ -411,15 +402,11 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | CLONE expr                                                 {$$=ExprNode::CreateFromCloneOp($2);}
         | expr '?' expr ':' expr                                     {$$=ExprNode::CreateFromTernaryOp($1, $3, $5);}
         | expr '?' ':' expr                                          {$$=ExprNode::CreateFromTernaryOp($1, nullptr, $4);}
-        | get_value '{' expr '}'                                     {$$=ExprNode::CreateFromRefOp($1, $3);}
         | expr '[' expr ']'                                          {$$=ExprNode::CreateFromGetArrayVal($1, $3);}
         | expr '[' ']' '=' expr                                      {$$=ExprNode::CreateFromAssignArrayValByExpr($1, $5);}
         | ID '(' expr_list ')'                                       {$$=ExprNode::CreateFromFunctionCall(new string(*$1), $3);}
         | NEW ID '(' expr_list ')'                                   {$$=ExprNode::CreateFromNewDecl(new string(*$2), $4);}
         | NEW ID                                                     {$$=ExprNode::CreateFromNewDecl(new string(*$2), ExprList::CreateNode(nullptr));}
-        | NEW get_value ID                                           {$$=ExprNode::CreateFromGetValueDecl($2, new string(*$3), ExprList::CreateNode(nullptr));}
-        | NEW get_value ID '(' expr_list ')'                         {$$=ExprNode::CreateFromGetValueDecl($2, new string(*$3), $5);}
-        | NEW '(' expr ')'                                           {$$=ExprNode::CreateFromNewDeclNoId($3);}
         ;
 
 expr_may_empty: expr                                                 {$$=$1;}
