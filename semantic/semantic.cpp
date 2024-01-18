@@ -796,6 +796,8 @@ void inspectIfStmt(IfStmtNode *node, vector<string *> &variablesScope, vector<Co
                    vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
+    node->expr = ExprNode::CreateFromBoolCast(node->expr);
+
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
 
     switch (node->type) {
@@ -897,6 +899,9 @@ void inspectForStmt(ForStmtNode *node, vector<string *> &variablesScope, vector<
 
     //Убрал доп массив, потому что не нужен, думал, что как в си, переменные внутри цикла снаружи быть не могут, а они глобальные
 
+
+    node->expr_central = ExprNode::CreateFromBoolCast(node->expr_central);
+
     inspectExpr(node->expr_central, variablesScope, constsScope, functionsScope, isInClass, context);
 
     inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, context);
@@ -962,6 +967,8 @@ void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vec
                       vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
+    node->expr = ExprNode::CreateFromBoolCast(node->expr);
+
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
 
     switch (node->type) {
@@ -979,6 +986,8 @@ void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vec
 void inspectDoWhileStmt(DoWhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                         vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
+
+    node->expr = ExprNode::CreateFromBoolCast(node->expr);
 
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
 
@@ -1023,12 +1032,29 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
 
     switch (node->exprType) {
         case ExprType::class_method_ref_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::classInstRef);
+            if (node->left == nullptr) return;
+            auto parentScope = getClassScopeContainer(node->left->id);
+            if (!isDeclaredFunction(node->id, parentScope->functions)) {
+                throw runtime_error(
+                        "Fatal error: Uncaught Error: Call to undefined method " + *node->left->id + "::" + *node->id +
+                        "() in " + *file_name);
+            }
+            break;
         case ExprType::class_method_by_ref_op:
         case ExprType::class_inst_field_by_expr_ref:
         case ExprType::class_inst_field_ref_op:
         case ExprType::class_inst_field_by_ref_op:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::classInstRef);
+            if (node->left == nullptr) return;
+            auto parentScope = getClassScopeContainer(node->left->id);
+            if (!isDeclaredVariable(node->id, parentScope->variables) &
+                !isDeclaredConst(node->id, parentScope->consts)) {
+                cout << "Warning: Undefined property " << *node->left->id << "::$" << *node->id << " in " << *file_name
+                     << endl;
+            }
             break;
         case ExprType::class_inst_field_ref_dots_op:
         case ExprType::class_inst_field_by_expr_ref_dots_op:
