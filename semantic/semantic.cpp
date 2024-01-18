@@ -936,7 +936,7 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
             break;
         case ForEachStmtType::foreach_r_double_arrow_stmt_type:
         case ForEachStmtType::foreach_r_double_arrow_pointer_stmt_type:
-            foreachVariableScope.push_back(node->id);
+            variablesScope.push_back(node->id);
             inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForEachStmtType::end_foreach_stmt_type:
@@ -946,14 +946,14 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
             }
             break;
         case ForEachStmtType::end_foreach_r_double_arrow_stmt_type:
-            foreachVariableScope.push_back(node->id);
+            variablesScope.push_back(node->id);
             for (auto i: node->stmtList->vector) {
                 inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass,
                             ContextType::inLoop);
             }
             break;
         case ForEachStmtType::end_foreach_r_double_arrow_pointer_stmt_type:
-            foreachVariableScope.push_back(node->id);
+            variablesScope.push_back(node->id);
             for (auto i: node->stmtList->vector) {
                 inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
@@ -1029,13 +1029,14 @@ void inspectGlobalVar(GlobalVarNode *node, vector<string *> &variablesScope, vec
 void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<ConstDeclNode *> &constsScope,
                  vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
+    ClassScopeContainer *parentScope;
 
     switch (node->exprType) {
         case ExprType::class_method_ref_op:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::classInstRef);
             if (node->left == nullptr) return;
-            auto parentScope = getClassScopeContainer(node->left->id);
+            parentScope = getClassScopeContainer(node->left->id);
             if (!isDeclaredFunction(node->id, parentScope->functions)) {
                 throw runtime_error(
                         "Fatal error: Uncaught Error: Call to undefined method " + *node->left->id + "::" + *node->id +
@@ -1049,7 +1050,7 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::classInstRef);
             if (node->left == nullptr) return;
-            auto parentScope = getClassScopeContainer(node->left->id);
+            parentScope = getClassScopeContainer(node->left->id);
             if (!isDeclaredVariable(node->id, parentScope->variables) &
                 !isDeclaredConst(node->id, parentScope->consts)) {
                 cout << "Warning: Undefined property " << *node->left->id << "::$" << *node->id << " in " << *file_name
