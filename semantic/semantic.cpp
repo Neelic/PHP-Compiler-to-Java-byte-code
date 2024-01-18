@@ -1023,12 +1023,29 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
 
     switch (node->exprType) {
         case ExprType::class_method_ref_op:
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope,
+                        isInClass, ContextType::classInstRef);
+            if (node->left == nullptr) return;
+            auto parentScope = getClassScopeContainer(node->left->id);
+            if (!isDeclaredFunction(node->id, parentScope->functions)) {
+                throw runtime_error(
+                        "Fatal error: Uncaught Error: Call to undefined method " + *node->left->id + "::" + *node->id +
+                        "() in " + *file_name);
+            }
+            break;
         case ExprType::class_method_by_ref_op:
         case ExprType::class_inst_field_by_expr_ref:
         case ExprType::class_inst_field_ref_op:
         case ExprType::class_inst_field_by_ref_op:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::classInstRef);
+            if (node->left == nullptr) return;
+            auto parentScope = getClassScopeContainer(node->left->id);
+            if (!isDeclaredVariable(node->id, parentScope->variables) &
+                !isDeclaredConst(node->id, parentScope->consts)) {
+                cout << "Warning: Undefined property " << *node->left->id << "::$" << *node->id << " in " << *file_name
+                     << endl;
+            }
             break;
         case ExprType::class_inst_field_ref_dots_op:
         case ExprType::class_inst_field_by_expr_ref_dots_op:
