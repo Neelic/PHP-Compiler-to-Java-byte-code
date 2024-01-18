@@ -796,6 +796,8 @@ void inspectIfStmt(IfStmtNode *node, vector<string *> &variablesScope, vector<Co
                    vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
+    node->expr = ExprNode::CreateFromBoolCast(node->expr);
+
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
 
     switch (node->type) {
@@ -897,6 +899,9 @@ void inspectForStmt(ForStmtNode *node, vector<string *> &variablesScope, vector<
 
     //Убрал доп массив, потому что не нужен, думал, что как в си, переменные внутри цикла снаружи быть не могут, а они глобальные
 
+
+    node->expr_central = ExprNode::CreateFromBoolCast(node->expr_central);
+
     inspectExpr(node->expr_central, variablesScope, constsScope, functionsScope, isInClass, context);
 
     inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, context);
@@ -962,6 +967,8 @@ void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vec
                       vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
+    node->expr = ExprNode::CreateFromBoolCast(node->expr);
+
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
 
     switch (node->type) {
@@ -979,6 +986,8 @@ void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vec
 void inspectDoWhileStmt(DoWhileStmtNode *node, vector<string *> &variablesScope, vector<ConstDeclNode *> &constsScope,
                         vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
+
+    node->expr = ExprNode::CreateFromBoolCast(node->expr);
 
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
 
