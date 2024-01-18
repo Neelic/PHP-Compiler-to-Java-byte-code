@@ -45,11 +45,7 @@ ExprNode *ExprNode::CreateFromStringValue(std::string *value) {
 }
 
 ExprNode *ExprNode::CreateFromComStringValue(std::string *value) {
-    auto *tmp = new ExprNode();
-    tmp->com_string_val = value;
-    tmp->exprType = ExprType::string_val;
-    tmp->cur_id = ExprNode::GLOBAL_ID++;
-    return tmp;
+    return nullptr;
 }
 
 ExprNode *ExprNode::CreateFromThisKeyword() {

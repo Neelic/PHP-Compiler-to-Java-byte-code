@@ -183,4 +183,5 @@ add_executable(PHP_Compiler
         parser_classes/Vector_classes/ElseIfDotList/ElseIfDotList.cpp
         parser_classes/Vector_classes/ElseIfDotList/ElseIfDotList.h
         semantic/semantic.h
-        semantic/semantic.cpp)
+        semantic/semantic.cpp
+        semantic/classScopeContainer/ClassScopeContainer.cpp)

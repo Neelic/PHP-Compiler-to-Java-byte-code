@@ -279,7 +279,7 @@ void inspectFunction(FunctionStmtDeclNode *node, string *parentId) {
 
     inspectFunctionDef(node->function_def);
 
-    vector < string * > varList;
+    vector<string *> varList;
 
     varList.reserve(node->function_def->expr_func_list->vector.size());
     for (auto &tmp: node->function_def->expr_func_list->vector) {
@@ -1139,7 +1139,7 @@ void inspectExprList(ExprList *node, vector<string *> &variablesScope, const vec
                      vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
-    for (auto tmp : node->vector) {
+    for (auto tmp: node->vector) {
         inspectExpr(tmp, variablesScope, constsScope, functionsScope, isInClass, context);
     }
 }
