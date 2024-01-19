@@ -1083,13 +1083,27 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
                 cout << "Warning: Undefined variable $" << *node->right->id << " in " << *file_name << endl;
                 node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());
                 variables.push_back(node->right->left->id);
-            } else if (node->left->exprType == ExprType::get_array_val) {
-                node->exprType = set_array_val;
+            } else {
                 auto tmp = node->left;
-                node->left = tmp->left;
-                node->central = tmp->right;
+
+                switch (node->left->exprType) {
+
+                    case ExprType::get_array_val:
+                        node->exprType = set_array_val;
+                        node->left = tmp->left;
+                        node->central = tmp->right;
+                        inspectExpr(node->central, variablesScope, constsScope, functionsScope, isInClass, context);
+                        break;
+
+                    case ExprType::class_inst_field_ref_op:
+                    case ExprType::class_field_ref_op:
+                        node->exprType = set_class_field_op;
+                        node->left = tmp->left;
+                        node->id = tmp->id;
+                        break;
+                }
+
                 delete tmp;
-                inspectExpr(node->central, variablesScope, constsScope, functionsScope, isInClass, context);
             }
         case ExprType::plus_op:
         case ExprType::minus_op:
@@ -1103,6 +1117,7 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
         case ExprType::bool_less:
         case ExprType::bool_and:
         case ExprType::bool_equal:
+        case ExprType::bool_or:
         case ExprType::bool_equal_strict:
         case ExprType::bool_equal_more:
         case ExprType::bool_equal_less:
@@ -1129,6 +1144,12 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case ExprType::ref_op:
+            inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+        case ExprType::ternary_op:
+            node->left = ExprNode::CreateFromBoolCast(node->left);
+            inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
+            inspectExpr(node->central, variablesScope, constsScope, functionsScope, isInClass, context);
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
 

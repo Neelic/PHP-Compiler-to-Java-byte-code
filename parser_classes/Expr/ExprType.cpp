@@ -22,6 +22,7 @@ enum ExprType
     class_inst_field_by_expr_ref,
     class_inst_method_by_ref_op_dots,
     class_inst_get_value_method_by_ref_op_dots,
+    set_class_field_op,
     class_field_ref_op,
     class_field_by_ref_op,
     class_method_ref_op,
