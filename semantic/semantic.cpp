@@ -759,6 +759,23 @@ void inspectInterfaceStmt(InterfaceStmtNode *node, string *parentId) {
 
     if (node->access_mod != nullptr) {
         inspectClassAccessModList(node->access_mod);
+
+        for (auto &i: node->access_mod->vector) {
+            switch (i->access_mod) {
+                case abstract_node:
+                    throw runtime_error(
+                            string("Fatal error: Interface method " + *parentId + "::" + *node->function_def->func_id +
+                                   "() must not be abstract in " + *file_name));
+                case final_node:
+                    throw runtime_error(
+                            string("Fatal error: Interface method " + *parentId + "::" + *node->function_def->func_id +
+                                   "() must not be final in " + *file_name));
+                case read_only_node:
+                    throw runtime_error(
+                            string("Fatal error: Cannot use 'readonly' as method modifier in " + *file_name));
+            }
+        }
+
         for (auto i: node->access_mod->vector) {
             if (i->access_mod == ClassAccessMod::abstract_node)
                 throw runtime_error(
