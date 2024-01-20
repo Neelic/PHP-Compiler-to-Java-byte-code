@@ -247,6 +247,7 @@ void inspectGlobalScope(StartNode *node) {
                 inspectInterface(tmp->interface_stmt_decl);
                 break;
             case TopStmtType::trait_top_type:
+                inspectTrait(tmp->trait_stmt_decl);
                 break;
         }
     }
