@@ -286,7 +286,6 @@ case_default_stmt_list: case_default_stmt                                       
 
 case_default_stmt: CASE expr ':' stmt_list_may_empty                                  {$$=CaseDefaultStmtNode::CreateFromCaseStmt($2, $4);}
                 |  DEFAULT ':' stmt_list_may_empty                                    {$$=CaseDefaultStmtNode::CreateFromDefaultStmt($3);}
-                |  FINALLY '{' stmt_list_may_empty '}'                                {$$=CaseDefaultStmtNode::CreateFromFinallyStmt($3);}
                 ;
 
 for_stmt: FOR '(' expr_may_empty ';' expr_may_empty ';' expr_may_empty ')' stmt                                 {$$=ForStmtNode::CreateFromForStmt($3, $5, $7, $9);}
