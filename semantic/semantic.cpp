@@ -127,14 +127,14 @@ bool isDeclaredClass(string *id, const vector<ClassStmtDeclNode *> &list) {
                   });
 }
 
-bool getClass(string *id) {
-    if (id == nullptr) return false;
-
-    for (auto &i: classes) {
-        if (i->class_def->class_id == id)
-            return i;
-    }
-}
+//bool getClass(string *id) {
+//    if (id == nullptr) return false;
+//
+//    for (auto &i: classes) {
+//        if (i->class_def->class_id == id)
+//            return i;
+//    }
+//}
 
 bool isDeclaredInterface(string *id, const vector<InterfaceStmtDeclNode *> &list) {
     if (id == nullptr) return false;
@@ -223,10 +223,13 @@ bool isPredeclaredVariable(string *id) {
 ClassScopeContainer *getClassScopeContainer(string *parentId) {
     if (parentId == nullptr) return nullptr;
 
+    ClassScopeContainer *res;
+
     for (auto &i: classProperties) {
         if (i->id == parentId)
-            return i;
+            res = i;
     }
+    return res;
 }
 
 void inspectGlobalScope(StartNode *node) {
