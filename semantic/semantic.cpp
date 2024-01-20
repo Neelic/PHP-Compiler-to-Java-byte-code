@@ -34,7 +34,7 @@ void inspectClass(ClassStmtDeclNode *node);
 
 void inspectClassDef(ClassDefNode *node);
 
-void inspectClassStmt(ClassStmtNode *node, string *parentId);
+void inspectClassStmt(ClassStmtNode *node, string *parentId, bool isAbstractClass = false);
 
 void inspectClassExpr(ClassExprNode *node, string *parentId);
 
@@ -310,9 +310,20 @@ void inspectFunctionDef(FunctionDefNode *node) {
             break;
     }
 
+    ExprFuncNode *prevNode = nullptr;
+
     for (auto &i: node->expr_func_list->vector) {
+        if (prevNode != nullptr && prevNode->type == get_value_assign_expr_type && i->type == get_value_expr_type) {
+            cout << "Deprecated: Optional parameter $" << prevNode->get_value_func->id_value
+                 << "declared before required parameter $" << i->get_value_func->id_value
+                 << "is implicitly treated as a required parameter in " << *file_name << endl;
+            prevNode->type = get_value_expr_type; // Судя по предупреждению, пхп просто преобразует объявленный параметр к обязательному, то бишь без значения по умолчанию
+        }
         inspectExprFunc(i);
+        prevNode = i;
     }
+
+    delete prevNode;
 }
 
 // Проверка параметров функции
@@ -381,10 +392,11 @@ void inspectClass(ClassStmtDeclNode *node) {
         throw runtime_error(string("Fatal error: Cannot declare class " + *node->class_def->class_id +
                                    ", because the name is already in use in " + *file_name));
 
+
     inspectClassDef(node->class_def);
 
     for (auto &i: node->class_stmt_list->vector) {
-        inspectClassStmt(i, node->class_def->class_id);
+        inspectClassStmt(i, node->class_def->class_id, node->type == abstract_type);
     }
 
     currentObjectName = "";
@@ -478,7 +490,7 @@ void inspectClassDef(ClassDefNode *node) {
 }
 
 
-void inspectClassStmt(ClassStmtNode *node, string *parentId) {
+void inspectClassStmt(ClassStmtNode *node, string *parentId, bool isAbstractClass) {
     if (node == nullptr) return;
 
     auto parentProperties = getClassScopeContainer(parentId);
@@ -490,6 +502,17 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId) {
             break;
         case ClassStmtType::function_decl_type:
             inspectClassAccessModList(node->access_mod);
+            for (auto &i: node->access_mod->vector) {
+                switch (i->access_mod) {
+                    case abstract_node:
+                        throw runtime_error(string("Fatal error: Abstract function " + *parentId + "::" +
+                                                   *node->function_def->func_id +
+                                                   "() cannot contain body in " + *file_name));
+                    case read_only_node:
+                        throw runtime_error(
+                                string("Fatal error: Cannot use 'readonly' as method modifier in " + *file_name));
+                }
+            }
             inspectFunction(node->function_stmt_decl, parentId);
             if (parentProperties != nullptr) parentProperties->functions.push_back(node->function_stmt_decl);
             break;
@@ -497,15 +520,25 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId) {
 
             inspectClassAccessModList(node->access_mod);
 
-            //Проверяю, есть ли в модификатор abstract, т.к. заголовок функции без тела может быть только абстрактным
-            isAbstract = any_of(node->access_mod->vector.cbegin(), node->access_mod->vector.cend(),
-                                [](auto &var) {
-                                    return var->access_mod == ClassAccessMod::abstract_node;
-                                });
+            for (auto &i: node->access_mod->vector) {
+                switch (i->access_mod) {
+                    case abstract_node:
+                        isAbstract = true; //Проверяю, есть ли в модификатор abstract, т.к. заголовок функции без тела может быть только абстрактным
+                        break;
+                    case read_only_node:
+                        throw runtime_error(
+                                string("Fatal error: Cannot use 'readonly' as method modifier in " + *file_name));
+                }
+            }
+
             if (!isAbstract) {
                 throw runtime_error(
                         string("Fatal error: Non-abstract method " + *parentId + "::" + *node->function_def->func_id +
                                "() must contain body in" + *file_name));
+            } else if (!isAbstractClass) {
+                throw runtime_error(string("Fatal error: Class " + *parentId +
+                                           " contains abstract methods and must therefore be declared abstract or implement the remaining methods in" +
+                                           *file_name));
             }
 
             // Проверка на переопределение
@@ -545,10 +578,52 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
     switch (node->type) {
         case ClassExprType::get_value_class_type:
             inspectClassAccessModList(node->access_mod_list);
+
+            for (auto &i: node->access_mod_list->vector) {
+                switch (i->access_mod) {
+                    case abstract_node:
+                        throw runtime_error(
+                                string("Fatal error: Properties cannot be declared abstract in " + *file_name));
+                    case final_node:
+                        throw runtime_error(string("Cannot declare property " + *parentId + "::$ " + *node->id +
+                                                   " final, the final modifier is allowed only for methods, classes, and class constants in " +
+                                                   *file_name));
+                    case read_only_node:
+                        if (node->id_type == nullptr) {
+                            throw runtime_error(
+                                    string("Fatal error: Readonly property " + *parentId + "::$ " + *node->id +
+                                           " must have type in " + *file_name));
+                        }
+                        break;
+                }
+            }
             //Проверка на переопределение будет на рантайме
             break;
         case ClassExprType::get_value_assign_class_type:
             inspectClassAccessModList(node->access_mod_list);
+
+            for (auto &i: node->access_mod_list->vector) {
+                switch (i->access_mod) {
+                    case abstract_node:
+                        throw runtime_error(
+                                string("Fatal error: Properties cannot be declared abstract in " + *file_name));
+                    case final_node:
+                        throw runtime_error(string("Cannot declare property " + *parentId + "::$ " + *node->id +
+                                                   " final, the final modifier is allowed only for methods, classes, and class constants in " +
+                                                   *file_name));
+                    case read_only_node:
+                        if (node->id_type == nullptr) {
+                            throw runtime_error(
+                                    string("Fatal error: Readonly property " + *parentId + "::$ " + *node->id +
+                                           " must have type in " + *file_name));
+                        } else {
+                            throw runtime_error(
+                                    string("Fatal error: Readonly property " + *parentId + "::$ " + *node->id +
+                                           " cannot have default value in " + *file_name));
+                        }
+                }
+            }
+
             if (parentProperties != nullptr) {
                 //Проверка на переопределение будет на рантайме
                 inspectExpr(node->expr, parentProperties->variables, parentProperties->consts,
@@ -557,7 +632,21 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
             }
             break;
         case ClassExprType::const_class_type:
-            //TODO: добавить проверку объявления констант
+            inspectClassAccessModList(node->access_mod_list);
+
+            for (auto &i: node->access_mod_list->vector) {
+                switch (i->access_mod) {
+                    case abstract_node:
+                        throw runtime_error(
+                                string("Fatal error: Cannot use 'abstract' as constant modifier in " + *file_name));
+                    case static_node:
+                        throw runtime_error(
+                                string("Fatal error: Cannot use 'static' as constant modifier in " + *file_name));
+                    case read_only_node:
+                        throw runtime_error(
+                                string("Fatal error: Cannot use 'readonly' as constant modifier in " + *file_name));
+                }
+            }
             break;
     }
 }
