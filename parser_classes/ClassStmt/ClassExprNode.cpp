@@ -7,24 +7,30 @@ std::string *ClassExprNode::idTag() const {
     return tmp;
 }
 
-ClassExprNode* ClassExprNode::CreateFromGetValueAssign(ClassAccessModList* access_mod_list, GetValueNode* get_value, std::string* id, ExprNode* expr)
+ClassExprNode *
+ClassExprNode::CreateFromGetValueAssign(ClassAccessModList *access_mod_list, GetValueNode *get_value, std::string *id,
+                                        ExprNode *expr, std::string *id_type)
 {
     ClassExprNode* tmp = new ClassExprNode();
     tmp->access_mod_list = access_mod_list;
     tmp->get_value = get_value;
     tmp->id = id;
     tmp->expr = expr;
+    tmp->id_type = id_type;
     tmp->type = ClassExprType::get_value_assign_class_type;
     tmp->cur_id = ClassExprNode::GLOBAL_ID++;
     return tmp;
 }
 
-ClassExprNode* ClassExprNode::CreateFromGetValue(ClassAccessModList* access_mod_list, GetValueNode* get_value, std::string* id)
+ClassExprNode *
+ClassExprNode::CreateFromGetValue(ClassAccessModList *access_mod_list, GetValueNode *get_value, std::string *id,
+                                  std::string *id_type)
 {
     ClassExprNode* tmp = new ClassExprNode();
     tmp->access_mod_list = access_mod_list;
     tmp->get_value = get_value;
     tmp->id = id;
+    tmp->id_type = id_type;
     tmp->type = ClassExprType::get_value_class_type;
     tmp->cur_id = ClassExprNode::GLOBAL_ID++;
     return tmp;

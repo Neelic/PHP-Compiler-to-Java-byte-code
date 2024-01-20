@@ -475,6 +475,10 @@ class_expr: class_access_mod_list get_value ID '=' expr              {$$=ClassEx
         |   get_value ID '=' expr                                    {$$=ClassExprNode::CreateFromGetValueAssign(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1, new string(*$2), $4);}
         |   get_value ID                                             {$$=ClassExprNode::CreateFromGetValue(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1, new string(*$2));}
         |   CONST const_decl_list_not_e                              {$$=ClassExprNode::CreateFromConstant(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $2);}
+        |   class_access_mod_list ID get_value ID '=' expr           {$$=ClassExprNode::CreateFromGetValueAssign($1, $3, new string(*$4), $6, new string(*$2));}
+        |   class_access_mod_list ID get_value ID                    {$$=ClassExprNode::CreateFromGetValue($1, $3, new string(*$4), new string(*$2));}
+        |   ID get_value ID '=' expr                                 {$$=ClassExprNode::CreateFromGetValueAssign(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $2, new string(*$3), $5, new string(*$1));}
+        |   ID get_value ID                                          {$$=ClassExprNode::CreateFromGetValue(ClassAccessModList::CreateNode(ClassAccessModNode::CreateNode(ClassAccessMod::public_node)), $1, new string(*$2), new string(*$1));}
         ;
 
 interface_expr_def: INTERFACE ID                                     {$$=InterfaceExprDefNode::CreateFromNoExtendedDefinition(new string(*$2));}
