@@ -648,6 +648,10 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
                                 string("Fatal error: Cannot use 'readonly' as constant modifier in " + *file_name));
                 }
             }
+
+            for (auto &i: node->const_decl_list->vector) {
+                inspectConstDecl(i, parentId);
+            }
             break;
     }
 }
