@@ -680,12 +680,12 @@ void inspectConstDecl(ConstDeclNode *node, string *parent_id) {
     if (parent_id != nullptr) {
         auto parentProperties = getClassScopeContainer(parent_id);
 
-        if (isDeclaredConst(node->id, parentProperties->consts))
+        if (isDeclaredConst(node->id, parentProperties->consts) || isPredeclaredConst(node->id))
             cout << "Warning: Constant " << *node->id << " already defined in " << *file_name << endl;
         else parentProperties->consts.push_back(node);
 
     } else {
-        if (isDeclaredConst(node->id, consts))
+        if (isDeclaredConst(node->id, consts) || isPredeclaredConst(node->id))
             cout << "Warning: Constant " << *node->id << " already defined in " << *file_name << endl;
         else consts.push_back(node);
     }
