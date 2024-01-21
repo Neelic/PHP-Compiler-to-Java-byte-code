@@ -4,8 +4,8 @@
 
 #include "ClassCodeGenerator.h"
 
-void ClassCodeGenerator::addConst(string *constName) {
-    consts.push_back(constName);
+void ClassCodeGenerator::addConst(ConstantValue &constName) {
+    consts.push_back(&constName);
 }
 
 void ClassCodeGenerator::generateFieldDef(string &nameField, string &descriptor) {

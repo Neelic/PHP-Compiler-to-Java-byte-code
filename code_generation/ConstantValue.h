@@ -6,16 +6,26 @@
 #define PHP_COMPILER_CONSTANTVALUE_H
 
 #include <vector>
-#include "ValueAndBytes.h"
+#include <algorithm>
+#include "code_generation/bytes/ValueAndBytes.h"
 
-struct Flags {
-    bool public_f = false;
-    bool abstract_f = false;
-    bool super_f = false;
-    bool static_f = false;
-    bool private_f = false;
-    bool protected_f = false;
-    bool final_f = false;
+enum CodeFlags {
+    ACC_PUBLIC = 0x0001,
+    ACC_PRIVATE = 0x0002,
+    ACC_PROTECTED = 0x0004,
+    ACC_STATIC = 0x0008,
+    ACC_FINAL = 0x0010,
+    ACC_ABSTRACT = 0x0400
+};
+
+class Flags {
+    unsigned int codeOfFlag;
+public:
+    explicit Flags(unsigned int codeOfFlag) : codeOfFlag(codeOfFlag) {}
+
+    ValueAndBytes flagToBytes() const {
+        return {codeOfFlag, 2};
+    }
 };
 
 enum ConstantType {
@@ -34,7 +44,7 @@ private:
     ConstantType typeConst;
     ValueAndBytes *value;
     Flags flags;
-    vector<ConstantValue *> refs;
+    vector<ConstantValue *> descriptors;
 public:
     ConstantType getTypeConst() const {
         return typeConst;
@@ -48,16 +58,33 @@ public:
         return flags;
     }
 
-    const vector<ConstantValue *> &getRefs() const {
-        return refs;
+    const vector<ConstantValue *> &getDescriptors() const {
+        return descriptors;
     }
 
-    ConstantValue(ConstantType type, ValueAndBytes *value, Flags flags = Flags(),
-                  const vector<ConstantValue *> &refs = vector<ConstantValue *>()) {
-        this->value = value;
-        this->typeConst = type;
-        this->flags = flags;
-        this->refs = refs;
+    static bool isContainsConst(vector<ConstantValue *> &consts, ConstantValue &val) {
+        return any_of(consts.cbegin(), consts.cend(),
+                      [&val](auto var) { return *var == val; });
+    }
+
+    static int getIdConst(vector<ConstantValue *> &consts, ConstantValue &searchValue) {
+        for (int i = 0; i < consts.size(); i++) {
+            if (searchValue == *consts[i]) return i + 1;
+        }
+
+        return -1;
+    }
+
+    ConstantValue(ConstantType type, ValueAndBytes *value, const Flags &flags = Flags(ACC_PUBLIC + ACC_FINAL),
+                  const vector<ConstantValue *> &descriptors = vector<ConstantValue *>()) : typeConst(type),
+                                                                                            value(value),
+                                                                                            flags(flags),
+                                                                                            descriptors(descriptors) {
+    }
+
+    bool operator==(ConstantValue other) {
+        return typeConst == other.typeConst && (string(value->getValue()) == string(other.value->getValue()) &&
+                                                value->getBytes() == other.value->getBytes());
     }
 };
 

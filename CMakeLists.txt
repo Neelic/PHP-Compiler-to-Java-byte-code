@@ -187,6 +187,12 @@ add_executable(PHP_Compiler
         semantic/classScopeContainer/ClassScopeContainer.cpp
         code_generation/ClassCodeGenerator.cpp
         code_generation/ClassCodeGenerator.h
-        code_generation/ValueAndBytes.h
-        code_generation/WriteBytesToFile.h
-        code_generation/ConstantValue.h)
+        code_generation/bytes/ValueAndBytes.h
+        code_generation/bytes/WriteBytesToFile.h
+        code_generation/ConstantValue.h
+        code_generation/MethodCodeGenerator.cpp
+        code_generation/MethodCodeGenerator.h
+        code_generation/bytes/ClassBytes.h
+        code_generation/bytes/MethodBytes.h
+        code_generation/bytes/FieldBytes.h
+)
