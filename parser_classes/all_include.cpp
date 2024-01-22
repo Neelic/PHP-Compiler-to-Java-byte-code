@@ -1108,7 +1108,6 @@ void printStringValueNode(string *value, string *parentId, string *arrowLabel) {
     cout << GRAPH_STR.size() << " from string value" << "\n";
     GRAPH_STR += tag + " [label=\"" + *value + "\"];\n";
     GRAPH_STR += tag + " -> " + *parentId + " [label=\"" + *arrowLabel + "\"];\n";
-    delete value;
     delete parentId;
     delete arrowLabel;
 }

@@ -368,11 +368,6 @@ int lexer_main(FILE* file) {
 
   fclose(file);
 
-  GRAPH_STR += "}";
-  file = fopen("graph.dot", "w");
-  fputs(GRAPH_STR.c_str(), file);
-  fclose(file);
-
   return 0;
 }
 

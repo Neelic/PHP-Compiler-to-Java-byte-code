@@ -27,6 +27,11 @@ int main(int argc, char *argv[]) {
 
     printTreeGraph(startNode);
 
+    GRAPH_STR += "}";
+    file = fopen("graph.dot", "w");
+    fputs(GRAPH_STR.c_str(), file);
+    fclose(file);
+
     try {
         inspectGlobalScope(startNode);
     } catch (const runtime_error &error) {

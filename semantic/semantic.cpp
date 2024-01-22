@@ -285,10 +285,17 @@ void inspectFunction(FunctionStmtDeclNode *node, string *parentId) {
 
     vector<string *> varList;
 
-    varList.reserve(node->function_def->expr_func_list->vector.size());
-    for (auto &tmp: node->function_def->expr_func_list->vector) {
-        varList.push_back(tmp->get_value_func->id_value);
+    if (node->function_def->expr_func_list != nullptr) {
+
+        varList.reserve(node->function_def->expr_func_list->vector.size());
+        for (auto &tmp: node->function_def->expr_func_list->vector) {
+            varList.push_back(tmp->get_value_func->id_value);
+        }
+
     }
+
+
+    if (node->stmt_list == nullptr) return;
 
     for (auto &i: node->stmt_list->vector) {
         auto tmp1 = varList;
@@ -314,13 +321,15 @@ void inspectFunctionDef(FunctionDefNode *node) {
             break;
     }
 
+    if (node->expr_func_list == nullptr) return;
+
     ExprFuncNode *prevNode = nullptr;
 
     for (auto &i: node->expr_func_list->vector) {
         if (prevNode != nullptr && prevNode->type == get_value_assign_expr_type && i->type == get_value_expr_type) {
-            cout << "Deprecated: Optional parameter $" << prevNode->get_value_func->id_value
-                 << "declared before required parameter $" << i->get_value_func->id_value
-                 << "is implicitly treated as a required parameter in " << *file_name << endl;
+            cout << "Deprecated: Optional parameter $" << *prevNode->get_value_func->id_value
+                 << " declared before required parameter $" << *i->get_value_func->id_value
+                 << " is implicitly treated as a required parameter in " << *file_name << endl;
             prevNode->type = get_value_expr_type; // Судя по предупреждению, пхп просто преобразует объявленный параметр к обязательному, то бишь без значения по умолчанию
         }
         inspectExprFunc(i);
@@ -398,6 +407,13 @@ void inspectClass(ClassStmtDeclNode *node) {
 
 
     inspectClassDef(node->class_def);
+
+    classes.push_back(node);
+
+    if (node->class_stmt_list == nullptr) {
+        currentObjectName = "";
+        return;
+    }
 
     for (auto &i: node->class_stmt_list->vector) {
         inspectClassStmt(i, node->class_def->class_id, node->type == abstract_type);
@@ -506,16 +522,20 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId, bool isAbstractClas
             break;
         case ClassStmtType::function_decl_type:
             inspectClassAccessModList(node->access_mod);
-            for (auto &i: node->access_mod->vector) {
-                switch (i->access_mod) {
-                    case abstract_node:
-                        throw runtime_error(string("Fatal error: Abstract function " + *parentId + "::" +
-                                                   *node->function_def->func_id +
-                                                   "() cannot contain body in " + *file_name));
-                    case read_only_node:
-                        throw runtime_error(
-                                string("Fatal error: Cannot use 'readonly' as method modifier in " + *file_name));
+            if (node->access_mod != nullptr) {
+
+                for (auto &i: node->access_mod->vector) {
+                    switch (i->access_mod) {
+                        case abstract_node:
+                            throw runtime_error(string("Fatal error: Abstract function " + *parentId + "::" +
+                                                       *node->function_def->func_id +
+                                                       "() cannot contain body in " + *file_name));
+                        case read_only_node:
+                            throw runtime_error(
+                                    string("Fatal error: Cannot use 'readonly' as method modifier in " + *file_name));
+                    }
                 }
+
             }
             inspectFunction(node->function_stmt_decl, parentId);
             if (parentProperties != nullptr) parentProperties->functions.push_back(node->function_stmt_decl);
@@ -524,15 +544,19 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId, bool isAbstractClas
 
             inspectClassAccessModList(node->access_mod);
 
-            for (auto &i: node->access_mod->vector) {
-                switch (i->access_mod) {
-                    case abstract_node:
-                        isAbstract = true; //Проверяю, есть ли в модификатор abstract, т.к. заголовок функции без тела может быть только абстрактным
-                        break;
-                    case read_only_node:
-                        throw runtime_error(
-                                string("Fatal error: Cannot use 'readonly' as method modifier in " + *file_name));
+            if (node->access_mod != nullptr) {
+
+                for (auto &i: node->access_mod->vector) {
+                    switch (i->access_mod) {
+                        case abstract_node:
+                            isAbstract = true; //Проверяю, есть ли в модификатор abstract, т.к. заголовок функции без тела может быть только абстрактным
+                            break;
+                        case read_only_node:
+                            throw runtime_error(
+                                    string("Fatal error: Cannot use 'readonly' as method modifier in " + *file_name));
+                    }
                 }
+
             }
 
             if (!isAbstract) {
@@ -583,6 +607,10 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
         case ClassExprType::get_value_class_type:
             inspectClassAccessModList(node->access_mod_list);
 
+            //Проверка на переопределение будет на рантайме
+
+            if (node->access_mod_list == nullptr) break;
+
             for (auto &i: node->access_mod_list->vector) {
                 switch (i->access_mod) {
                     case abstract_node:
@@ -601,9 +629,18 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
                         break;
                 }
             }
-            //Проверка на переопределение будет на рантайме
             break;
         case ClassExprType::get_value_assign_class_type:
+
+            if (parentProperties != nullptr) {
+                //Проверка на переопределение будет на рантайме
+                inspectExpr(node->expr, parentProperties->variables, parentProperties->consts,
+                            parentProperties->functions,
+                            true);
+            }
+
+            if (node->access_mod_list == nullptr) break;
+
             inspectClassAccessModList(node->access_mod_list);
 
             for (auto &i: node->access_mod_list->vector) {
@@ -627,16 +664,13 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
                         }
                 }
             }
-
-            if (parentProperties != nullptr) {
-                //Проверка на переопределение будет на рантайме
-                inspectExpr(node->expr, parentProperties->variables, parentProperties->consts,
-                            parentProperties->functions,
-                            true);
-            }
             break;
         case ClassExprType::const_class_type:
             inspectClassAccessModList(node->access_mod_list);
+
+            for (auto &i: node->const_decl_list->vector) {
+                inspectConstDecl(i, parentId);
+            }
 
             for (auto &i: node->access_mod_list->vector) {
                 switch (i->access_mod) {
@@ -651,10 +685,6 @@ void inspectClassExpr(ClassExprNode *node, string *parentId) {
                                 string("Fatal error: Cannot use 'readonly' as constant modifier in " + *file_name));
                 }
             }
-
-            for (auto &i: node->const_decl_list->vector) {
-                inspectConstDecl(i, parentId);
-            }
             break;
     }
 }
@@ -663,13 +693,15 @@ void inspectClassAccessModList(ClassAccessModList *list) {
     if (list == nullptr) return;
 
     // Здесь пытаюсь проверить спискок модов на дубликаты
-    auto noRepeatList = list->vector;
 
-    sort(noRepeatList.begin(), noRepeatList.end());
-    auto i = unique(noRepeatList.begin(), noRepeatList.end());
+    ClassAccessModNode *prevNode = nullptr;
 
-    if (i != list->vector.end()) {
-        throw runtime_error(string("Fatal error: Multiple access type modifiers are not allowed in " + *file_name));
+    for (auto &i: list->vector) {
+        if (prevNode != nullptr && i->access_mod == prevNode->access_mod) {
+            throw runtime_error(string("Fatal error: Multiple access type modifiers are not allowed in " + *file_name));
+        } else {
+            prevNode = i;
+        }
     }
 }
 
@@ -718,9 +750,11 @@ void inspectInterface(InterfaceStmtDeclNode *node) {
         isDeclaredTrait(node->expr_definition->id)) {
         throw runtime_error(string("Fatal error: Cannot declare interface " + *node->expr_definition->id +
                                    ", because the name is already in use in " + *file_name));
-    }
+    } else interfaces.push_back(node);
 
     inspectInterfaceDef(node->expr_definition);
+
+    if (node->stmt_list == nullptr) return;
 
     for (auto i: node->stmt_list->vector) {
         inspectInterfaceStmt(i, node->expr_definition->id);
@@ -824,7 +858,9 @@ void inspectTrait(TraitStmtDeclNode *node) {
         throw runtime_error(
                 string("Fatal error: Cannot declare trait " + *node->id + ", because the name is already in use in " +
                        *file_name));
-    }
+    } else traits.push_back(node);
+
+    if (node->stmt_list == nullptr) return;
 
     for (auto i: node->stmt_list->vector) {
         inspectClassStmt(i, node->id);
@@ -859,6 +895,7 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
                         string("Fatal error: 'break' not in the 'loop' or 'switch' context in " + *file_name));
             break;
         case StmtType::const_decl:
+            if (node->const_decl == nullptr) break;
             for (auto i: node->const_decl->vector) {
                 inspectConstDecl(i);
             }
@@ -869,6 +906,7 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
                         string("Fatal error: 'continue' not in the 'loop' or 'switch' context in " + *file_name));
             break;
         case StmtType::global_var:
+            if (node->global_var == nullptr) break;
             for (auto i: node->global_var->vector) {
                 inspectGlobalVar(i, variablesScope, constsScope, functionsScope, isInClass, context);
             }
@@ -885,11 +923,13 @@ void inspectStmt(StmtNode *node, vector<string *> &variablesScope, vector<ConstD
             inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case StmtType::static_var:
+            if (node->static_var == nullptr) break;
             for (auto i: node->static_var->vector) {
                 inspectStaticVar(i, variablesScope, constsScope, functionsScope, isInClass, context);
             }
             break;
         case StmtType::stmt_list:
+            if (node->stmtList == nullptr) break;
             for (auto i: node->stmtList->vector) {
                 inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, context);
             }
@@ -926,26 +966,35 @@ void inspectIfStmt(IfStmtNode *node, vector<string *> &variablesScope, vector<Co
                         isInClass, ContextType::inIf);
             break;
         case IfStmtType::end_if:
+            if (node->stmtListMain == nullptr) break;
             for (auto i: node->stmtListMain->vector) {
                 inspectStmt(i, variablesScope, constsScope, functionsScope,
                             isInClass, ContextType::inIf);
             }
             break;
         case IfStmtType::if_else_endif:
-            for (auto i: node->stmtListMain->vector) {
-                inspectStmt(i, variablesScope, constsScope, functionsScope,
-                            isInClass, ContextType::inIf);
+            if (node->stmtListMain != nullptr) {
+                for (auto i: node->stmtListMain->vector) {
+                    inspectStmt(i, variablesScope, constsScope, functionsScope,
+                                isInClass, ContextType::inIf);
+                }
             }
-            for (auto i: node->stmtListElse->vector) {
-                inspectStmt(i, variablesScope, constsScope, functionsScope,
-                            isInClass, ContextType::inIf);
+
+            if (node->stmtListElse != nullptr) {
+                for (auto i: node->stmtListElse->vector) {
+                    inspectStmt(i, variablesScope, constsScope, functionsScope,
+                                isInClass, ContextType::inIf);
+                }
             }
             break;
         case IfStmtType::if_else_list_endif:
-            for (auto i: node->stmtListMain->vector) {
-                inspectStmt(i, variablesScope, constsScope, functionsScope,
-                            isInClass, ContextType::inIf);
+            if (node->stmtListMain != nullptr) {
+                for (auto i: node->stmtListMain->vector) {
+                    inspectStmt(i, variablesScope, constsScope, functionsScope,
+                                isInClass, ContextType::inIf);
+                }
             }
+
             if (node->listElse != nullptr)
                 for (auto i: node->listElse->vector) {
                     inspectIfStmt(i, variablesScope, constsScope, functionsScope,
@@ -967,12 +1016,14 @@ void inspectSwitchStmt(SwitchStmtNode *node, vector<string *> &variablesScope, v
         case SwitchStmtType::just_switch:
             break;
         case SwitchStmtType::switch_default:
+            if (node->defaultStmtList == nullptr) break;
             for (auto i: node->defaultStmtList->vector) {
                 inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass,
                                        ContextType::inSwitch);
             }
             break;
         case SwitchStmtType::switch_default_endswitch:
+            if (node->defaultStmtList == nullptr) break;
             for (auto i: node->defaultStmtList->vector) {
                 inspectCaseDefaultStmt(i, variablesScope, constsScope, functionsScope, isInClass,
                                        ContextType::inSwitch);
@@ -987,8 +1038,10 @@ void inspectCaseDefaultStmt(CaseDefaultStmtNode *node, vector<string *> &variabl
                             bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
-    for (auto i: node->stmtList->vector) {
-        inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inSwitch);
+    if (node->stmtList != nullptr) {
+        for (auto i: node->stmtList->vector) {
+            inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inSwitch);
+        }
     }
 
     switch (node->type) {
@@ -996,7 +1049,6 @@ void inspectCaseDefaultStmt(CaseDefaultStmtNode *node, vector<string *> &variabl
             inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case CaseDefaultType::default_stmt:
-            break;
         case CaseDefaultType::finally_stmt:
             break;
     }
@@ -1025,6 +1077,7 @@ void inspectForStmt(ForStmtNode *node, vector<string *> &variablesScope, vector<
             inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForStmtType::for_end_stmt_type:
+            if (node->stmtList == nullptr) break;
             for (auto i: node->stmtList->vector) {
                 inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
@@ -1054,6 +1107,7 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
             inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case ForEachStmtType::end_foreach_stmt_type:
+            if (node->stmtList == nullptr) break;
             for (auto i: node->stmtList->vector) {
                 inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass,
                             ContextType::inLoop);
@@ -1061,6 +1115,8 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
             break;
         case ForEachStmtType::end_foreach_r_double_arrow_stmt_type:
             variablesScope.push_back(node->id);
+
+            if (node->stmtList == nullptr) break;
             for (auto i: node->stmtList->vector) {
                 inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass,
                             ContextType::inLoop);
@@ -1068,6 +1124,8 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
             break;
         case ForEachStmtType::end_foreach_r_double_arrow_pointer_stmt_type:
             variablesScope.push_back(node->id);
+
+            if (node->stmtList == nullptr) break;
             for (auto i: node->stmtList->vector) {
                 inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
@@ -1090,6 +1148,8 @@ void inspectWhileStmt(WhileStmtNode *node, vector<string *> &variablesScope, vec
             inspectStmt(node->stmt, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             break;
         case WhileStmtType::end_while_stmt_type:
+
+            if (node->stmtList == nullptr) break;
             for (auto i: node->stmtList->vector) {
                 inspectStmt(i, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
             }
@@ -1174,6 +1234,7 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
         case ExprType::class_inst_field_ref_dots_op:
         case ExprType::class_inst_field_by_expr_ref_dots_op:
         case ExprType::class_inst_get_value_method_by_ref_op_dots:
+        case ExprType::class_inst_field_by_ref_dots_op:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::staticRef);
             break;
@@ -1239,7 +1300,6 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
         case ExprType::logic_or:
         case ExprType::logic_xor:
         case ExprType::call_func:
-        case ExprType::new_decl:
         case ExprType::new_decl_no_id:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
@@ -1265,6 +1325,20 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
             inspectExpr(node->central, variablesScope, constsScope, functionsScope, isInClass, context);
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
+            break;
+        case ExprType::id_type:
+            if (!isDeclaredClass(node->id, classes) && !isDeclaredConst(node->id, consts) &&
+                !isDeclaredConst(node->id, constsScope)) {
+                throw runtime_error(string("Fatal error: Uncaught Error: Undefined constant \"" + *node->id + "\" in " +
+                                           *file_name));
+            }
+            break;
+        case ExprType::new_decl:
+            if (node->exprType == new_decl && !isDeclaredClass(node->id, classes) &&
+                !isDeclaredConst(node->id, consts) && !isDeclaredConst(node->id, constsScope)) {
+                throw runtime_error(
+                        string("Fatal error: Uncaught Error: Class \"" + *node->id + "\" not found in " + *file_name));
+            }
             break;
 
     }
