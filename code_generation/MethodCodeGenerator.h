@@ -11,12 +11,12 @@
 class MethodCodeGenerator {
 private:
     string methodName;
-    Flags flags;
+    Flags flags = Flags(ACC_PUBLIC + ACC_FINAL);
     vector<ConstantValue *> consts;
-    bool isAbstract;
+    bool isAbstract = false;
 
 public:
-    MethodCodeGenerator(vector<ConstantValue *> &consts) {
+    explicit MethodCodeGenerator(vector<ConstantValue *> &consts) {
         this->consts = consts;
     }
 };
