@@ -7,6 +7,7 @@
 
 #include "string"
 #include "ConstantValue.h"
+#include "code_generation/bytes/Flags.h"
 
 class MethodCodeGenerator {
 private:

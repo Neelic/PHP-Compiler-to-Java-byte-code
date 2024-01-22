@@ -25,7 +25,9 @@ public:
 
     void addField(FieldBytes *field) {}
 
-    ValueAndBytes classToBytes() {}
+    ValueAndBytes classToBytes() {
+        return ValueAndBytes(1);
+    }
 };
 
 ValueAndBytes ClassBytes::magicConst = ValueAndBytes(0xCAFEBABE, 4);

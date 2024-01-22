@@ -9,25 +9,6 @@
 #include <algorithm>
 #include "code_generation/bytes/ValueAndBytes.h"
 
-enum CodeFlags {
-    ACC_PUBLIC = 0x0001,
-    ACC_PRIVATE = 0x0002,
-    ACC_PROTECTED = 0x0004,
-    ACC_STATIC = 0x0008,
-    ACC_FINAL = 0x0010,
-    ACC_ABSTRACT = 0x0400
-};
-
-class Flags {
-    unsigned int codeOfFlag;
-public:
-    explicit Flags(unsigned int codeOfFlag) : codeOfFlag(codeOfFlag) {}
-
-    ValueAndBytes flagToBytes() const {
-        return {codeOfFlag, 2};
-    }
-};
-
 enum ConstantType {
     C_Utf8 = 1,
     C_Integer = 3,
@@ -41,10 +22,10 @@ enum ConstantType {
 
 class ConstantValue {
 private:
-    ConstantType typeConst;
-    ValueAndBytes *value;
-    Flags flags;
-    vector<ConstantValue *> descriptors;
+    ConstantType typeConst = C_Utf8;
+    ValueAndBytes *value = nullptr;
+
+    ConstantValue() {}
 public:
     ConstantType getTypeConst() const {
         return typeConst;
@@ -52,14 +33,6 @@ public:
 
     ValueAndBytes *getValue() const {
         return value;
-    }
-
-    const Flags &getFlags() const {
-        return flags;
-    }
-
-    const vector<ConstantValue *> &getDescriptors() const {
-        return descriptors;
     }
 
     static bool isContainsConst(vector<ConstantValue *> &consts, ConstantValue &val) {
@@ -75,16 +48,61 @@ public:
         return -1;
     }
 
-    ConstantValue(ConstantType type, ValueAndBytes *value, const Flags &flags = Flags(ACC_PUBLIC + ACC_FINAL),
-                  const vector<ConstantValue *> &descriptors = vector<ConstantValue *>()) : typeConst(type),
-                                                                                            value(value),
-                                                                                            flags(flags),
-                                                                                            descriptors(descriptors) {
-    }
-
     bool operator==(ConstantValue other) {
         return typeConst == other.typeConst && (string(value->getValue()) == string(other.value->getValue()) &&
                                                 value->getBytes() == other.value->getBytes());
+    }
+
+    static ConstantValue *CreateUtf8(string &value, vector<ConstantValue *> &consts) {
+        auto *constant = new ConstantValue();
+        constant->typeConst = C_Utf8;
+        constant->value = new ValueAndBytes(value.c_str(), (int) value.length());
+
+        if (isContainsConst(consts, *constant)) throw runtime_error("Const is already exist");
+        consts.push_back(constant);
+
+        return constant;
+    }
+
+    static ConstantValue *CreateClass(ConstantValue *name, vector<ConstantValue *> &consts) {
+        if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not utf-8");
+
+        auto constant = new ConstantValue;
+        constant->typeConst = C_Class;
+        constant->value = new ValueAndBytes(getIdConst(consts, *name), 2);
+        consts.push_back(constant);
+
+        return constant;
+    }
+
+    static ConstantValue *CreateNameAndType(ConstantValue *name, ConstantValue *descriptor,
+                                            vector<ConstantValue *> &consts) {
+        if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not utf-8");
+        if (descriptor->getTypeConst() != C_Utf8) throw runtime_error("Descriptor is not utf-8");
+
+        auto constant = new ConstantValue;
+        constant->typeConst = C_NameAndType;
+        int idName = getIdConst(consts, *name);
+        int idDesc = getIdConst(consts, *descriptor);
+        constant->value = new ValueAndBytes((idName << 16) | idDesc, 4);
+        consts.push_back(constant);
+
+        return constant;
+    }
+
+    static ConstantValue *CreateMethodRef(ConstantValue *classConst, ConstantValue *nameAndType,
+                                          vector<ConstantValue *> &consts) {
+        if (classConst->getTypeConst() != C_Class) throw runtime_error("Class const is not Class type");
+        if (nameAndType->getTypeConst() != C_NameAndType) throw runtime_error("Name&Type const is not N&T type");
+
+        auto constant = new ConstantValue;
+        constant->typeConst = C_MethodRef;
+        int idClass = getIdConst(consts, *classConst);
+        int idNameAndType = getIdConst(consts, *nameAndType);
+        constant->value = new ValueAndBytes((idClass << 16) | idNameAndType, 4);
+        consts.push_back(constant);
+
+        return constant;
     }
 };
 

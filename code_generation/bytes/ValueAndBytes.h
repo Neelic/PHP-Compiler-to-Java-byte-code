@@ -22,8 +22,8 @@ private:
     }
 
 public:
-    ValueAndBytes(unsigned int value, int bytes) {
-        reverseBytes(&value, bytes);
+    ValueAndBytes(unsigned int value, int bytes, bool isReverseBytes = true) {
+        if (isReverseBytes) reverseBytes(&value, bytes);
         this->value = &value;
         this->bytes = bytes;
     }
@@ -33,8 +33,7 @@ public:
         this->bytes = bytes;
     }
 
-    ValueAndBytes(int bytes) {
-        this->value = nullptr;
+    explicit ValueAndBytes(int bytes) {
         this->bytes = bytes;
     }
 

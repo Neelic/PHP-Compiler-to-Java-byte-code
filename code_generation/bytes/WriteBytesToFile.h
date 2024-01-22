@@ -7,6 +7,7 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 #include "code_generation/bytes/ValueAndBytes.h"
 
 using namespace std;
@@ -15,12 +16,18 @@ class WriteBytesToFile {
 private:
     ofstream *out;
 public:
-    WriteBytesToFile(string &filePath) {
+    WriteBytesToFile(const char* filePath) {
         out = new ofstream(filePath, ios::binary | ios::out);
     }
 
     void write(ValueAndBytes value) {
         out->write(value.getValue(), value.getBytes());
+    }
+
+    void write(vector<ValueAndBytes *> &values) {
+        for (auto value : values) {
+            out->write(value->getValue(), value->getBytes());
+        }
     }
 
     void close() {
