@@ -9,6 +9,7 @@
 #include "code_generation/ConstantValue.h"
 #include "WriteBytesToFile.h"
 #include "Flags.h"
+#include "code_generation/ConstantValueAttribute.h"
 
 class FieldBytes {
 private:
@@ -16,41 +17,41 @@ private:
     Flags flags;
     ConstantValue fieldName;
     ConstantValue descriptor;
-    vector<ConstantValue *> attributes;
+    vector<ConstantValueAttribute *> attributes;
 public:
     FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags flags, vector<ConstantValue *> &consts) :
             descriptor(descriptor), fieldName(fieldName), flags(flags), consts(consts) {
         if (fieldName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Field name is not utf-8 type");
         if (descriptor.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Descriptor is not utf-8 type");
-        if (!ConstantValue::isContainsConst(consts, fieldName)) consts.push_back(&fieldName);
-        if (!ConstantValue::isContainsConst(consts, descriptor)) consts.push_back(&descriptor);
     }
 
-    void setAttributes(vector<ConstantValue *> &attr) {
+    FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags flags,
+               vector<ConstantValueAttribute *> &attributes, vector<ConstantValue *> &consts) :
+            descriptor(descriptor), fieldName(fieldName), flags(flags), consts(consts), attributes(attributes) {
+        if (fieldName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Field name is not utf-8 type");
+        if (descriptor.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Descriptor is not utf-8 type");
+    }
+
+    void setAttributes(vector<ConstantValueAttribute *> &attr) {
         attributes = attr;
     }
 
-    void addAttribute(ConstantValue &attr) {
-        attributes.push_back(&attr);
+    void addAttribute(ConstantValueAttribute *attr) {
+        attributes.push_back(attr);
     }
 
     vector<ValueAndBytes *> fieldToBytes() {
         vector<ValueAndBytes *> res;
         ValueAndBytes flagsBytes = flags.flagToBytes();
         res.push_back(&flagsBytes);
-        ValueAndBytes nameBytes = ValueAndBytes(ConstantValue::getIdConst(consts, fieldName), 2);
-        res.push_back(&nameBytes);
-        ValueAndBytes descBytes = ValueAndBytes(ConstantValue::getIdConst(consts, descriptor), 2);
-        res.push_back(&descBytes);
+        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, fieldName), 2));
+        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, descriptor), 2));
 
-        int countAttr = (int) attributes.size();
-        ValueAndBytes countAttrBytes = ValueAndBytes(countAttr, 2);
-        res.push_back(&countAttrBytes);
+        res.push_back(new ValueAndBytes((int) attributes.size(), 2));
 
         for (auto *attr: attributes) {
-            res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *attr), 2));
-            res.push_back(new ValueAndBytes(2, 4));
-            res.push_back(new ValueAndBytes(2));
+            auto attrBytes = attr->attributeToBytes();
+            res.insert(res.end(), attrBytes.begin(), attrBytes.end());
         }
 
         return res;

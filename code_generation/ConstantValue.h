@@ -17,7 +17,6 @@ enum ConstantType {
     C_Class = 7,
     C_FieldRef = 9,
     C_MethodRef = 10,
-    C_ConstantValue = 13,
 };
 
 class ConstantValue {
@@ -100,6 +99,41 @@ public:
         int idClass = getIdConst(consts, *classConst);
         int idNameAndType = getIdConst(consts, *nameAndType);
         constant->value = new ValueAndBytes((idClass << 16) | idNameAndType, 4);
+        consts.push_back(constant);
+
+        return constant;
+    }
+
+    static ConstantValue *CreateFieldRef(ConstantValue *classConst, ConstantValue *nameAndType,
+                                         vector<ConstantValue *> &consts) {
+        if (classConst->getTypeConst() != C_Class) throw runtime_error("Class const is not Class type");
+        if (nameAndType->getTypeConst() != C_NameAndType) throw runtime_error("Name&Type const is not N&T type");
+
+        auto constant = new ConstantValue;
+        constant->typeConst = C_FieldRef;
+        int idClass = getIdConst(consts, *classConst);
+        int idNameAndType = getIdConst(consts, *nameAndType);
+        constant->value = new ValueAndBytes((idClass << 16) | idNameAndType, 4);
+        consts.push_back(constant);
+
+        return constant;
+    }
+
+    static ConstantValue *CreateInteger(int value, vector<ConstantValue *> &consts) {
+        auto constant = new ConstantValue;
+        constant->typeConst = C_Integer;
+        constant->value = new ValueAndBytes(value, 4);
+        consts.push_back(constant);
+
+        return constant;
+    }
+
+    static ConstantValue *CreateString(ConstantValue *string, vector<ConstantValue *> &consts) {
+        if (string->getTypeConst() != C_Utf8) throw runtime_error("String is not utf-8");
+
+        auto constant = new ConstantValue;
+        constant->typeConst = C_String;
+        constant->value = new ValueAndBytes(getIdConst(consts, *string), 2);
         consts.push_back(constant);
 
         return constant;
