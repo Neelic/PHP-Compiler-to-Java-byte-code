@@ -33,10 +33,6 @@ public:
         this->bytes = bytes;
     }
 
-    explicit ValueAndBytes(int bytes) {
-        this->bytes = bytes;
-    }
-
     int getBytes() const {
         return bytes;
     }

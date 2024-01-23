@@ -21,7 +21,7 @@ private:
     int getAttrLength() {
         int res = 12; //exclude first 6 bytes
         res += getCodeLength();
-        for (auto table : attributes) {
+        for (auto table: attributes) {
             res += table->getAttributeLength();
         }
 
@@ -30,7 +30,7 @@ private:
 
     int getCodeLength() {
         int res = 0;
-        for (auto bytes : code) {
+        for (auto bytes: code) {
             res += bytes->getBytes();
         }
 
@@ -57,7 +57,7 @@ public:
         res.push_back(new ValueAndBytes((int) 0, 2));
 
         res.push_back(new ValueAndBytes((int) attributes.size(), 2));
-        for (auto table : attributes) {
+        for (auto table: attributes) {
             auto tableBytes = table->attributeToBytes();
             res.insert(res.end(), tableBytes.begin(), tableBytes.end());
         }
