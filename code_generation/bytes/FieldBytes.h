@@ -9,7 +9,7 @@
 #include "code_generation/ConstantValue.h"
 #include "WriteBytesToFile.h"
 #include "Flags.h"
-#include "code_generation/ConstantValueAttribute.h"
+#include "code_generation/attributes/ConstantValueAttribute.h"
 
 class FieldBytes {
 private:
