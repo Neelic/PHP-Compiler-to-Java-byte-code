@@ -42,12 +42,12 @@ class Person
 
     public function greet()
     {
-        echo "Hello, \u{41} my \x41 name is " . $this->name . " and I am " . self::$age . " years old." . PHP_EOL;
+        echo "Hello, \u{41} my \x41 name is " . $this->name . " and I am " . self::age . " years old." . PHP_EOL;
     }
 
     public static function statFunc($name)
     {
-        echo "Hello,\ \ \my $name \is A \n \x and I am " . self::$age . " years old." . PHP_EOL;
+        echo "Hello,\ \ \my $name \is A \n \x and I am " . self::age . " years old." . PHP_EOL;
     }
 }
 
@@ -80,7 +80,7 @@ b()::a;
 // Creating instances of the Person class
 $person1 = new Person("John", 2.5);
 $person2 = new Person("Jane", 30);
-echo $person1::$name[0];
+echo $person1::name[0];
 $str = '\n \\ \'';
 $nul = (int) 1;
 
