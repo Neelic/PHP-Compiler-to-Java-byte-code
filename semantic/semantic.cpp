@@ -159,9 +159,9 @@ bool isStandartType(string *id) {
     if (id == nullptr) return false;
 
     // Тут просто сравниваю со всеми стандартными типами, дополнения приветствуются
-    return id == new string("int") || id == new string("float") ||
-           id == new string("string") || id == new string("bool") ||
-           id == new string("array") || id == new string("object");
+    return *id == string("int") || *id == string("float") ||
+           *id == string("string") || *id == string("bool") ||
+           *id == string("array") || *id == string("object");
 }
 
 // Определяет, является ли id системной константой
@@ -209,13 +209,13 @@ bool isPredeclaredConst(string *id) {
 bool isPredeclaredVariable(string *id) {
     if (id == nullptr) return false;
 
-    return id == new string("GLOBALS") || id == new string("_SERVER") ||
-           id == new string("_GET") || id == new string("_POST") ||
-           id == new string("_FILES") || id == new string("_REQUEST") ||
-           id == new string("_SESSION") || id == new string("_ENV") ||
-           id == new string("_COOKIE") || id == new string("php_errormsg") ||
-           id == new string("http_response_header") || id == new string("argc") ||
-           id == new string("argv");
+    return *id == string("GLOBALS") || *id == string("_SERVER") ||
+           *id == string("_GET") || *id == string("_POST") ||
+           *id == string("_FILES") || *id == string("_REQUEST") ||
+           *id == string("_SESSION") || *id == string("_ENV") ||
+           *id == string("_COOKIE") || *id == string("php_errormsg") ||
+           *id == string("http_response_header") || *id == string("argc") ||
+           *id == string("argv");
 }
 
 
@@ -226,7 +226,7 @@ ClassScopeContainer *getClassScopeContainer(string *parentId) {
     ClassScopeContainer *res;
 
     for (auto &i: classProperties) {
-        if (i->id == parentId)
+        if (*i->id == *parentId)
             res = i;
     }
     return res;
