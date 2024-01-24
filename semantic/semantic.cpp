@@ -312,12 +312,6 @@ void inspectFunctionDef(FunctionDefNode *node) {
         case FunctionDefType::no_type:
             break;
         case FunctionDefType::with_type:
-            if (!isDeclaredClass(node->type_id, classes) &&
-                !isDeclaredInterface(node->type_id, interfaces) &&
-                !isStandartType(node->type_id))
-                throw runtime_error(
-                        string("Fatal error: Uncaught Error: Class \"" + *node->type_id + "\" not found in " +
-                               *file_name));
             break;
     }
 
@@ -367,22 +361,10 @@ void inspectGetValueFunc(GetValueFuncNode *node) {
         case GetValueFuncType::no_ref_no_type:
             break;
         case GetValueFuncType::no_ref_with_type:
-            if (!isDeclaredClass(node->id_type, classes) &&
-                !isDeclaredInterface(node->id_type, interfaces) &&
-                !isStandartType(node->id_type))
-                throw runtime_error(
-                        string("Fatal error: Uncaught Error: Class \"" + *node->id_type + "\" not found in " +
-                               *file_name));
             break;
         case GetValueFuncType::with_ref_no_type:
             break;
         case GetValueFuncType::with_ref_with_type:
-            if (!isDeclaredClass(node->id_type, classes) &&
-                !isDeclaredInterface(node->id_type, interfaces) &&
-                !isStandartType(node->id_type))
-                throw runtime_error(
-                        string("Fatal error: Uncaught Error: Class \"" + *node->id_type + "\" not found in " +
-                               *file_name));
             break;
     }
 }
@@ -441,11 +423,7 @@ void inspectClassDef(ClassDefNode *node) {
                 else if (isDeclaredTrait(node->extend_id))
                     throw runtime_error(string("Fatal error: Class " + *node->class_id + " cannot extend trait " +
                                                *node->extend_id + " in " + *file_name));
-                    // Иначе является неопознанным индентификатором
-                else
-                    throw runtime_error(
-                            string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " +
-                                   *file_name));
+
             } else {
                 if (classProps != nullptr) {
                     classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
@@ -464,11 +442,7 @@ void inspectClassDef(ClassDefNode *node) {
                         throw runtime_error(string("Fatal error: " + *node->class_id + " cannot implement " +
                                                    *node->impl_id_list->vector[i] + " - it is not an interface in " +
                                                    *file_name));
-                        // Иначе неопознанный индентификатор
-                    else
-                        throw runtime_error(
-                                string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] +
-                                       "\" not found in " + *file_name));
+
                 } else if (classProps != nullptr)
                     classProps->extended.push_back(
                             node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
@@ -483,12 +457,10 @@ void inspectClassDef(ClassDefNode *node) {
                 else if (isDeclaredTrait(node->extend_id))
                     throw runtime_error(string("Fatal error: Class " + *node->class_id + " cannot extend trait " +
                                                *node->extend_id + " in " + *file_name));
-                else
-                    throw runtime_error(
-                            string("Fatal error: Uncaught Error: Class \"" + *node->extend_id + "\" not found in " +
-                                   *file_name));
+
             } else if (classProps != nullptr)
                 classProps->extended.push_back(node->extend_id); // Добавляю id найденного класса в список extend
+
             // Проверка includes
             for (int i = 0; i < node->impl_id_list->vector.size(); i++) {
                 if (!isDeclaredInterface(node->impl_id_list->vector[i], interfaces)) {
@@ -497,10 +469,7 @@ void inspectClassDef(ClassDefNode *node) {
                         throw runtime_error(string("Fatal error: " + *node->class_id + " cannot implement " +
                                                    *node->impl_id_list->vector[i] + " - it is not an interface in " +
                                                    *file_name));
-                    else
-                        throw runtime_error(
-                                string("Fatal error: Uncaught Error: Interface \"" + *node->impl_id_list->vector[i] +
-                                       "\" not found in " + *file_name));
+
                 } else if (classProps != nullptr)
                     classProps->included.push_back(
                             node->impl_id_list->vector[i]); // Добавляю id найденного интерфейса в список includes
@@ -527,9 +496,7 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId, bool isAbstractClas
                 for (auto &i: node->access_mod->vector) {
                     switch (i->access_mod) {
                         case abstract_node:
-                            throw runtime_error(string("Fatal error: Abstract function " + *parentId + "::" +
-                                                       *node->function_def->func_id +
-                                                       "() cannot contain body in " + *file_name));
+                            break;
                         case read_only_node:
                             throw runtime_error(
                                     string("Fatal error: Cannot use 'readonly' as method modifier in " + *file_name));
@@ -563,10 +530,6 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId, bool isAbstractClas
                 throw runtime_error(
                         string("Fatal error: Non-abstract method " + *parentId + "::" + *node->function_def->func_id +
                                "() must contain body in" + *file_name));
-            } else if (!isAbstractClass) {
-                throw runtime_error(string("Fatal error: Class " + *parentId +
-                                           " contains abstract methods and must therefore be declared abstract or implement the remaining methods in" +
-                                           *file_name));
             }
 
             // Проверка на переопределение
@@ -588,10 +551,6 @@ void inspectClassStmt(ClassStmtNode *node, string *parentId, bool isAbstractClas
                         throw runtime_error(string("Fatal error: " + *parentId + " cannot use " +
                                                    *i + " - it is not an trait in " +
                                                    *file_name));
-                    else
-                        throw runtime_error(
-                                string("Fatal error: Trait \"" + *i +
-                                       "\" not found in " + *file_name));
                 }
             }
             break;
@@ -776,10 +735,6 @@ void inspectInterfaceDef(InterfaceExprDefNode *node) {
                     throw runtime_error(string("Fatal error: " + *node->id + " cannot implement " +
                                                *i + " - it is not an interface in " +
                                                *file_name));
-                else
-                    throw runtime_error(
-                            string("Fatal error: Uncaught Error: Interface \"" + *i +
-                                   "\" not found in " + *file_name));
             } else {
                 if (interfaceProps == nullptr) throw length_error("null error");
                 interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
@@ -1220,23 +1175,11 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::staticRef);
             if (node->left == nullptr) return;
-            parentScope = getClassScopeContainer(node->left->id);
-            if (!isDeclaredVariable(node->id, parentScope->variables) &
-                !isDeclaredConst(node->id, parentScope->consts)) {
-                cout << "Warning: Undefined property " << *node->left->id << "::$" << *node->id << " in " << *file_name
-                     << endl;
-            }
             break;
         case ExprType::class_inst_get_value_method_by_ref_op_dots:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope,
                         isInClass, ContextType::staticRef);
             if (node->left == nullptr) return;
-            parentScope = getClassScopeContainer(node->left->id);
-            if (!isDeclaredFunction(node->id, parentScope->functions)) {
-                throw runtime_error(
-                        "Fatal error: Uncaught Error: Call to undefined method " + *node->left->id + "::" + *node->id +
-                        "() in " + *file_name);
-            }
             break;
         case ExprType::this_keyword:
             if (!isInClass)
@@ -1255,7 +1198,6 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
                 throw runtime_error(string("Fatal error: Cannot re-assign $this in " + *file_name));
             //if use right-side variable is not declared
             if (node->right->exprType == ExprType::variable && !isDeclaredVariable(node->right->id, variables)) {
-                cout << "Warning: Undefined variable $" << *node->right->id << " in " << *file_name << endl;
                 node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());
                 variables.push_back(node->right->left->id);
             } else {
@@ -1327,23 +1269,12 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case ExprType::id_type:
-            if (!isDeclaredClass(node->id, classes) && !isDeclaredConst(node->id, consts) &&
-                    !isDeclaredConst(node->id, constsScope) && !isPredeclaredConst(node->id)) {
-                throw runtime_error(string("Fatal error: Uncaught Error: Undefined constant \"" + *node->id + "\" in " +
-                                           *file_name));
-            }
-            break;
         case ExprType::new_decl:
-            if (node->exprType == new_decl && !isDeclaredClass(node->id, classes) &&
-                !isDeclaredConst(node->id, consts) && !isDeclaredConst(node->id, constsScope)) {
-                throw runtime_error(
-                        string("Fatal error: Uncaught Error: Class \"" + *node->id + "\" not found in " + *file_name));
-            }
-            break;
         case ExprType::variable:
             if (!isDeclaredVariable(node->id, variables) && !isDeclaredVariable(node->id, variablesScope)) {
                 variables.push_back(node->id);
             }
+            break;
 
     }
 }
