@@ -168,41 +168,41 @@ bool isStandartType(string *id) {
 bool isPredeclaredConst(string *id) {
     if (id == nullptr) return false;
 
-    return id == new string("PHP_VERSION") || id == new string("PHP_MAJOR_VERSION") ||
-           id == new string("PHP_MINOR_VERSION") || id == new string("PHP_RELEASE_VERSION") ||
-           id == new string("PHP_VERSION_ID") || id == new string("PHP_EXTRA_VERSION") ||
-           id == new string("PHP_ZTS") || id == new string("PHP_DEBUG") ||
-           id == new string("PHP_MAXPATHLEN") || id == new string("PHP_OS") ||
-           id == new string("PHP_OS_FAMILY") || id == new string("PHP_SAPI") ||
-           id == new string("PHP_EOL") || id == new string("PHP_INT_MAX") ||
-           id == new string("PHP_INT_MIN") || id == new string("PHP_INT_SIZE") ||
-           id == new string("PHP_FLOAT_DIG") || id == new string("PHP_FLOAT_EPSILON") ||
-           id == new string("PHP_FLOAT_MIN") || id == new string("PHP_FLOAT_MAX") ||
-           id == new string("DEFAULT_INCLUDE_PATH") || id == new string("PEAR_INSTALL_DIR") ||
-           id == new string("PEAR_EXTENSION_DIR") || id == new string("PHP_EXTENSION_DIR") ||
-           id == new string("PHP_PREFIX") || id == new string("PHP_BINDIR") ||
-           id == new string("PHP_MINOR_VERSION") || id == new string("PHP_RELEASE_VERSION") ||
-           id == new string("PHP_BINARY") || id == new string("PHP_MANDIR") ||
-           id == new string("PHP_LIBDIR") || id == new string("PHP_DATADIR") ||
-           id == new string("PHP_SYSCONFDIR") || id == new string("PHP_LOCALSTATEDIR") ||
-           id == new string("PHP_CONFIG_FILE_PATH") || id == new string("PHP_CONFIG_FILE_SCAN_DIR") ||
-           id == new string("PHP_SHLIB_SUFFIX") || id == new string("PHP_FD_SETSIZE") ||
-           id == new string("E_ERROR") || id == new string("E_WARNING") ||
-           id == new string("E_PARSE") || id == new string("E_NOTICE") ||
-           id == new string("E_CORE_ERROR") || id == new string("E_CORE_WARNING") ||
-           id == new string("E_COMPILE_ERROR") || id == new string("E_COMPILE_WARNING") ||
-           id == new string("E_USER_ERROR") || id == new string("E_USER_WARNING") ||
-           id == new string("E_USER_NOTICE") || id == new string("E_RECOVERABLE_ERROR") ||
-           id == new string("E_DEPRECATED") || id == new string("E_USER_DEPRECATED") ||
-           id == new string("E_ALL") || id == new string("E_STRICT") ||
-           id == new string("__COMPILER_HALT_OFFSET__") || id == new string("true") ||
-           id == new string("false") || id == new string("null") ||
-           id == new string("PHP_WINDOWS_EVENT_CTRL_C") || id == new string("PHP_WINDOWS_EVENT_CTRL_BREAK") ||
-           id == new string("__LINE__") || id == new string("__FILE__") ||
-           id == new string("__DIR__") || id == new string("__FUNCTION__") ||
-           id == new string("__CLASS__") || id == new string("__TRAIT__") ||
-           id == new string("__METHOD__") || id == new string("__NAMESPACE__") ||
-           id == new string("ClassName::class");
+    return *id == string("PHP_VERSION") || *id == string("PHP_MAJOR_VERSION") ||
+           *id == string("PHP_MINOR_VERSION") || *id == string("PHP_RELEASE_VERSION") ||
+           *id == string("PHP_VERSION_ID") || *id == string("PHP_EXTRA_VERSION") ||
+           *id == string("PHP_ZTS") || *id == string("PHP_DEBUG") ||
+           *id == string("PHP_MAXPATHLEN") || *id == string("PHP_OS") ||
+           *id == string("PHP_OS_FAMILY") || *id == string("PHP_SAPI") ||
+           *id == string("PHP_EOL") || *id == string("PHP_INT_MAX") ||
+           *id == string("PHP_INT_MIN") || *id == string("PHP_INT_SIZE") ||
+           *id == string("PHP_FLOAT_DIG") || *id == string("PHP_FLOAT_EPSILON") ||
+           *id == string("PHP_FLOAT_MIN") || *id == string("PHP_FLOAT_MAX") ||
+           *id == string("DEFAULT_INCLUDE_PATH") || *id == string("PEAR_INSTALL_DIR") ||
+           *id == string("PEAR_EXTENSION_DIR") || *id == string("PHP_EXTENSION_DIR") ||
+           *id == string("PHP_PREFIX") || *id == string("PHP_BINDIR") ||
+           *id == string("PHP_MINOR_VERSION") || *id == string("PHP_RELEASE_VERSION") ||
+           *id == string("PHP_BINARY") || *id == string("PHP_MANDIR") ||
+           *id == string("PHP_LIBDIR") || *id == string("PHP_DATADIR") ||
+           *id == string("PHP_SYSCONFDIR") || *id == string("PHP_LOCALSTATEDIR") ||
+           *id == string("PHP_CONFIG_FILE_PATH") || *id == string("PHP_CONFIG_FILE_SCAN_DIR") ||
+           *id == string("PHP_SHLIB_SUFFIX") || *id == string("PHP_FD_SETSIZE") ||
+           *id == string("E_ERROR") || *id == string("E_WARNING") ||
+           *id == string("E_PARSE") || *id == string("E_NOTICE") ||
+           *id == string("E_CORE_ERROR") || *id == string("E_CORE_WARNING") ||
+           *id == string("E_COMPILE_ERROR") || *id == string("E_COMPILE_WARNING") ||
+           *id == string("E_USER_ERROR") || *id == string("E_USER_WARNING") ||
+           *id == string("E_USER_NOTICE") || *id == string("E_RECOVERABLE_ERROR") ||
+           *id == string("E_DEPRECATED") || *id == string("E_USER_DEPRECATED") ||
+           *id == string("E_ALL") || *id == string("E_STRICT") ||
+           *id == string("__COMPILER_HALT_OFFSET__") || *id == string("true") ||
+           *id == string("false") || *id == string("null") ||
+           *id == string("PHP_WINDOWS_EVENT_CTRL_C") || *id == string("PHP_WINDOWS_EVENT_CTRL_BREAK") ||
+           *id == string("__LINE__") || *id == string("__FILE__") ||
+           *id == string("__DIR__") || *id == string("__FUNCTION__") ||
+           *id == string("__CLASS__") || *id == string("__TRAIT__") ||
+           *id == string("__METHOD__") || *id == string("__NAMESPACE__") ||
+           *id == string("ClassName::class") || *id == string("true") || *id == string("false");
 }
 
 // Определяет, является ли id системной переменной
