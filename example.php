@@ -38,7 +38,6 @@ class Person
     public function __construct($name, $age)
     {
         $this->name = $name;
-        $this->age = $age | $age;
     }
 
     public function greet()
@@ -58,7 +57,6 @@ abstract class Example extends Person {
     private const NAME = 1, abc = '123';
     protected function b() {
         parent::greet();
-        self::${$_COOKIE};
     }
     public abstract static function a();
 }
@@ -78,8 +76,6 @@ $b = ( fLoat ) 100;
 function b () {}
 
 b()::a;
-
-${1 + 2}->cal_info();
 
 // Creating instances of the Person class
 $person1 = new Person("John", 2.5);
