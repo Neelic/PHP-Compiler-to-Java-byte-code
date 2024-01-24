@@ -726,6 +726,8 @@ void inspectInterfaceDef(InterfaceExprDefNode *node) {
 
     auto interfaceProps = getClassScopeContainer(node->id);
 
+    string *prevId;
+
     if (node->id_extended_list != nullptr) {
 
         for (auto i: node->id_extended_list->vector) {
@@ -740,13 +742,15 @@ void inspectInterfaceDef(InterfaceExprDefNode *node) {
                 interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
             }
 
+            cout << *i << endl;
+
             // Проверяю на дубликат в списке интерфейсов
-            for (auto j: interfaceProps->included) {
-                if (i == j)
-                    throw runtime_error(
-                            string("Fatal error: Interface a cannot implement previously implemented interface " + *i +
-                                   " in " + *file_name));
-            }
+            if (prevId != nullptr && *i == *prevId)
+                throw runtime_error(
+                        string("Fatal error: Interface " + *node->id +
+                               " cannot implement previously implemented interface " + *i +
+                               " in " + *file_name));
+            else prevId = i;
         }
     }
 }
