@@ -158,7 +158,7 @@ void printStmt(StmtNode *node, string *parentId, string *arrowLabel) {
         case StmtType::t_echo_stmt:
             cout << GRAPH_STR.size() << " from echo_stmt" << "\n";
             GRAPH_STR += *node->idTag() + " [label=\"t-echo\"];\n";
-            printExpr(node->expr_left, node->idTag(), new string(""));
+            printExpr(node->expr_right, node->idTag(), new string(""));
             break;
 
         case StmtType::continue_stmt:
@@ -451,6 +451,8 @@ void printHtmlStmt(HtmlStmtNode *node, string *parentId) {
 
 //ExprNode
 void printExpr(ExprNode *node, string *parentId, string *arrowLabel) {
+    cout <<"Expr is null\n";
+    if (node == nullptr) return;
     cout << "PRINT EXPR\n";
     cout << GRAPH_STR.size() << " of " << GRAPH_STR.max_size() << "\n";
     // Значения
@@ -458,7 +460,6 @@ void printExpr(ExprNode *node, string *parentId, string *arrowLabel) {
         case ExprType::int_val: //Если просто значение, может просто его и печатать? А то получится узел ради узла
             cout << GRAPH_STR.size() << " from int_val" << "\n";
             GRAPH_STR += *node->idTag() + " [label=\"" + to_string(node->int_val) + "\"];\n";
-            cout << GRAPH_STR.size() << " from int_val #2" << "\n";
             break;
         case ExprType::string_val:
             cout << GRAPH_STR.size() << " from string_val" << "\n";
