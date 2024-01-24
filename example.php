@@ -52,7 +52,7 @@ class Person
 }
 
 abstract class Example extends Person {
-    use property, ai;
+    //use property, ai; error
     abstract public $c = 1;
     private const NAME = 1, abc = '123';
     protected function b() {
