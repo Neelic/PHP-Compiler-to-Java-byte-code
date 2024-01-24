@@ -15,7 +15,7 @@ private:
     Flags flags;
     ConstantValue *name;
     ConstantValue *descriptor;
-    CodeAttribute *code;
+    CodeAttribute *code = nullptr;
     vector<ConstantValue *> consts;
 
 public:
@@ -33,10 +33,14 @@ public:
         res.push_back(&flagsBytes);
         res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *name), 2));
         res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *descriptor), 2));
-        res.push_back(new ValueAndBytes(1, 2));
 
-        auto codeByteVector = code->attributeToBytes();
-        res.insert(res.end(), codeByteVector.begin(), codeByteVector.end());
+        if (code != nullptr) {
+            res.push_back(new ValueAndBytes(1, 2));
+            auto codeByteVector = code->attributeToBytes();
+            res.insert(res.end(), codeByteVector.begin(), codeByteVector.end());
+        } else {
+            res.push_back(new ValueAndBytes((int) 0, 2));
+        }
 
         return res;
     }

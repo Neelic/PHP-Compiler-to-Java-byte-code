@@ -9,24 +9,80 @@
 #include "ValueAndBytes.h"
 #include "code_generation/ConstantValue.h"
 #include "FieldBytes.h"
+#include "MethodBytes.h"
+#include "code_generation/attributes/SourceFileAttribute.h"
 
 class ClassBytes {
 private:
     static ValueAndBytes magicConst;
     static ValueAndBytes versionClassFile;
 
-    vector<ConstantValue *> consts;
+    ConstantValue *name;
+    ConstantValue *superClass;
+    Flags flags;
     vector<FieldBytes *> fields;
+    vector<MethodBytes *> methods;
+    SourceFileAttribute *sourceFile;
+
+    vector<ConstantValue *> consts;
 
 public:
-    ClassBytes(vector<ConstantValue *> &consts) {
-        this->consts = consts;
+    ClassBytes(Flags flags, ConstantValue *name, ConstantValue *superClass, SourceFileAttribute *file,
+               vector<ConstantValue *> &consts)
+            : flags(flags), name(name), superClass(superClass), sourceFile(file), consts(consts) {
+        if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
+        if (superClass->getTypeConst() != C_Utf8) throw runtime_error("Super class is not Utf-8");
     }
 
-    void addField(FieldBytes *field) {}
+    void addField(FieldBytes *field) {
+        fields.push_back(field);
+    }
 
-    ValueAndBytes classToBytes() {
-        return ValueAndBytes(1);
+    void addMethod(MethodBytes *method) {
+        methods.push_back(method);
+    }
+
+    vector<ConstantValue *> getConsts() {
+        return consts;
+    }
+
+    vector<ValueAndBytes *> classToBytes() {
+        auto res = vector<ValueAndBytes *>();
+        res.push_back(&magicConst);
+        res.push_back(&versionClassFile);
+        //consts
+        res.push_back(new ValueAndBytes((int) consts.size(), 2));
+        for (auto constValue: consts) {
+            res.push_back(new ValueAndBytes(constValue->getTypeConst(), 1)); //tag const
+            res.push_back(constValue->getValue()); //value const
+        }
+        //flags
+        auto flag = flags.flagToBytes();
+        res.push_back(&flag);
+        //name
+        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *name), 2));
+        //super class
+        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *superClass), 2));
+        //interfaces
+        res.push_back(new ValueAndBytes((int) 0, 2));
+        //fields
+        res.push_back(new ValueAndBytes((int) fields.size(), 2));
+        for (auto field: fields) {
+            auto fieldBytes = field->fieldToBytes();
+            res.insert(res.end(), fieldBytes.begin(), fieldBytes.end());
+        }
+        //methods
+        res.push_back(new ValueAndBytes((int) methods.size(), 2));
+        for (auto method: methods) {
+            auto methodBytes = method->methodToBytes();
+            res.insert(res.end(), methodBytes.begin(), methodBytes.end());
+        }
+        //source file attribute
+        res.push_back(new ValueAndBytes(1, 2));
+        auto sourceBytes = sourceFile->attributeToBytes();
+        res.insert(res.end(), sourceBytes.begin(), sourceBytes.end());
+
+        return res;
     }
 };
 
