@@ -196,4 +196,5 @@ add_executable(PHP_Compiler
         code_generation/attributes/CodeAttribute.h
         code_generation/attributes/TableAttribute.h
         code_generation/attributes/SourceFileAttribute.h
+        code_generation/bytes/Commands.h
 )
