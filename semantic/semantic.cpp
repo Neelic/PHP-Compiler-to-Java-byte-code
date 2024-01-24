@@ -1328,7 +1328,7 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             break;
         case ExprType::id_type:
             if (!isDeclaredClass(node->id, classes) && !isDeclaredConst(node->id, consts) &&
-                !isDeclaredConst(node->id, constsScope)) {
+                    !isDeclaredConst(node->id, constsScope) && !isPredeclaredConst(node->id)) {
                 throw runtime_error(string("Fatal error: Uncaught Error: Undefined constant \"" + *node->id + "\" in " +
                                            *file_name));
             }
