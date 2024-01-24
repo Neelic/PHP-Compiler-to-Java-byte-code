@@ -1174,7 +1174,7 @@ void inspectStaticVar(StaticVarNode *node, vector<string *> &variablesScope, vec
                       vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
-    if (isDeclaredVariable(node->id, variables)) {
+    if (!isDeclaredVariable(node->id, variables)) {
         variables.push_back(node->id);
     }
 
@@ -1193,7 +1193,7 @@ void inspectGlobalVar(GlobalVarNode *node, vector<string *> &variablesScope, vec
                       vector<FunctionStmtDeclNode *> &functionsScope, bool isInClass, ContextType context) {
     if (node == nullptr) return;
 
-    if (isDeclaredVariable(node->id, variables)) {
+    if (!isDeclaredVariable(node->id, variables)) {
         variables.push_back(node->id);
     }
 
@@ -1340,6 +1340,10 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
                         string("Fatal error: Uncaught Error: Class \"" + *node->id + "\" not found in " + *file_name));
             }
             break;
+        case ExprType::variable:
+            if (!isDeclaredVariable(node->id, variables) && !isDeclaredVariable(node->id, variablesScope)) {
+                variables.push_back(node->id);
+            }
 
     }
 }
