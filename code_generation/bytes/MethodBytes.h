@@ -51,8 +51,22 @@ public:
         return new MethodBytes(
                 flags,
                 ConstantValue::CreateUtf8(*node->function_def->func_id, consts),
-                ConstantValue::getConstantByString(consts, new string("()V")),
+                ConstantValue::getConstantByString(consts, new string("()V")) ?: ConstantValue::CreateUtf8(
+                        *new string("()V"), consts),
                 nullptr, //Заменить на конвертацию vector<StmtList> в CodeAttribute
+                consts
+        );
+    }
+
+    static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue *> &consts) {
+        if (node == nullptr) return nullptr;
+
+        return new MethodBytes(
+                flags,
+                ConstantValue::CreateUtf8(*node->func_id, consts),
+                ConstantValue::getConstantByString(consts, new string("()V")) ?: ConstantValue::CreateUtf8(
+                        *new string("()V"), consts),
+                nullptr,
                 consts
         );
     }
