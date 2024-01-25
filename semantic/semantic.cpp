@@ -1276,6 +1276,10 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
         case ExprType::new_decl:
         case ExprType::variable:
             if (!isDeclaredVariable(node->id, variables) && !isDeclaredVariable(node->id, variablesScope)) {
+                switch (context) {
+                    case ContextType::inFunction:
+                        variablesScope.push_back(node->id);
+                }
                 variables.push_back(node->id);
             }
             break;
