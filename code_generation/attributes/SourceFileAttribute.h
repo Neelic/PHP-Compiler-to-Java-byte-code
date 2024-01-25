@@ -24,7 +24,7 @@ public:
     vector<ValueAndBytes *> attributeToBytes() {
         auto res = vector<ValueAndBytes *>();
 
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *nameAttr)));
+        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *nameAttr), 2));
         res.push_back(new ValueAndBytes(2, 4));
         res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *fileName), 2));
 

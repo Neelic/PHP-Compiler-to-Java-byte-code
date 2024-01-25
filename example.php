@@ -52,8 +52,8 @@ class Person
 }
 
 abstract class Example extends Person {
-    //use property, ai; error
-    abstract public $c = 1;
+    //use property, ai; //error
+    //abstract public $c = 1;
     private const NAME = 1, abc = '123';
     protected function b() {
         parent::greet();
@@ -68,8 +68,8 @@ interface interfaceO extends objectO {
 }
 
 trait TraitName {
-    public abstract static $a = 1;
-    protected abstract function r();
+    public static $a = 1;
+    #protected abstract function r();
 }
 $b = ( fLoat ) 100;
 
