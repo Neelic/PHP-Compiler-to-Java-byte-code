@@ -9,6 +9,7 @@
 #include "Flags.h"
 #include "code_generation/ConstantValue.h"
 #include "code_generation/attributes/CodeAttribute.h"
+#include "../all_include.hpp"
 
 class MethodBytes {
 private:
@@ -43,6 +44,17 @@ public:
         }
 
         return res;
+    }
+
+    static MethodBytes *fromFunctionStmtDecl(FunctionStmtDeclNode *node, Flags flags, vector<ConstantValue *> &consts) {
+        if (node == nullptr) return nullptr;
+        return new MethodBytes(
+                flags,
+                ConstantValue::CreateUtf8(*node->function_def->func_id, consts),
+                ConstantValue::getConstantByString(consts, new string("()V")),
+                nullptr, //Заменить на конвертацию vector<StmtList> в CodeAttribute
+                consts
+        );
     }
 };
 
