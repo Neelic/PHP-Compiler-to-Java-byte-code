@@ -22,7 +22,13 @@ private:
     }
 
 public:
-    ValueAndBytes(unsigned int value, int bytes, bool isReverseBytes = true) {
+    ValueAndBytes(int value, int bytes, bool isReverseBytes = true) {
+        if (isReverseBytes) reverseBytes(&value, bytes);
+        this->value = &value;
+        this->bytes = bytes;
+    }
+
+    ValueAndBytes(float value, int bytes, bool isReverseBytes = true) {
         if (isReverseBytes) reverseBytes(&value, bytes);
         this->value = &value;
         this->bytes = bytes;
