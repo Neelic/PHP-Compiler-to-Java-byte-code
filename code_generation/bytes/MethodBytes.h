@@ -48,11 +48,21 @@ public:
 
     static MethodBytes *fromFunctionStmtDecl(FunctionStmtDeclNode *node, Flags flags, vector<ConstantValue *> &consts) {
         if (node == nullptr) return nullptr;
+
+        // Собираю строку дескриптора
+        auto descriptor = string("(");
+        // Для каждого параметра функции кроме последнего
+        for (int i = 0; i < node->function_def->expr_func_list->vector.size() - 1; i++) {
+            descriptor += "RTL/Value,";
+        }
+        // Добавляю последний тип и закрываю
+        descriptor += "RTL/Value)RTL/Value";
+
         return new MethodBytes(
                 flags,
                 ConstantValue::CreateUtf8(*node->function_def->func_id, consts),
-                ConstantValue::getConstantByString(consts, new string("()V")) ?: ConstantValue::CreateUtf8(
-                        *new string("()V"), consts),
+                ConstantValue::getConstantByString(consts, &descriptor) ?: ConstantValue::CreateUtf8(
+                        descriptor, consts),
                 nullptr, //Заменить на конвертацию vector<StmtList> в CodeAttribute
                 consts
         );
@@ -61,11 +71,20 @@ public:
     static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue *> &consts) {
         if (node == nullptr) return nullptr;
 
+        // Собираю строку дескриптора
+        auto descriptor = string("(");
+        // Для каждого параметра функции кроме последнего
+        for (int i = 0; i < node->expr_func_list->vector.size() - 1; i++) {
+            descriptor += "RTL/Value,";
+        }
+        // Добавляю последний тип и закрываю
+        descriptor += "RTL/Value)RTL/Value";
+
         return new MethodBytes(
                 flags,
                 ConstantValue::CreateUtf8(*node->func_id, consts),
-                ConstantValue::getConstantByString(consts, new string("()V")) ?: ConstantValue::CreateUtf8(
-                        *new string("()V"), consts),
+                ConstantValue::getConstantByString(consts, &descriptor) ?: ConstantValue::CreateUtf8(
+                        descriptor, consts),
                 nullptr,
                 consts
         );

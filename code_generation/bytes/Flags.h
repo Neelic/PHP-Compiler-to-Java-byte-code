@@ -57,7 +57,9 @@ public:
             }
         }
 
-        return new Flags(code);
+        auto tmp = new Flags(code);
+
+        return tmp;
     }
 };
 
