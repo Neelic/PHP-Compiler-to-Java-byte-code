@@ -23,6 +23,8 @@ class ConstantValue {
 private:
     ConstantType typeConst = C_Utf8;
     ValueAndBytes *value = nullptr;
+    // id константы в виде строки, для поиска
+    string *id = new string();
 
     ConstantValue() {}
 public:
@@ -32,6 +34,10 @@ public:
 
     ValueAndBytes *getValue() const {
         return value;
+    }
+
+    string *getString() const {
+        return id;
     }
 
     static bool isContainsConst(vector<ConstantValue *> &consts, ConstantValue &val) {
@@ -47,6 +53,15 @@ public:
         return -1;
     }
 
+    static ConstantValue *getConstantByString(vector<ConstantValue *> &consts, string *searchValue) {
+        for (auto &i: consts) {
+            if (i->typeConst == C_Utf8 && *i->id == *searchValue) {
+                return i;
+            }
+        }
+        return nullptr; // если не нашел в списке
+    }
+
     bool operator==(ConstantValue other) {
         return typeConst == other.typeConst && (string(value->getValue()) == string(other.value->getValue()) &&
                                                 value->getBytes() == other.value->getBytes());
@@ -56,6 +71,7 @@ public:
         auto *constant = new ConstantValue();
         constant->typeConst = C_Utf8;
         constant->value = new ValueAndBytes(value.c_str(), (int) value.length());
+        *constant->id = value;
 
         if (isContainsConst(consts, *constant)) throw runtime_error("Const is already exist");
         consts.push_back(constant);
@@ -67,6 +83,7 @@ public:
         if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not utf-8");
 
         auto constant = new ConstantValue;
+        *constant->id = *name->id;
         constant->typeConst = C_Class;
         constant->value = new ValueAndBytes(getIdConst(consts, *name), 2);
         consts.push_back(constant);
@@ -83,6 +100,7 @@ public:
         constant->typeConst = C_NameAndType;
         int idName = getIdConst(consts, *name);
         int idDesc = getIdConst(consts, *descriptor);
+        *constant->id = *name->id;
         constant->value = new ValueAndBytes((idName << 16) | idDesc, 4);
         consts.push_back(constant);
 
@@ -99,6 +117,7 @@ public:
         int idClass = getIdConst(consts, *classConst);
         int idNameAndType = getIdConst(consts, *nameAndType);
         constant->value = new ValueAndBytes((idClass << 16) | idNameAndType, 4);
+        *constant->id = *nameAndType->id;
         consts.push_back(constant);
 
         return constant;
@@ -114,6 +133,7 @@ public:
         int idClass = getIdConst(consts, *classConst);
         int idNameAndType = getIdConst(consts, *nameAndType);
         constant->value = new ValueAndBytes((idClass << 16) | idNameAndType, 4);
+        *constant->id = *nameAndType->id;
         consts.push_back(constant);
 
         return constant;
@@ -123,6 +143,7 @@ public:
         auto constant = new ConstantValue;
         constant->typeConst = C_Integer;
         constant->value = new ValueAndBytes(value, 4);
+        *constant->id = to_string(value);
         consts.push_back(constant);
 
         return constant;
@@ -134,6 +155,7 @@ public:
         auto constant = new ConstantValue;
         constant->typeConst = C_String;
         constant->value = new ValueAndBytes(getIdConst(consts, *string), 2);
+        *constant->id = *string->id;
         consts.push_back(constant);
 
         return constant;
