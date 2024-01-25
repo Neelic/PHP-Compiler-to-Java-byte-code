@@ -254,6 +254,11 @@ void inspectGlobalScope(StartNode *node) {
                 break;
         }
     }
+
+    // Добавляю класс скоп для глобального класса, в id пусто т.к. не может появиться класса с пустым именем
+    classProperties.push_back(
+            ClassScopeContainer::CreateContainer(new string(""), variables, consts, vector<string *>(),
+                                                 vector<string *>(), vector<string *>(), functions));
 }
 
 
