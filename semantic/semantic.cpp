@@ -1279,8 +1279,12 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
                 switch (context) {
                     case ContextType::inFunction:
                         variablesScope.push_back(node->id);
+                        break;
+                    default:
+                        variables.push_back(node->id);
+                        break;
                 }
-                variables.push_back(node->id);
+
             }
             break;
 
