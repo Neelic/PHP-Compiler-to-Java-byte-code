@@ -6,6 +6,7 @@
 #define PHP_COMPILER_COMMANDS_H
 
 #include <vector>
+#include <map>
 #include "ValueAndBytes.h"
 #include "code_generation/ConstantValue.h"
 
@@ -73,16 +74,10 @@ enum CodeCommandsOneParam {
     // загружает на стек однобайтовую целую константу
     bipush = 0x10,
 
-    // загружает на стек двухбатовую целую константу
-    sipush = 0x11,
+    //
 
-    //Загружают на стек целую или дробную константу из таблицы кон-
-    //стант класса
-
-    // как однобайтное число
+    // Загружают на стек целую или дробную константу из таблицы констант класса как однобайтное число
     ldc = 0x12,
-    // как двухбайтное
-    ldc_w = 0x13,
 
     //загружают на стек целое число
     iload = 0x15,
@@ -93,6 +88,15 @@ enum CodeCommandsOneParam {
     istore = 0x36,
     // сохраняют из стека в локальную - ссылка
     astore = 0x3A,
+};
+
+enum CodeCommandsOneParamTwoBytes {
+
+    // загружает на стек двухбатовую целую константу
+    sipush = 0x11,
+
+    // Загружают на стек целую или дробную константу из таблицы констант класса как двухбайтное
+    ldc_w = 0x13,
 
     //Передача управления
 
@@ -110,12 +114,18 @@ enum CodeCommandsOneParam {
     // >=
     if_cmpge = 0xA2,
 
-    ifeq = 0x99, // = 0
-    ifne = 0x9A, // != 0
-    iflt = 0x55, // <0
-    ifle = 0x9E, // <=0
-    ifgt = 0x9D, // > 0
-    ifge = 0x9C, // >= 0
+    // = 0
+    ifeq = 0x99,
+    // != 0
+    ifne = 0x9A,
+    // <0
+    iflt = 0x55,
+    // <=0
+    ifle = 0x9E,
+    // > 0
+    ifgt = 0x9D,
+    // >= 0
+    ifge = 0x9C,
 
     // Ссылки
 
@@ -127,6 +137,13 @@ enum CodeCommandsOneParam {
 
     // безусловный переход на указанное смещение от текущей команды
     go_to = 0xA7,
+
+
+    // создает массив заданного типа и размера в «куче» и помещает ссылку на него на вершину стека.
+    // Тип массива определяется по таблице констант текущего класса. В таблице констант элемент с номером,
+    // указанным в команде, должен содержать символическую ссылку на тип класса, массива или интерфейса.
+    // При разрешении символической ссылки может быть выброшено любое из исключений классов и интерфейсов
+    anewarray = 0xBE,
 
     // Создает объект заданного типа в области динамически выделяемой памяти («куче») и
     //помещает ссылку на него на вершину стека.
@@ -187,15 +204,13 @@ enum CodeCommandsArray {
     // создает массив заданного типа и размера в области динамически выделяемойпамяти («куче») и помещает ссылку на него на вершину стека
     newarray = 0xBC,
 
-    // определяет длинну массива
-    anewarray = 0xBE,
-
-
 };
 
 class Commands {
 
 public:
+    //Функции для кол-ва байт в инте возможно вообще не нужны, а я сильно затупил
+
     // Пытаюсь найти минимальное кол-во байтов для значения
     static int minimumBytesForInt(int value) {
         int v = 30000; // 32-bit word to find the log base 2 of
@@ -211,19 +226,58 @@ public:
         return (int) res + 1;
     }
 
+    //альтернативная функция, считает с учетом знака
+    static int GetMinByteSize(long value, bool _signed) {
+        unsigned long v = (unsigned long) value;
+        // Invert the value when it is negative.
+        if (_signed && value < 0)
+            v = ~v;
+        // The minimum length is 1.
+        int length = 1;
+        // Is there any bit set in the upper half?
+        // Move them to the lower half and try again.
+        if ((v & 0xFFFFFFFF00000000) != 0) {
+            length += 4;
+            v >>= 32;
+        }
+        if ((v & 0xFFFF0000) != 0) {
+            length += 2;
+            v >>= 16;
+        }
+        if ((v & 0xFF00) != 0) {
+            length += 1;
+            v >>= 8;
+        }
+        // We have at most 8 bits left.
+        // Is the most significant bit set (or cleared for a negative number),
+        // then we need an extra byte for the sign bit.
+        if (_signed && (v & 0x80) != 0)
+            length++;
+        return length;
+    }
+
+    // Функция для команд без параметров
     static void doCommand(CodeCommandsNoParams type, vector<ValueAndBytes *> res) {
         res.push_back(new ValueAndBytes(type, 1));
     }
 
+    // Функция для команд с одним однобайтовым параметром
     static void doCommand(CodeCommandsOneParam type, int param, vector<ValueAndBytes *> res) {
 
         res.push_back(new ValueAndBytes(type, 1));
 
-        int bytes = minimumBytesForInt(param);
-
-        res.push_back(new ValueAndBytes(param, bytes));
+        res.push_back(new ValueAndBytes(param, 1));
     }
 
+    // Функция для команд с одним двубайтовым параметром
+    static void doCommandTwoBytes(CodeCommandsOneParamTwoBytes type, int param, vector<ValueAndBytes *> res) {
+
+        res.push_back(new ValueAndBytes(type, 1));
+
+        res.push_back(new ValueAndBytes(param, 2));
+    }
+
+    // Функция для команды с двумя параметрами
     static void doCommand(CodeCommandsTwoParams type, int param1, int param2, vector<ValueAndBytes *> res) {
 
         res.push_back(new ValueAndBytes(type, 1));
@@ -234,19 +288,59 @@ public:
 
     }
 
-    static void doSwitchCommand(CodeCommandsSwitch type, int byteAmount, vector<ValueAndBytes *> res) {
 
-        res.push_back(new ValueAndBytes(type, 1));
+    // Используется для реализации команды switch и используется в тех случаях,
+    // когда ключи расположены достаточно близко друг к другу, так что они могут служить индексами масси-ва.
+    // Поступающий индекс будет сравнен с верхней и нижней границами. Если он меньше нижней или
+    // больше верхней, то будет произведен переход по сдвигу адрес команды + сдвиг по умолчанию. Иначе из
+    // таблицы сдвигов извлечется сдвиг с индекс – нижняя граница и произойдет переход по нему
+    static void
+    doTableSwitchCommand(int zeroAmount, int defaultShift, int topBorder, int BottomBorder, const vector<int> &shifts,
+                         vector<ValueAndBytes *> res) {
 
-        if (byteAmount < 0 || byteAmount > 3) {
-            throw runtime_error("Неккоректное кол-во байтов");
+        // Записываю код комманды
+        res.push_back(new ValueAndBytes(tableswitch, 1));
+
+        // Записываю вспомогательные нули
+        for (zeroAmount; zeroAmount > 0; zeroAmount--) {
+            res.push_back(new ValueAndBytes((int) 0x00, 1));
         }
 
-        for (byteAmount; byteAmount > 0; byteAmount--) {
-            res.push_back(new ValueAndBytes((int) 0x00, 1));
+        // Записываю сдвиг по умолчанию
+        res.push_back(new ValueAndBytes(defaultShift, 4));
+
+        // Записываю границы
+        res.push_back(new ValueAndBytes(BottomBorder, 4));
+
+        res.push_back(new ValueAndBytes(topBorder, 4));
+
+        // Записываю сдвиги для каждого случая
+        for (int shift: shifts) {
+            res.push_back(new ValueAndBytes(shift, 4));
         }
     }
 
+    // Используется для реализации команды switch и используется в тех случаях,
+    //когда ключи являются произвольными целочисленными значениями. Поступивший на вход индекс будет
+    //сравниваться со всему указанными ключами и если совпадет с одним из них, то произойдет переход по
+    //соответствующему сдвигу. Если индекс не совпадет ни с одним ключом, то произойдет сдвиг по умолчанию
+    static void doLookUpSwitchCommand(int zeroAmount, const map<int, int> &shifts, vector<ValueAndBytes *> res) {
+        // Записываю код комманды
+        res.push_back(new ValueAndBytes(lookupswitch, 1));
+
+        // Записываю вспомогательные нули
+        for (zeroAmount; zeroAmount > 0; zeroAmount--) {
+            res.push_back(new ValueAndBytes((int) 0x00, 1));
+        }
+
+        for (auto shift: shifts) {
+            res.push_back(new ValueAndBytes(shift.first, 2));
+            res.push_back(new ValueAndBytes(shift.second, 4));
+        }
+
+    }
+
+    // создает массив заданного типа и размера в области динамически выделяемойпамяти («куче») и помещает ссылку на него на вершину стека
     static void doNewArrayCommand(ConstantType arrayItemsType, vector<ValueAndBytes *> res) {
 
         res.push_back(new ValueAndBytes(newarray, 1));
