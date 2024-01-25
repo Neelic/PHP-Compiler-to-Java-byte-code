@@ -742,8 +742,6 @@ void inspectInterfaceDef(InterfaceExprDefNode *node) {
                 interfaceProps->included.push_back(i); // Добавляю id найденного интерфейса в список includes
             }
 
-            cout << *i << endl;
-
             // Проверяю на дубликат в списке интерфейсов
             if (prevId != nullptr && *i == *prevId)
                 throw runtime_error(
@@ -1276,7 +1274,15 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
         case ExprType::new_decl:
         case ExprType::variable:
             if (!isDeclaredVariable(node->id, variables) && !isDeclaredVariable(node->id, variablesScope)) {
-                variables.push_back(node->id);
+                switch (context) {
+                    case ContextType::inFunction:
+                        variablesScope.push_back(node->id);
+                        break;
+                    default:
+                        variables.push_back(node->id);
+                        break;
+                }
+
             }
             break;
 
