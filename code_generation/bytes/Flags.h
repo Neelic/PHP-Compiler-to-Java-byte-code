@@ -6,6 +6,8 @@
 #define PHP_COMPILER_FLAGS_H
 
 #include "ValueAndBytes.h"
+#include "ClassAccessModList.hpp"
+#include "ClassAccessModNode.hpp"
 
 enum CodeFlags {
     ACC_PUBLIC = 0x0001,
@@ -22,7 +24,40 @@ public:
     explicit Flags(unsigned int codeOfFlag) : codeOfFlag(codeOfFlag) {}
 
     ValueAndBytes flagToBytes() const {
-        return {codeOfFlag, 2};
+        return {(int) codeOfFlag, 2};
+    }
+
+    static Flags *convertToFlags(ClassAccessModList *accessMod) {
+        if (accessMod == nullptr) return nullptr;
+        unsigned int code = 0;
+
+        for (auto &i: accessMod->vector) {
+            switch (i->access_mod) {
+                case ClassAccessMod::public_node:
+                    code += ACC_PUBLIC;
+                    break;
+                case ClassAccessMod::protected_node:
+                    code += ACC_PROTECTED;
+                    break;
+                case ClassAccessMod::private_node:
+                    code += ACC_PRIVATE;
+                    break;
+                case ClassAccessMod::static_node:
+                    code += ACC_STATIC;
+                    break;
+                case ClassAccessMod::final_node:
+                    code += ACC_FINAL;
+                    break;
+                case ClassAccessMod::abstract_node:
+                    code += ACC_ABSTRACT;
+                    break;
+                case ClassAccessMod::read_only_node:
+                    code += ACC_FINAL;
+                    break;
+            }
+        }
+
+        return new Flags(code);
     }
 };
 
