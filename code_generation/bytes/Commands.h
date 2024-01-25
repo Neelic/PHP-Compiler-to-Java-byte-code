@@ -10,9 +10,6 @@
 #include "ValueAndBytes.h"
 #include "code_generation/ConstantValue.h"
 
-
-#endif //PHP_COMPILER_COMMANDS_H
-
 enum CodeCommandsNoParams {
     //Работа со стеком
 
@@ -209,60 +206,14 @@ enum CodeCommandsArray {
 class Commands {
 
 public:
-    //Функции для кол-ва байт в инте возможно вообще не нужны, а я сильно затупил
-
-    // Пытаюсь найти минимальное кол-во байтов для значения
-    static int minimumBytesForInt(int value) {
-        int v = 30000; // 32-bit word to find the log base 2 of
-        int r = 0; // r will be lg(v)
-
-        while ((v >>= 1) != 0) // unroll for more speed...
-        {
-            r++;
-        }
-
-        float res = (float) r / 8;
-
-        return (int) res + 1;
-    }
-
-    //альтернативная функция, считает с учетом знака
-    static int GetMinByteSize(long value, bool _signed) {
-        unsigned long v = (unsigned long) value;
-        // Invert the value when it is negative.
-        if (_signed && value < 0)
-            v = ~v;
-        // The minimum length is 1.
-        int length = 1;
-        // Is there any bit set in the upper half?
-        // Move them to the lower half and try again.
-        if ((v & 0xFFFFFFFF00000000) != 0) {
-            length += 4;
-            v >>= 32;
-        }
-        if ((v & 0xFFFF0000) != 0) {
-            length += 2;
-            v >>= 16;
-        }
-        if ((v & 0xFF00) != 0) {
-            length += 1;
-            v >>= 8;
-        }
-        // We have at most 8 bits left.
-        // Is the most significant bit set (or cleared for a negative number),
-        // then we need an extra byte for the sign bit.
-        if (_signed && (v & 0x80) != 0)
-            length++;
-        return length;
-    }
 
     // Функция для команд без параметров
-    static void doCommand(CodeCommandsNoParams type, vector<ValueAndBytes *> res) {
+    static void doCommand(CodeCommandsNoParams type, vector<ValueAndBytes *> &res) {
         res.push_back(new ValueAndBytes(type, 1));
     }
 
     // Функция для команд с одним однобайтовым параметром
-    static void doCommand(CodeCommandsOneParam type, int param, vector<ValueAndBytes *> res) {
+    static void doCommand(CodeCommandsOneParam type, int param, vector<ValueAndBytes *> &res) {
 
         res.push_back(new ValueAndBytes(type, 1));
 
@@ -270,7 +221,7 @@ public:
     }
 
     // Функция для команд с одним двубайтовым параметром
-    static void doCommandTwoBytes(CodeCommandsOneParamTwoBytes type, int param, vector<ValueAndBytes *> res) {
+    static void doCommandTwoBytes(CodeCommandsOneParamTwoBytes type, int param, vector<ValueAndBytes *> &res) {
 
         res.push_back(new ValueAndBytes(type, 1));
 
@@ -278,13 +229,13 @@ public:
     }
 
     // Функция для команды с двумя параметрами
-    static void doCommand(CodeCommandsTwoParams type, int param1, int param2, vector<ValueAndBytes *> res) {
+    static void doCommand(CodeCommandsTwoParams type, int param1, int param2, vector<ValueAndBytes *> &res) {
 
         res.push_back(new ValueAndBytes(type, 1));
 
-        res.push_back(new ValueAndBytes(param1, minimumBytesForInt(param1)));
+        res.push_back(new ValueAndBytes(param1, 1));
 
-        res.push_back(new ValueAndBytes(param2, minimumBytesForInt(param2)));
+        res.push_back(new ValueAndBytes(param2, 1));
 
     }
 
@@ -296,7 +247,7 @@ public:
     // таблицы сдвигов извлечется сдвиг с индекс – нижняя граница и произойдет переход по нему
     static void
     doTableSwitchCommand(int zeroAmount, int defaultShift, int topBorder, int BottomBorder, const vector<int> &shifts,
-                         vector<ValueAndBytes *> res) {
+                         vector<ValueAndBytes *> &res) {
 
         // Записываю код комманды
         res.push_back(new ValueAndBytes(tableswitch, 1));
@@ -324,7 +275,7 @@ public:
     //когда ключи являются произвольными целочисленными значениями. Поступивший на вход индекс будет
     //сравниваться со всему указанными ключами и если совпадет с одним из них, то произойдет переход по
     //соответствующему сдвигу. Если индекс не совпадет ни с одним ключом, то произойдет сдвиг по умолчанию
-    static void doLookUpSwitchCommand(int zeroAmount, const map<int, int> &shifts, vector<ValueAndBytes *> res) {
+    static void doLookUpSwitchCommand(int zeroAmount, const map<int, int> &shifts, vector<ValueAndBytes *> &res) {
         // Записываю код комманды
         res.push_back(new ValueAndBytes(lookupswitch, 1));
 
@@ -341,7 +292,7 @@ public:
     }
 
     // создает массив заданного типа и размера в области динамически выделяемойпамяти («куче») и помещает ссылку на него на вершину стека
-    static void doNewArrayCommand(ConstantType arrayItemsType, vector<ValueAndBytes *> res) {
+    static void doNewArrayCommand(ConstantType arrayItemsType, vector<ValueAndBytes *> &res) {
 
         res.push_back(new ValueAndBytes(newarray, 1));
         res.push_back(new ValueAndBytes(arrayItemsType, 1));
@@ -350,4 +301,4 @@ public:
 };
 
 
-
+#endif //PHP_COMPILER_COMMANDS_H

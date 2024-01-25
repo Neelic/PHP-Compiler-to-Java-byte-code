@@ -16,7 +16,7 @@ class WriteBytesToFile {
 private:
     ofstream *out;
 public:
-    WriteBytesToFile(const char* filePath) {
+    explicit WriteBytesToFile(const char* filePath) {
         out = new ofstream(filePath, ios::binary | ios::out);
     }
 
