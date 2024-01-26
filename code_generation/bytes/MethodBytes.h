@@ -175,6 +175,11 @@ public:
                 findAllConstInStmtNode(i, consts);
             }
         }
+        if (node->listElse != nullptr) {
+            for (auto i: node->listElse->vector) {
+                findAllConstantsInIfStmt(i, consts);
+            }
+        }
     }
 
     static void findAllConstantsInSwitchStmt(SwitchStmtNode *node, vector<ConstantValue *> &consts) {
