@@ -332,16 +332,15 @@ public:
                 findConstantInExpr(node->right, consts);
                 break;
             case ternary_op:
+            case get_array_val:
+            case add_array_val:
+            case set_array_val:
                 findConstantInExpr(node->left, consts);
                 findConstantInExpr(node->right, consts);
                 findConstantInExpr(node->central, consts);
                 break;
             case ref_op:
-            case get_array_val:
-            case add_array_val:
-            case set_array_val:
                 findConstantInExpr(node->right, consts);
-                break;
             default:
                 break;
         }
