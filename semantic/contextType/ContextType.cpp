@@ -5,5 +5,6 @@ enum ContextType {
     inFunction,
   staticRef,
   classInstRef,
+    ifCondition,
   noContext
 };
