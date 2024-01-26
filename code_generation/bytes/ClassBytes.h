@@ -104,9 +104,10 @@ public:
         for (auto i: node->class_stmt_list->vector) {
             switch (i->type) {
                 case function_def:
-                    tmp_class->addMethod(MethodBytes::fromFunctionStmtDecl(i->function_stmt_decl,
-                                                                           *Flags::convertToFlags(i->access_mod),
-                                                                           consts));
+                    tmp_class->addMethod(
+                            MethodBytes::fromFunctionStmtDecl(i->function_stmt_decl,
+                                                              *Flags::convertToFlags(i->access_mod),
+                                                              consts));
                     break;
                 case function_decl_type:
                     tmp_class->addMethod(
@@ -126,10 +127,10 @@ public:
     // На будущее
     static ClassBytes *fromInterfaceStmtDecl(InterfaceStmtDeclNode *node, Flags &flags, string *superClass,
                                              SourceFileAttribute *sourceFile,
-                                             vector<ConstantValue *> &consts) {
+                                             vector<ConstantValue *> *consts) {
         if (node == nullptr) return nullptr;
 
-        auto tmp_name = ConstantValue::CreateUtf8(*node->expr_definition->id, consts);
+        auto tmp_name = ConstantValue::CreateUtf8(node->expr_definition->id, consts);
         auto tmp_super = ConstantValue::getConstantByString(consts, superClass);
 
         auto tmp_class = new ClassBytes(

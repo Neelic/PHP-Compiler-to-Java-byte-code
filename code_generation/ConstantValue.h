@@ -54,8 +54,8 @@ public:
         return -1;
     }
 
-    static ConstantValue *getConstantByString(vector<ConstantValue *> &consts, string *searchValue) {
-        for (auto &i: consts) {
+    static ConstantValue *getConstantByString(vector<ConstantValue *> *consts, string *searchValue) {
+        for (auto &i: *consts) {
             if (i->typeConst == C_Utf8 && *i->id == *searchValue) {
                 return i;
             }

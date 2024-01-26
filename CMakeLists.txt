@@ -194,7 +194,6 @@ add_executable(PHP_Compiler
         code_generation/bytes/Flags.h
         code_generation/attributes/ConstantValueAttribute.h
         code_generation/attributes/CodeAttribute.h
-        code_generation/attributes/TableAttribute.h
         code_generation/attributes/SourceFileAttribute.h
         code_generation/bytes/Commands.h
 )

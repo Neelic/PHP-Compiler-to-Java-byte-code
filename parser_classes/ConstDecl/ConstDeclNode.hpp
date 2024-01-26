@@ -1,3 +1,7 @@
+
+#ifndef PHP_COMPILER_CONST_DECL_NODE
+#define PHP_COMPILER_CONST_DECL_NODE
+
 #include <string>
 
 class ExprNode;
@@ -14,3 +18,5 @@ public:
 
     std::string* idTag() const;
 };
+
+#endif

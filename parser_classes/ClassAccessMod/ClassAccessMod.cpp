@@ -1,3 +1,7 @@
+
+#ifndef PHP_COMPILER_CLASSACCESSMOD
+#define PHP_COMPILER_CLASSACCESSMOD
+
 enum ClassAccessMod
 {
     public_node,
@@ -8,3 +12,5 @@ enum ClassAccessMod
     read_only_node,
     static_node
 };
+
+#endif

@@ -1,3 +1,7 @@
+
+#ifndef PHP_COMPILER_CLASSACCESSMODNODE
+#define PHP_COMPILER_CLASSACCESSMODNODE
+
 #include "ClassAccessMod.cpp"
 
 #include <string>
@@ -13,3 +17,5 @@ public:
 
     std::string* idTag() const;
 };
+
+#endif

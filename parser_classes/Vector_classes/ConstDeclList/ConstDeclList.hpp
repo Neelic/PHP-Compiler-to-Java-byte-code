@@ -1,3 +1,6 @@
+#ifndef PHP_COMPILER_CONST_DECL_LIST
+#define PHP_COMPILER_CONST_DECL_LIST
+
 #include <vector>
 #include <string>
 
@@ -13,3 +16,5 @@ public:
     
     std::string* idTag() const;
 };
+
+#endif

@@ -1,3 +1,7 @@
+
+#ifndef PHP_COMPILER_CLASSACCESSMODLIST
+#define PHP_COMPILER_CLASSACCESSMODLIST
+
 #include <vector>
 #include <string>
 
@@ -14,3 +18,5 @@ public:
     
     std::string* idTag() const;
 };
+
+#endif

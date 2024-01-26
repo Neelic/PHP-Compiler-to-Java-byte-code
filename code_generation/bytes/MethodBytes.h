@@ -45,7 +45,7 @@ public:
         return res;
     }
 
-    static MethodBytes *fromFunctionStmtDecl(FunctionStmtDeclNode *node, Flags flags, vector<ConstantValue *> &consts) {
+    static MethodBytes *fromFunctionStmtDecl(FunctionStmtDeclNode *node, Flags flags, vector<ConstantValue *> *consts) {
         if (node == nullptr) return nullptr;
 
         // Собираю строку дескриптора
@@ -60,15 +60,15 @@ public:
 
         return new MethodBytes(
                 flags,
-                ConstantValue::CreateUtf8(*node->function_def->func_id, consts),
+                ConstantValue::CreateUtf8(node->function_def->func_id, consts),
                 ConstantValue::getConstantByString(consts, &descriptor) ?: ConstantValue::CreateUtf8(
-                        descriptor, consts),
+                        &descriptor, consts),
                 nullptr, //Заменить на конвертацию vector<StmtList> в CodeAttribute
                 consts
         );
     }
 
-    static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue *> &consts) {
+    static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue *> *consts) {
         if (node == nullptr) return nullptr;
 
         // Собираю строку дескриптора
@@ -82,9 +82,9 @@ public:
 
         return new MethodBytes(
                 flags,
-                ConstantValue::CreateUtf8(*node->func_id, consts),
+                ConstantValue::CreateUtf8(node->func_id, consts),
                 ConstantValue::getConstantByString(consts, &descriptor) ?: ConstantValue::CreateUtf8(
-                        descriptor, consts),
+                        &descriptor, consts),
                 nullptr,
                 consts
         );
