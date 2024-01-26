@@ -66,8 +66,8 @@ public:
 
         auto tmp_name = ConstantValue::CreateUtf8(node->id, consts);
 
-        auto tmp_type = ConstantValue::getConstantByString(consts, new string("RTL/Value;"))
-                        ?: ConstantValue::CreateUtf8(new string("RTL/Value;"), consts);
+        auto tmp_type = ConstantValue::getConstantByString(consts, new string("LRTL/Value;"))
+                        ?: ConstantValue::CreateUtf8(new string("LRTL/Value;"), consts);
 
         auto tmp = new FieldBytes(
                 *tmp_name,
@@ -102,8 +102,8 @@ public:
             case ClassExprType::get_value_class_type:
                 auto tmp_name = ConstantValue::CreateUtf8(node->id, consts);
 
-                auto tmp_type = ConstantValue::getConstantByString(consts, new string("RTL/Value;"))
-                                ?: ConstantValue::CreateUtf8(new string("RTL/Value;"), consts);
+                auto tmp_type = ConstantValue::getConstantByString(consts, new string("LRTL/Value;"))
+                                ?: ConstantValue::CreateUtf8(new string("LRTL/Value;"), consts);
 
                 tmp = new FieldBytes(
                         *tmp_name,

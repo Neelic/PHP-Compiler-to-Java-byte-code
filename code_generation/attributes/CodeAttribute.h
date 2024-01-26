@@ -8,6 +8,14 @@
 
 #include "code_generation/ConstantValue.h"
 #include "TableAttribute.h"
+#include "StmtList.hpp"
+#include "StmtNode.hpp"
+#include "StaticVarList.hpp"
+#include "StaticVarNode.hpp"
+#include "GlobalVarList.hpp"
+#include "GlobalVarNode.hpp"
+#include "parser_classes/Vector_classes/ConstDeclList/ConstDeclList.hpp"
+#include "parser_classes/ConstDecl/ConstDeclNode.hpp"
 
 class CodeAttribute {
 private:
@@ -71,6 +79,62 @@ public:
         }
 
         return res;
+    }
+
+    static CodeAttribute *
+    fromStmtList(StmtList *node, int maxLocals, vector<ConstantValue *> &params, vector<ConstantValue *> &consts) {
+        if (node == nullptr) return nullptr;
+        CodeAttribute *res;
+
+        auto code = vector<ValueAndBytes *>();
+
+        int byteCount = 0;
+
+        for (auto i: node->vector) {
+            switch (i->type) {
+
+                case StmtType::stmt_list:
+                    res = fromStmtList(i->stmtList, maxLocals, consts);
+                    break;
+                case StmtType::static_var:
+                    if (i->static_var == nullptr) break;
+                    for (auto j: i->static_var->vector) {
+                        // Разобраться со сбором констант
+                    }
+                    break;
+                case StmtType::global_var:
+                    if (i->global_var == nullptr) break;
+                    for (auto j: i->global_var->vector) {
+                        // Разобраться со сбором констант
+                    }
+                    break;
+                case StmtType::const_decl:
+                    if (i->const_decl == nullptr) break;
+
+                    for (auto j: i->const_decl->vector) {
+                        // Разобраться со сбором констант
+                    }
+                    break;
+
+                case StmtType::expr:
+                    //getCodeFromStmt
+                    break;
+                case StmtType::break_stmt:
+                    //getCodeFromBreak;
+                    break;
+                case StmtType::continue_stmt:
+                    //getCodeFromContinue
+                    break;
+                case StmtType::if_stmt:
+                    //GenCodeFromIfStmt
+                    break;
+            }
+
+        }
+    }
+
+    const vector<ValueAndBytes *> getCodeFromStmtList(StmtList *node, int currLine, vector<ConstantValue *> &consts) {
+
     }
 };
 
