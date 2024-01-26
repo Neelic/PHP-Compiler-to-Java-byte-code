@@ -66,7 +66,6 @@ public:
         res.push_back(new ValueAndBytes((int) 0, 2));
         //fields
         res.push_back(new ValueAndBytes((int) fields.size(), 2));
-        //!TODO
         for (auto field: fields) {
             auto fieldBytes = field->fieldToBytes();
             res.insert(res.end(), fieldBytes.begin(), fieldBytes.end());
@@ -84,9 +83,72 @@ public:
 
         return res;
     }
-};
 
-ValueAndBytes ClassBytes::magicConst = ValueAndBytes((int) 0xCAFEBABE, 4);
-ValueAndBytes ClassBytes::versionClassFile = ValueAndBytes(65, 4);
+    static ClassBytes *
+    fromClassStmtDeclNode(ClassStmtDeclNode *node, Flags &flags, string *superClass, SourceFileAttribute *sourceFile,
+                          vector<ConstantValue *> *consts) {
+
+        if (node == nullptr) return nullptr;
+
+        auto tmp_name = ConstantValue::CreateUtf8(node->class_def->class_id, consts);
+        auto tmp_super = ConstantValue::getConstantByString(consts, superClass);
+
+        auto tmp_class = new ClassBytes(
+                flags,
+                tmp_name,
+                tmp_super,
+                sourceFile,
+                consts
+        );
+
+        for (auto i: node->class_stmt_list->vector) {
+            switch (i->type) {
+                case function_def:
+                    tmp_class->addMethod(MethodBytes::fromFunctionStmtDecl(i->function_stmt_decl,
+                                                                           *Flags::convertToFlags(i->access_mod),
+                                                                           consts));
+                    break;
+                case function_decl_type:
+                    tmp_class->addMethod(
+                            MethodBytes::fromFunctionDefStmtDecl(i->function_def, *Flags::convertToFlags(i->access_mod),
+                                                                 consts));
+                    break;
+                case class_expr_stmt_type:
+                    tmp_class->addField(FieldBytes::fromStmtExpr(i->class_expr, consts));
+                    break;
+            }
+        }
+
+        return tmp_class;
+    }
+
+
+    // На будущее
+    static ClassBytes *fromInterfaceStmtDecl(InterfaceStmtDeclNode *node, Flags &flags, string *superClass,
+                                             SourceFileAttribute *sourceFile,
+                                             vector<ConstantValue *> &consts) {
+        if (node == nullptr) return nullptr;
+
+        auto tmp_name = ConstantValue::CreateUtf8(*node->expr_definition->id, consts);
+        auto tmp_super = ConstantValue::getConstantByString(consts, superClass);
+
+        auto tmp_class = new ClassBytes(
+                flags,
+                tmp_name,
+                tmp_super,
+                sourceFile,
+                consts
+        );
+
+        for (auto i: node->stmt_list->vector) {
+
+            tmp_class->addMethod(
+                    MethodBytes::fromFunctionDefStmtDecl(i->function_def, *Flags::convertToFlags(i->access_mod),
+                                                         consts));
+        }
+
+        return tmp_class;
+    }
+};
 
 #endif //PHP_COMPILER_CLASSBYTES_H
