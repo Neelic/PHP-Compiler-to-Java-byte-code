@@ -51,12 +51,13 @@ public:
 
         // Собираю строку дескриптора
         auto descriptor = string("(");
+
         // Для каждого параметра функции кроме последнего
         for (int i = 0; i < node->function_def->expr_func_list->vector.size() - 1; i++) {
-            descriptor += "RTL/Value,";
+            descriptor += "LRTL/Value;";
         }
         // Добавляю последний тип и закрываю
-        descriptor += "RTL/Value)RTL/Value";
+        descriptor += ")LRTL/Value;";
 
         return new MethodBytes(
                 flags,
@@ -75,10 +76,10 @@ public:
         auto descriptor = string("(");
         // Для каждого параметра функции кроме последнего
         for (int i = 0; i < node->expr_func_list->vector.size() - 1; i++) {
-            descriptor += "RTL/Value,";
+            descriptor += "LRTL/Value;";
         }
         // Добавляю последний тип и закрываю
-        descriptor += "RTL/Value)RTL/Value";
+        descriptor += ")RTL/Value;";
 
         return new MethodBytes(
                 flags,
