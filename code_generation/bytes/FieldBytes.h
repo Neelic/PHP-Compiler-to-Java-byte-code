@@ -13,20 +13,20 @@
 
 class FieldBytes {
 private:
-    vector<ConstantValue *> consts;
+    vector<ConstantValue *> *consts;
     Flags flags;
     ConstantValue fieldName;
     ConstantValue descriptor;
     vector<ConstantValueAttribute *> attributes;
 public:
-    FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags flags, vector<ConstantValue *> &consts) :
+    FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags flags, vector<ConstantValue *> *consts) :
             descriptor(descriptor), fieldName(fieldName), flags(flags), consts(consts) {
         if (fieldName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Field name is not utf-8 type");
         if (descriptor.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Descriptor is not utf-8 type");
     }
 
     FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags flags,
-               vector<ConstantValueAttribute *> &attributes, vector<ConstantValue *> &consts) :
+               vector<ConstantValueAttribute *> &attributes, vector<ConstantValue *> *consts) :
             descriptor(descriptor), fieldName(fieldName), flags(flags), consts(consts), attributes(attributes) {
         if (fieldName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Field name is not utf-8 type");
         if (descriptor.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Descriptor is not utf-8 type");
@@ -40,10 +40,10 @@ public:
         attributes.push_back(attr);
     }
 
-    vector<ValueAndBytes *> fieldToBytes() {
-        vector<ValueAndBytes *> res;
-        ValueAndBytes flagsBytes = flags.flagToBytes();
-        res.push_back(&flagsBytes);
+    vector<const ValueAndBytes *> fieldToBytes() {
+        vector<const ValueAndBytes *> res;
+        //flags
+        res.push_back(flags.flagToBytes());
         res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, fieldName), 2));
         res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, descriptor), 2));
 

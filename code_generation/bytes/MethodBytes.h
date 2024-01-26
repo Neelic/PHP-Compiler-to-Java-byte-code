@@ -16,21 +16,20 @@ private:
     ConstantValue *name;
     ConstantValue *descriptor;
     CodeAttribute *code = nullptr;
-    vector<ConstantValue *> consts;
+    vector<ConstantValue *> *consts;
 
 public:
-    MethodBytes(Flags &flags, ConstantValue *name, ConstantValue *descriptor, CodeAttribute *code,
-                vector<ConstantValue *> &consts) :
+    MethodBytes(Flags flags, ConstantValue *name, ConstantValue *descriptor, CodeAttribute *code,
+                vector<ConstantValue *> *consts) :
             flags(flags), name(name), descriptor(descriptor), code(code), consts(consts) {
         if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
         if (descriptor->getTypeConst() != C_Utf8) throw runtime_error("Descriptor is not Utf-8");
     }
 
-    vector<ValueAndBytes *> methodToBytes() {
-        auto res = vector<ValueAndBytes *>();
+    vector<const ValueAndBytes *> methodToBytes() {
+        auto res = vector<const ValueAndBytes *>();
 
-        auto flagsBytes = flags.flagToBytes();
-        res.push_back(&flagsBytes);
+        res.push_back(flags.flagToBytes());
         res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *name), 2));
         res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *descriptor), 2));
 

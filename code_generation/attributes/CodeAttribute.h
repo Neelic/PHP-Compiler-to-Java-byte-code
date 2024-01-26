@@ -14,9 +14,9 @@ private:
     ConstantValue *name;
     int maxStack;
     int maxLocals;
-    vector<ValueAndBytes *> code;
+    vector<ValueAndBytes *> *code;
     vector<TableAttribute *> attributes;
-    vector<ConstantValue *> consts;
+    vector<ConstantValue *> *consts;
 
     int getAttrLength() {
         int res = 12; //exclude first 6 bytes
@@ -30,7 +30,7 @@ private:
 
     int getCodeLength() {
         int res = 0;
-        for (auto bytes: code) {
+        for (auto bytes: *code) {
             res += bytes->getBytes();
         }
 
@@ -38,10 +38,18 @@ private:
     }
 
 public:
-    CodeAttribute(ConstantValue *name, int maxStack, int maxLocals, vector<ValueAndBytes *> &code,
-                  vector<TableAttribute *> &attributes, vector<ConstantValue *> &consts)
-            : name(name), maxStack(maxStack), maxLocals(maxLocals), code(code), attributes(attributes), consts(consts) {
-        if (name->getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Name is not utf-8 type");
+    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes *> *code, vector<ConstantValue *> *consts)
+            : maxStack(maxStack), maxLocals(maxLocals), code(code), consts(consts) {
+        auto nameStr = string("Code");
+        name = ConstantValue::CreateUtf8(&nameStr, consts);
+    }
+
+    void addAttribute(TableAttribute *attr) {
+        attributes.push_back(attr);
+    }
+
+    void addCodeValueByte(ValueAndBytes *value) {
+        code->push_back(value);
     }
 
     vector<ValueAndBytes *> attributeToBytes() {
@@ -53,7 +61,7 @@ public:
         res.push_back(new ValueAndBytes(maxLocals, 2));
 
         res.push_back(new ValueAndBytes(getCodeLength(), 4));
-        res.insert(res.end(), code.begin(), code.end());
+        res.insert(res.end(), code->begin(), code->end());
         res.push_back(new ValueAndBytes((int) 0, 2));
 
         res.push_back(new ValueAndBytes((int) attributes.size(), 2));

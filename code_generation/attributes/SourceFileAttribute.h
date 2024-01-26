@@ -12,13 +12,14 @@ class SourceFileAttribute {
 private:
     ConstantValue *nameAttr;
     ConstantValue *fileName;
-    vector<ConstantValue *> consts;
+    vector<ConstantValue *> *consts;
 
 public:
-    SourceFileAttribute(ConstantValue *nameAttr, ConstantValue *fileName, vector<ConstantValue *> &consts)
-            : nameAttr(nameAttr), fileName(fileName), consts(consts) {
-        if (nameAttr->getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Name is not utf-8 type");
+    SourceFileAttribute(ConstantValue *fileName, vector<ConstantValue *> *consts)
+            : fileName(fileName), consts(consts) {
         if (fileName->getTypeConst() != ConstantType::C_Utf8) throw runtime_error("File name is not utf-8 type");
+        auto tmpStr = string("SourceFile"); //TODO че-то происходит с этой строкой
+        nameAttr = ConstantValue::CreateUtf8(&tmpStr, consts);
     }
 
     vector<ValueAndBytes *> attributeToBytes() {

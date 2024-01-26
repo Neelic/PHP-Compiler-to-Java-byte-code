@@ -21,8 +21,9 @@ class Flags {
 public:
     explicit Flags(unsigned int codeOfFlag) : codeOfFlag(codeOfFlag) {}
 
-    ValueAndBytes flagToBytes() const {
-        return {codeOfFlag, 2};
+    const ValueAndBytes *flagToBytes() const {
+        int resFlag = (int) codeOfFlag;
+        return new ValueAndBytes(resFlag, 2);
     }
 };
 
