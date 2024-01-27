@@ -26,6 +26,7 @@ private:
     vector<ValueAndBytes *> *code;
 //    vector<TableAttribute *> attributes; // TODO: Нормально бы удалить TableAttribute
     vector<ConstantValue *> *consts;
+    vector<string *> params; // Список id локальных переменных
 
     int getAttrLength() {
         int res = 12; //exclude first 6 bytes
@@ -47,8 +48,9 @@ private:
     }
 
 public:
-    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes *> *code, vector<ConstantValue *> *consts)
-            : maxStack(maxStack), maxLocals(maxLocals), code(code), consts(consts) {
+    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes *> *code, vector<ConstantValue *> *consts,
+                  vector<string *> &params)
+            : maxStack(maxStack), maxLocals(maxLocals), code(code), consts(consts), params(params) {
         auto nameStr = string("Code");
         name = ConstantValue::CreateUtf8(&nameStr, consts);
     }
@@ -79,48 +81,54 @@ public:
     }
 
     static CodeAttribute *
-    fromStmtList(StmtList *node, int maxLocals, vector<ConstantValue *> &params, vector<ConstantValue *> &consts) {
+    fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue *> &consts) {
         if (node == nullptr) return nullptr;
         CodeAttribute *res;
 
-        auto code_res = vector<ValueAndBytes *>();
-        auto code_tmp = vector<ValueAndBytes *>();
+        auto code_res = &vector<ValueAndBytes *>();
 
         int byteCount = 0;
 
+        res = new CodeAttribute(
+                (int) 10,
+                1000,
+                vector<ValueAndBytes *>(),
+                consts,
+                params
+        ); // TODO:  Какого черта он не создается
+
         for (auto i: node->vector) {
-            code_tmp = getCodeFromStmtNode(i, byteCount, consts);
-
-            byteCount += countByteSize(code_tmp);
-
-            code_res.insert(code_res.end(), code_tmp.begin(), code_tmp.end());
+            res->getCodeFromStmtNode(i, 0);
         }
     }
 
-    static vector<ValueAndBytes *> getCodeFromStmtNode(StmtNode *node, int currLine, vector<ConstantValue *> &consts) {
+    vector<ValueAndBytes *> getCodeFromStmtNode(StmtNode *node, int currLine) {
         if (node == nullptr) return {};
 
         auto res = vector<ValueAndBytes *>();
         auto code_tmp = vector<ValueAndBytes *>();
 
         switch (node->type) {
-                case StmtType::stmt_list:
-                    for (auto i: node->stmtList->vector) {
-                        code_tmp = getCodeFromStmtNode(i, currLine, consts);
-                    }
-                    break;
-                case StmtType::expr:
-                    //getCodeFromStmt
-                    break;
-                case StmtType::break_stmt:
-                    //getCodeFromBreak;
-                    break;
-                case StmtType::continue_stmt:
-                    //getCodeFromContinue
-                    break;
-                case StmtType::if_stmt:
-                    //GenCodeFromIfStmt
-                    break;
+            case stmt_list:
+                for (auto i: node->stmtList->vector) {
+                    code_tmp = getCodeFromStmtNode(i, currLine);
+                    res.insert(res.end(), code_tmp.begin(), code_tmp.end());
+                }
+                break;
+            case expr:
+                code_tmp = getCodeFromExpr(node->expr_left, currLine, 0);
+                res.insert(res.end(), code_tmp.begin(), code_tmp.end());
+                break;
+            case break_stmt:
+                //getCodeFromBreak;
+                break;
+            case continue_stmt:
+                //getCodeFromContinue
+                break;
+            case if_stmt:
+                code_tmp = getCodeFromIfStmt(node->if_stmt, currLine);
+                res.insert(res.end(), code_tmp.begin(), code_tmp.end());
+                break;
             case switch_stmt:
                 break;
             case while_stmt:
@@ -132,15 +140,24 @@ public:
             case foreach_stmt:
                 break;
             case return_stmt:
+                if (node->expr_left == nullptr) {
+                    Commands::doCommand(_return, res);
+                } else {
+                    getCodeFromExpr(node->expr_left, currLine, 1);
+                    Commands::doCommand(areturn, res);
+                }
                 break;
             default:
                 break;
-            }
+        }
 
-        res.insert(res.end(), code_tmp.begin(), code_tmp.end());
+        // Записываю код в code
+        code->insert(code->end(), res.begin(), res.end());
+
+        return res;
     }
 
-    static vector<ValueAndBytes *> getCodeFromIfStmt(IfStmtNode *node, int currLine, vector<ConstantValue *> &consts) {
+    vector<ValueAndBytes *> getCodeFromIfStmt(IfStmtNode *node, int currLine) {
         if (node == nullptr) return {};
 
         auto res = vector<ValueAndBytes *>();
@@ -155,11 +172,11 @@ public:
 
             case only_if:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
-                code_tmp = getCodeFromExpr(node->expr, byteCount, consts, ContextType::ifCondition);
+                code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 // Нахожу код тела
-                code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount, consts);
+                code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount);
                 //Считаю размер тела в байтах
                 skipBytes += countByteSize(code_tmp);
                 //Записываю код проверки условия со сдвигом на размер тела
@@ -169,21 +186,21 @@ public:
                 break;
             case if_else:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
-                code_tmp = getCodeFromExpr(node->expr, byteCount, consts, ContextType::ifCondition);
+                code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
                 // Считаю, сколько строк было в подготовке условия
                 byteCount += countByteSize(code_tmp);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 // Получаю байт код тела
-                code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount, consts);
-                //Считаю размер тела в байтах
-                skipBytes = countByteSize(code_tmp);
+                code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount);
+                //Считаю размер тела в байтах, +3 с учетом команды goto для пропуска else
+                skipBytes = countByteSize(code_tmp) + 3;
                 //Записываю код проверки условия со сдвигом на размер тела
                 Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, res);
                 //Записываю код тела в результат (тело сейчас в code_tmp)
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 //Получаю байт код блока else
-                code_tmp = getCodeFromStmtNode(node->stmt_else, byteCount, consts);
+                code_tmp = getCodeFromStmtNode(node->stmt_else, byteCount);
                 //Считаю размер блока else
                 skipBytes = countByteSize(code_tmp);
                 //Записываю в конец главного блока комманду goto со сдвигом на размер else
@@ -193,12 +210,12 @@ public:
                 break;
             case end_if:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
-                code_tmp = getCodeFromExpr(node->expr, byteCount, consts, ContextType::ifCondition);
+                code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 // Нахожу код тела
                 for (auto i: node->stmtListMain->vector) {
-                    code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount, consts);
+                    code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount);
                     main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
                 }
                 //Считаю размер тела в байтах
@@ -210,25 +227,25 @@ public:
                 break;
             case if_else_endif:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
-                code_tmp = getCodeFromExpr(node->expr, byteCount, consts, ContextType::ifCondition);
+                code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
                 // Считаю, сколько строк было в подготовке условия
                 byteCount += countByteSize(code_tmp);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 // Получаю байт код тела
                 for (auto i: node->stmtListMain->vector) {
-                    code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount, consts);
+                    code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount);
                     main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
                 }
-                //Считаю размер тела в байтах
-                skipBytes += countByteSize(main_code);
+                //Считаю размер тела в байтах, +3 с учетом команды goto для пропуска else
+                skipBytes += countByteSize(main_code) + 3;
                 //Записываю код проверки условия со сдвигом на размер тела
                 Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, res);
                 //Записываю код тела в результат (тело сейчас в main_code)
                 res.insert(res.end(), main_code.begin(), main_code.end());
                 //Получаю байт код блока else
                 for (auto i: node->stmtListElse->vector) {
-                    code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount, consts);
+                    code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount);
                     else_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
                 }
                 //Считаю размер блока else
@@ -239,32 +256,97 @@ public:
                 res.insert(res.end(), else_code.begin(), else_code.end());
                 break;
             case if_else_list_endif:
+                //Как выглядит схема в моей голове:
+                // expr -> iconst_0 или iconst_1;
+                // ifeq {размер тела плюс goto}
+                //      {тело main}
+                //      goto {размер всего else if}
+                // {еще один if}
+                //      {тело if main}
+                //      goto -{размер всех предыдущих ifelse, чтобы попасть в ( goto {размер всего else if} ) }
+
+
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
-                code_tmp = getCodeFromExpr(node->expr, byteCount, consts, ContextType::ifCondition);
+                code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 // Нахожу код тела
                 for (auto i: node->stmtListMain->vector) {
-                    code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount, consts);
+                    code_tmp = getCodeFromStmtNode(node->stmt_main, byteCount);
                     main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
                 }
-                //Считаю размер тела в байтах
-                skipBytes += countByteSize(main_code);
+                //Считаю размер тела в байтах с учетом goto для выхода из конструкции
+                skipBytes = countByteSize(main_code) + 3;
                 //Записываю код проверки условия со сдвигом на размер тела
                 Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, res);
                 //Записываю код тела в результат (тело сейчас в main_code)
                 res.insert(res.end(), main_code.begin(), main_code.end());
-                //Записываю код всех else if
+                //Получаю код всех else if
                 for (auto i: node->listElse->vector) {
-                    code_tmp = getCodeFromIfStmt(i, byteCount, consts);
-                    res.insert(res.end(), code_tmp.begin(), code_tmp.end());
+                    code_tmp = getCodeFromIfStmt(i, byteCount);
+                    else_code.insert(else_code.end(), code_tmp.begin(), code_tmp.end());
+                    skipBytes = countByteSize(else_code);
+                    // Записываю в конец else if команду для перехода на строчку прямо перед конструкцией
+                    Commands::doCommandTwoBytes(go_to, -skipBytes, else_code);
                 }
+                skipBytes = countByteSize(else_code); // Здесь в else_code - весь блок else if
+                Commands::doCommandTwoBytes(go_to, skipBytes, res); // Записываю сразу после main тела
+                res.insert(res.end(), code_tmp.begin(), code_tmp.end()); // Записываю в результат блок else if
+                break;
+        }
+
+        return res;
+    }
+
+    vector<ValueAndBytes *> getFromWhileStmt(WhileStmtNode *node, int currLine) {
+        if (node == nullptr) return {};
+
+        auto res = vector<ValueAndBytes *>();
+        auto main_code = vector<ValueAndBytes *>();
+        auto code_tmp = vector<ValueAndBytes *>();
+
+        int byteCount = currLine;
+        int skipBytes = 0;
+
+        // Условие продолжения цикла
+        code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+        res.insert(res.end(), code_tmp.begin(), code_tmp.end());
+
+        // Тело цикла
+        switch (node->type) {
+            case while_stmt_type:
+                // Тело цикла
+                main_code = getCodeFromStmtNode(node->stmt, byteCount);
+                break;
+            case end_while_stmt_type:
+                for (auto i: node->stmtList->vector) {
+                    code_tmp = getCodeFromStmtNode(i, byteCount);
+                    main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
+                }
+                break;
+        }
+        // +3, учитывая размер goto в конце тела
+        skipBytes = countByteSize(main_code);
+
+        Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes + 3, res);
+        res.insert(res.end(), main_code.begin(), main_code.end()); // Тело while
+        Commands::doCommandTwoBytes(go_to, -skipBytes, res);// Переход к условию цикла
+    }
+
+    vector<ValueAndBytes *> getCodeFromForStmt(ForStmtNode *node, int currLine) {
+        if (node == nullptr) return {};
+
+        switch (node->type) {
+
+            case for_stmt_type:
+                break;
+            case for_end_stmt_type:
                 break;
         }
     }
 
-    static vector<ValueAndBytes *>
-    getCodeFromExpr(ExprNode *node, int currLine, vector<ConstantValue *> &consts, ContextType contextType) {
+    vector<ValueAndBytes *>
+    getCodeFromExpr(ExprNode *node, int currLine, int toStack) {
         if (node == nullptr) return {};
         return {}; // Заглушка
     }
