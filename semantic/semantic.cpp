@@ -1054,6 +1054,10 @@ void inspectForEachStmt(ForEachStmtNode *node, vector<string *> &variablesScope,
     if (node == nullptr) return;
 
     inspectExpr(node->expr_left, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
+    auto tmp = node->expr_left;
+
+    node->expr_left->exprType = array_cast;
+    node->expr_left->left = tmp;
 
     inspectExpr(node->expr_right, variablesScope, constsScope, functionsScope, isInClass, ContextType::inLoop);
 
