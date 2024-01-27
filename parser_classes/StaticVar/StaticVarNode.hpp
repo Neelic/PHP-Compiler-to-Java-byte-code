@@ -1,3 +1,5 @@
+#ifndef PHP_COMPILER_STATIC_VAR_NODE
+#define PHP_COMPILER_STATIC_VAR_NODE
 #include <string>
 #include "StaticVarType.cpp"
 
@@ -17,3 +19,5 @@ public:
 
     std::string* idTag() const;
 };
+
+#endif

@@ -15,6 +15,7 @@ enum CodeFlags {
     ACC_PROTECTED = 0x0004,
     ACC_STATIC = 0x0008,
     ACC_FINAL = 0x0010,
+    ACC_SUPER = 0x0020,
     ACC_ABSTRACT = 0x0400
 };
 

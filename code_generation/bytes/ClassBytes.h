@@ -26,6 +26,9 @@ private:
 
     vector<ConstantValue *> *consts;
 
+    bool isCreatedClassConst = false;
+    bool isCreatedSuperClassConst = false;
+
 public:
     ClassBytes(Flags flags, ConstantValue *name, ConstantValue *superClass, SourceFileAttribute *file,
                vector<ConstantValue *> *consts)
@@ -46,22 +49,39 @@ public:
         return consts;
     }
 
+    ConstantValue *createClassConst() {
+        isCreatedClassConst = true;
+        return ConstantValue::CreateClass(name, consts);
+    }
+
+    ConstantValue *createSuperClassConst() {
+        isCreatedSuperClassConst = true;
+        return ConstantValue::CreateClass(superClass, consts);
+    }
+
     vector<const ValueAndBytes *> classToBytes() {
+        if (!isCreatedClassConst) createClassConst();
+        if (!isCreatedSuperClassConst) createSuperClassConst();
+
         auto res = vector<const ValueAndBytes *>();
         res.push_back(new ValueAndBytes((int) 0xCAFEBABE, 4));
         res.push_back(new ValueAndBytes(65, 4));
         //consts
         res.push_back(new ValueAndBytes((int) consts->size(), 2));
         for (auto constValue: *consts) {
-            res.push_back(new ValueAndBytes(constValue->getTypeConst(), 1)); //tag const
+            auto tagConst = constValue->getTypeConst();
+            res.push_back(new ValueAndBytes(tagConst, 1)); //tag const
+            if (tagConst == C_Utf8) res.push_back(new ValueAndBytes(constValue->getValue()->getBytes(), 2));
             res.push_back(constValue->getValue()); //value const
         }
         //flags
         res.push_back(flags.flagToBytes());
-        //name
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *name), 2)); //TODO возвращает хрень
+        //this class
+        res.push_back(new ValueAndBytes(
+                ConstantValue::getIdConstByString(consts, name->getIdString(), C_Class), 2));
         //super class
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *superClass), 2));
+        res.push_back(new ValueAndBytes(
+                ConstantValue::getIdConstByString(consts, superClass->getIdString(), C_Class), 2));
         //interfaces
         res.push_back(new ValueAndBytes((int) 0, 2));
         //fields

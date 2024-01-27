@@ -1,3 +1,6 @@
+#ifndef PHP_COMPILER_GLOBAL_VAR_LIST
+#define PHP_COMPILER_GLOBAL_VAR_LIST
+
 #include <vector>
 #include <string>
 
@@ -14,3 +17,5 @@ public:
     
     std::string* idTag() const;
 };
+
+#endif

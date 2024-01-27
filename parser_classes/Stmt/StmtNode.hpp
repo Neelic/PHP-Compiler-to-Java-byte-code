@@ -1,3 +1,6 @@
+#ifndef PHP_COMPILER_STMT_NODE
+#define PHP_COMPILER_STMT_NODE
+
 #include "../Stmt/StmtType.cpp"
 // #include "../Vector classes/ConstDeclList/ConstDeclList.hpp";
 #include <vector>
@@ -102,3 +105,5 @@ public:
 
     std::string *idTag() const;
 };
+
+#endif

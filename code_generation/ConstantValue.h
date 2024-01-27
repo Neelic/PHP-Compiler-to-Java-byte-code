@@ -28,6 +28,7 @@ private:
     string *id = new string();
 
     ConstantValue() {}
+
 public:
     ConstantType getTypeConst() const {
         return typeConst;
@@ -37,7 +38,7 @@ public:
         return value;
     }
 
-    string *getString() const {
+    string *getIdString() const {
         return id;
     }
 
@@ -54,9 +55,18 @@ public:
         return -1;
     }
 
-    static ConstantValue *getConstantByString(vector<ConstantValue *> *consts, string *searchValue) {
+    static int getIdConstByString(const vector<ConstantValue *> *consts, string *id, ConstantType type = C_Utf8) {
+        for (int i = 0; i < consts->size(); i++) {
+            if ((*consts)[i]->typeConst == type && *(*consts)[i]->id == *id) return i + 1;
+        }
+
+        return -1;
+    }
+
+    static ConstantValue *
+    getConstantByString(vector<ConstantValue *> *consts, string *searchValue, ConstantType type = C_Utf8) {
         for (auto &i: *consts) {
-            if (i->typeConst == C_Utf8 && *i->id == *searchValue) {
+            if (i->typeConst == type && *i->id == *searchValue) {
                 return i;
             }
         }
@@ -149,7 +159,7 @@ public:
         return constant;
     }
 
-    static ConstantValue *CreateFloat(float  value, vector<ConstantValue *> *consts) {
+    static ConstantValue *CreateFloat(float value, vector<ConstantValue *> *consts) {
         auto constant = new ConstantValue;
         constant->typeConst = C_Float;
         constant->value = new ValueAndBytes(value, 4);

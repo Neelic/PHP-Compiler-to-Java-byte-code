@@ -1456,7 +1456,7 @@ public class Value {
                         return false;
                     }
                     case stringVal -> {
-                        return stringVal.compareTo(other.getString()) > 0;
+                        return stringVal.compareTo(other.getIdString()) > 0;
                     }
                 }
             }

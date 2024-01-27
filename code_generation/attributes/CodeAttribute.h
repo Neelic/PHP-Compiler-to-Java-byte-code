@@ -24,15 +24,15 @@ private:
     int maxStack;
     int maxLocals;
     vector<ValueAndBytes *> *code;
-    vector<TableAttribute *> attributes; // TODO: Нормально бы удалить TableAttribute
+//    vector<TableAttribute *> attributes; // TODO: Нормально бы удалить TableAttribute
     vector<ConstantValue *> *consts;
 
     int getAttrLength() {
         int res = 12; //exclude first 6 bytes
         res += getCodeLength();
-        for (auto table: attributes) {
-            res += table->getAttributeLength();
-        }
+//        for (auto table: attributes) {
+//            res += table->getAttributeLength();
+//        }
 
         return res;
     }
@@ -69,11 +69,11 @@ public:
         res.insert(res.end(), code->begin(), code->end());
         res.push_back(new ValueAndBytes((int) 0, 2));
 
-        res.push_back(new ValueAndBytes((int) attributes.size(), 2));
-        for (auto table: attributes) {
-            auto tableBytes = table->attributeToBytes();
-            res.insert(res.end(), tableBytes.begin(), tableBytes.end());
-        }
+//        res.push_back(new ValueAndBytes((int) attributes.size(), 2));
+//        for (auto table: attributes) {
+//            auto tableBytes = table->attributeToBytes();
+//            res.insert(res.end(), tableBytes.begin(), tableBytes.end());
+//        }
 
         return res;
     }

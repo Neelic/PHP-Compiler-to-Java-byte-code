@@ -40,19 +40,22 @@ int main(int argc, char *argv[]) {
         cout << error.what() << endl;
     }
 
+    //code generation
     vector<ConstantValue *> consts;
     auto name = string("Main"); //
     auto super = string("java/lang/Object"); //
     auto source = string("Main.java"); //
-    auto init = string("init");
+    auto init = string("<init>");
     auto voidDesc = string("()V");
     auto codeVec = vector<ValueAndBytes *>();
     ClassBytes a = ClassBytes(
-            Flags(ACC_PUBLIC + ACC_FINAL),
+            Flags(ACC_PUBLIC + ACC_SUPER),
             ConstantValue::CreateUtf8(&name, &consts),
             ConstantValue::CreateUtf8(&super, &consts),
             new SourceFileAttribute(ConstantValue::CreateUtf8(&source, &consts), &consts),
             &consts);
+    auto classConst = a.createClassConst();
+    auto superClassConst = a.createSuperClassConst();
     a.addMethod(
             new MethodBytes(
                     Flags(ACC_PUBLIC),
@@ -66,7 +69,6 @@ int main(int argc, char *argv[]) {
                     ),
                     &consts
             ));
-    cout << "start code generation\n";
     auto out = WriteBytesToFile("Main.class");
     auto classBytes = a.classToBytes();
     out.write(classBytes);

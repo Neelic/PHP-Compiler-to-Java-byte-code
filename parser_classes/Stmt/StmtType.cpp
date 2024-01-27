@@ -1,3 +1,6 @@
+#ifndef PHP_COMPILER_STMT_TYPE
+#define PHP_COMPILER_STMT_TYPE
+
 enum StmtType
 {
     expr,
@@ -22,3 +25,5 @@ enum StmtType
     continue_stmt,
     t_echo_stmt,
 };
+
+#endif

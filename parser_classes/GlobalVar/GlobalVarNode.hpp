@@ -1,3 +1,6 @@
+#ifndef PHP_COMPILER_GET_VALUE_NODE
+#define PHP_COMPILER_GET_VALUE_NODE
+
 #include <vector>
 #include <string>
 
@@ -15,3 +18,5 @@ public:
 
     std::string* idTag() const;
 };
+
+#endif

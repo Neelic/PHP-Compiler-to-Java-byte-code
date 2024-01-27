@@ -1,3 +1,6 @@
+#ifndef PHP_COMPILER_STATIC_VAR_LIST
+#define PHP_COMPILER_STATIC_VAR_LIST
+
 #include <vector>
 #include <string>
 
@@ -10,6 +13,8 @@ public:
     std::vector<StaticVarNode *> vector;
 
     static StaticVarList *CreateNode(StaticVarNode *node);
-    
-    std::string* idTag() const;
+
+    std::string *idTag() const;
 };
+
+#endif
