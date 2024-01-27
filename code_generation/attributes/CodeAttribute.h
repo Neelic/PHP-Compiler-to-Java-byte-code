@@ -128,16 +128,19 @@ public:
             case break_stmt:
                 if (skipBytes > 0)
                     skipBytes + 3;
-                Commands::doCommandTwoBytes(go_to, skipBytes, &res);
+                Commands::doCommandTwoBytes(go_to, skipBytes, &res); // Заменяется на соответствующий переход
                 break;
             case continue_stmt:
-                //getCodeFromContinue
+                if (skipBytes > 0)
+                    skipBytes + 3;
+                Commands::doCommandTwoBytes(go_to, skipBytes, &res); // Заменяется на соответствующий переход
                 break;
             case if_stmt:
                 code_tmp = getCodeFromIfStmt(node->if_stmt, currLine);
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case switch_stmt:
+                // TODO
                 break;
             case while_stmt:
                 code_tmp = getCodeFromWhileStmt(node->while_stmt, currLine);
@@ -675,16 +678,16 @@ public:
         Commands::doCommandTwoBytes(_new,
                                     ConstantValue::getIdConstByString(consts, classId,
                                                                       ConstantType::C_Class),
-                                    &code_res);
+                                    code_res);
 
-        Commands::doCommand(dup, &code_res);
+        Commands::doCommand(dup, code_res);
 
-        Commands::doCommand(iconst_0, &code_res); // Пока что Value будет создаваться от нуля
+        Commands::doCommand(iconst_0, code_res); // Пока что Value будет создаваться от нуля
 
         Commands::doCommandTwoBytes(invokevirtual, ConstantValue::getIdConstByString(consts, constructor, C_MethodRef),
-                                    &code_res);// Вызываю конструктор, по идее
+                                    code_res);// Вызываю конструктор, по идее
 
-        Commands::doCommand(astore, params.size(), &code_res); // Сохраняю ссылку на объект в новый параметр
+        Commands::doCommand(astore, params.size(), code_res); // Сохраняю ссылку на объект в новый параметр
 
         params.push_back(varName); // Сохраняю имя переменной в учете
     }
