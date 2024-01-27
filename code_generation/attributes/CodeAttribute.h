@@ -81,18 +81,18 @@ public:
     }
 
     static CodeAttribute *
-    fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue *> &consts) {
+    fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue *> *consts) {
         if (node == nullptr) return nullptr;
         CodeAttribute *res;
 
-        auto code_res = &vector<ValueAndBytes *>();
+        auto code_res = vector<ValueAndBytes *>();
 
         int byteCount = 0;
 
         res = new CodeAttribute(
                 (int) 10,
                 1000,
-                vector<ValueAndBytes *>(),
+                &code_res,
                 consts,
                 params
         ); // TODO:  Какого черта он не создается
