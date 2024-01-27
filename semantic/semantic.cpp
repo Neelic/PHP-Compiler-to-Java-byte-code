@@ -973,6 +973,9 @@ void inspectSwitchStmt(SwitchStmtNode *node, vector<string *> &variablesScope, v
     if (node == nullptr) return;
 
     inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
+    auto tmp = node->expr;
+    node->expr->exprType = int_cast;
+    node->expr->left = tmp;
 
     switch (node->type) {
         case SwitchStmtType::just_switch:
@@ -1006,9 +1009,14 @@ void inspectCaseDefaultStmt(CaseDefaultStmtNode *node, vector<string *> &variabl
         }
     }
 
+    ExprNode *tmp;
+
     switch (node->type) {
         case CaseDefaultType::case_stmt:
             inspectExpr(node->expr, variablesScope, constsScope, functionsScope, isInClass, context);
+            tmp = node->expr;
+            node->expr->exprType = int_cast;
+            node->expr->left = tmp;
             break;
         case CaseDefaultType::default_stmt:
         case CaseDefaultType::finally_stmt:
