@@ -350,7 +350,6 @@ html_stmt: END_CODE_PHP_TAG HTML START_CODE_PHP_TAG                  {$$=HtmlStm
 expr:     INT_NUMBER                                                 {$$=ExprNode::CreateFromIntValue($1);}
         | FLOAT_NUMBER                                               {$$=ExprNode::CreateFromFloatValue($1);}
         | STRING                                                     {$$=ExprNode::CreateFromStringValue(new string(*$1));}
-        | COM_STRING                                                 {$$=ExprNode::CreateFromComStringValue(new string(*$1));}
         | '$' THIS                                                   {$$=ExprNode::CreateFromThisKeyword();}
         | get_value ID                                               {$$=ExprNode::CreateFromGetValueId($1, new string(*$2));}
         | ID                                                         {$$=ExprNode::CreateFromId(new string(*$1));}

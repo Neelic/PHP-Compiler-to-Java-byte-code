@@ -350,58 +350,119 @@ public:
         if (node == nullptr) return res;
 
         vector<ValueAndBytes *> tmpVec;
+        ConstantValue *tmpConstant1;
+        ConstantValue *tmpConstant2;
 
         switch (node->exprType) {
-            case plus_op:
-                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
-                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+            case int_val:
+                Commands::doCommandTwoBytes(name_new, -1, &res); //TODO id class constant Value
+                Commands::doCommand(dup, &res);
+                tmpConstant1 = ConstantValue::CreateInteger(node->int_val, consts);
+                Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
+                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(int)
+                Commands::doCommand(astore, -1, &res); //TODO number of local variable
+                break;
+            case float_val:
+                Commands::doCommandTwoBytes(name_new, -1, &res); //TODO id class constant Value
+                Commands::doCommand(dup, &res);
+                tmpConstant1 = ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
+                Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
+                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(float)
+                Commands::doCommand(astore, -1, &res); //TODO number of local variable
+                break;
+            case string_val:
+                Commands::doCommandTwoBytes(name_new, -1, &res); //TODO id class constant Value
+                Commands::doCommand(dup, &res);
+                if (ConstantValue::getIdConstByString(consts, node->string_val) == -1)
+                    tmpConstant1 = ConstantValue::CreateString(
+                            ConstantValue::CreateUtf8(node->string_val, consts),
+                            consts);
+                else
+                    tmpConstant1 = ConstantValue::CreateString(
+                            ConstantValue::getConstantByString(consts, node->string_val),
+                            consts);
+                //TODO Сделать проверку на существование string constant и для инта и флоата
+                Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
+                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(String)
+                Commands::doCommand(astore, -1, &res); //TODO number of local variable
+                break;
+                /// Assign
+            case assign_op:
+                //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommand(astore, -1, &res); //TODO get id number of variable
+                break;
+                ///Math ops
+            case plus_op:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id"), C_MethodRef), //TODO id на Value.add(Value)
+                        ConstantValue::getIdConstByString(consts, new string("id_add"),
+                                                          C_MethodRef), //TODO id на Value.add(Value)
                         &res
-                        );
+                );
                 break;
             case minus_op:
+                //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id"), C_MethodRef), //TODO id на Value.sub(Value)
+                        ConstantValue::getIdConstByString(consts, new string("id_sub"),
+                                                          C_MethodRef), //TODO id на Value.sub(Value)
                         &res
                 );
                 break;
             case mult_op:
+                //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id"), C_MethodRef), //TODO id на Value.mul(Value)
+                        ConstantValue::getIdConstByString(consts, new string("id_mul"),
+                                                          C_MethodRef), //TODO id на Value.mul(Value)
                         &res
                 );
                 break;
             case div_op:
+                //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id"), C_MethodRef), //TODO id на Value.div(Value)
+                        ConstantValue::getIdConstByString(consts, new string("id_div"),
+                                                          C_MethodRef), //TODO id на Value.div(Value)
                         &res
                 );
                 break;
+                ///Local params
             case variable:
-                //TODO aload_№ to bytes
+                //TODO aload № to bytes
                 break;
-                //TODO add constant
+            case id_type:
+                //TODO const
+                break;
         }
-
 
         return res; // Заглушка
     }
