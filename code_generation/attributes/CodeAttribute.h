@@ -108,7 +108,7 @@ public:
         }
     }
 
-    vector<ValueAndBytes *> getCodeFromStmtNode(StmtNode *node, int currLine) {
+    vector<ValueAndBytes *> getCodeFromStmtNode(StmtNode *node, int currLine, int skipBytes = 0) {
         if (node == nullptr) return {};
 
         auto res = vector<ValueAndBytes *>();
@@ -126,7 +126,9 @@ public:
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case break_stmt:
-                //getCodeFromBreak;
+                if (skipBytes > 0)
+                    skipBytes + 3;
+                Commands::doCommandTwoBytes(go_to, skipBytes, &res);
                 break;
             case continue_stmt:
                 //getCodeFromContinue
@@ -142,10 +144,16 @@ public:
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case do_while_stmt:
+                code_tmp = getCodeFromDoWhileStmt(node->do_while_stmt, currLine);
+                res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case for_stmt:
+                code_tmp = getCodeFromForStmt(node->for_stmt, currLine);
+                res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case foreach_stmt:
+                code_tmp = getCodeFromForeachStmt(node->foreach_stmt, currLine);
+                res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case return_stmt:
                 if (node->expr_left == nullptr) {
@@ -405,7 +413,7 @@ public:
 
         skipBytes = countByteSize(main_code);
         //Записываем безусловный переход при старте for
-        Commands::doCommandTwoBytes(go_to, skipBytes + 3, res);
+        Commands::doCommandTwoBytes(go_to, skipBytes + 3, &res);
 
         // Записываем тело цикла
         res.insert(res.end(), main_code.begin(), main_code.end());
@@ -414,8 +422,11 @@ public:
         code_tmp = getCodeFromExpr(node->expr_central, currLine, 1);
         res.insert(res.end(), code_tmp.begin(), code_tmp.end());
 
+        main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
+        skipBytes = countByteSize(main_code);
+
         // Проверка условия, если выполняется - продолжаем, иначе заканчиваем
-        Commands::doCommandTwoBytes(ifne, -skipBytes, res);
+        Commands::doCommandTwoBytes(ifne, -skipBytes, &res);
 
         return res;
     }
@@ -430,55 +441,82 @@ public:
         int byteCount = currLine;
         int skipBytes = 0;
 
-        auto classId = new string("RTL/Value;");
-        auto constructor = new string("RTL/Value.");
+        auto loopIndex = new string(); // Хранит имя переменной, служащей индексом для обхода массива
+        auto arrayItem = new string(); //Хранит имя переменной для текущего элемента массива
 
         // Записываем первое выражение из for
         code_tmp = getCodeFromExpr(node->expr_left, currLine, 0);
         res.insert(res.end(), code_tmp.begin(), code_tmp.end());
 
-        // Подготавливаю индекс для обхода массива и обращения к значениям
-        Commands::doCommand(iconst_0, res);
+        // Записываем второе выражение из for
+        code_tmp = getCodeFromExpr(node->expr_right, currLine, 0);
+        res.insert(res.end(), code_tmp.begin(), code_tmp.end());
 
         if (node->id != nullptr) {
-            auto arrayElementVar = findParamId(node->expr_right->id);
-            if (arrayElementVar == -1) {
-                Commands::doCommandTwoBytes(_new,
-                                            ConstantValue::getIdConstByString(consts, classId, ConstantType::C_Class),
-                                            res);
-                Commands::doCommand(dup, res);
-                Commands::doCommand(iconst_0, res);
-                Commands
-            }
-            Commands::doCommand(istore, findParamId(node->expr_right->id), res);
+            //Создаю последнюю переменную в заголовке, если ее еще нет
+            initializeNewVariable(node->id, &res);
 
-            Commands::doCommand(aaload, res);
+            *loopIndex = *node->expr_right->id;
+            *arrayItem = *node->id;
+
+            // Подготавливаю индекс для обхода массива и обращения к значениям
+            Commands::doCommand(iconst_0, &res);
+
+            Commands::doCommand(istore, findParamId(node->expr_right->id), &res);
 
         } else {
-            auto loopIndex = new string("loopIndex");
-            params.push_back(loopIndex);
-            Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::_new,)
             // Подготавливаю индекс для обхода массива и обращения к значениям
-            Commands::doCommand(istore, findParamId(loopIndex), res);
+            auto loopIndexTemp = new string("loopIndex");
+            initializeNewVariable(loopIndex, &res);
 
+            Commands::doCommand(iconst_0, &res);
+            Commands::doCommand(istore, findParamId(loopIndex), &res);
 
+            *loopIndex = *loopIndexTemp;
+            *arrayItem = *node->expr_right->id;
+            delete loopIndexTemp;
         }
 
-        switch (node->type) {
+        // В начале цикла получаем текущий элемент массива
+        // Записываю в стек ссылку на массив и индекс элемента
+        Commands::doCommand(aload, findParamId(node->expr_left->id), &main_code);
+        Commands::doCommand(iload, findParamId(loopIndex), &main_code);
+        //Загружаю элемент массива по индексу на стек и сохраняю в переменную текущего элемента массива
+        Commands::doCommand(aaload, &main_code);
+        Commands::doCommand(astore, findParamId(arrayItem), &main_code);
 
-            case foreach_stmt_type:
-                break;
-            case foreach_r_double_arrow_stmt_type:
-                break;
-            case foreach_r_double_arrow_pointer_stmt_type:
-                break;
-            case end_foreach_stmt_type:
-                break;
-            case end_foreach_r_double_arrow_stmt_type:
-                break;
-            case end_foreach_r_double_arrow_pointer_stmt_type:
-                break;
+        // Тело цикла
+        if (node->stmt != nullptr) {
+            code_tmp = getCodeFromStmtNode(node->stmt, currLine);
+            main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
+        } else if (node->stmtList != nullptr) {
+            for (auto i: node->stmtList->vector) {
+                code_tmp = getCodeFromStmtNode(i, currLine);
+                main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
+            }
         }
+
+        // Добавляем действие из последнего выражения for к телу цикла
+        Commands::doCommand(iinc, findParamId(loopIndex), 1, &main_code);
+
+        skipBytes = countByteSize(main_code);
+        //Записываем безусловный переход при старте for к вычислению условия
+        Commands::doCommandTwoBytes(go_to, skipBytes + 3, &res);
+
+        // Добавляем в main_code вычисление условия из центрального выражения for
+        Commands::doCommand(aload, findParamId(node->expr_left->id), &main_code);
+        Commands::doCommand(arraylength, &res); // Получаю размер массива
+
+        Commands::doCommand(iload, findParamId(loopIndex), &main_code); // Получаю текущий индекс массива
+
+        // Записываем тело цикла с условием
+        res.insert(res.end(), main_code.begin(), main_code.end());
+
+        // Проверка условия ( i<array.size), если выполняется - переходим к началу цикла, иначе заканчиваем
+        Commands::doCommandTwoBytes(if_cmpgt, -skipBytes, &res);
+
+        return res;
+
     }
 
     vector<ValueAndBytes *> getCodeFromExpr(ExprNode *node, int currLine, int toStack) {
@@ -619,6 +657,36 @@ public:
                 return i;
         }
         return -1;
+    }
+
+    void initializeNewVariable(string *varName, vector<ValueAndBytes *> *code_res) {
+
+        if (varName == nullptr) return;
+
+        auto classId = new string("RTL/Value;");
+        auto constructor = new string("RTL/Value.()");
+
+        auto arrayElementVar = findParamId(varName);
+
+        if (arrayElementVar != -1) {
+            return; // Если переменная уже есть
+        }
+
+        Commands::doCommandTwoBytes(_new,
+                                    ConstantValue::getIdConstByString(consts, classId,
+                                                                      ConstantType::C_Class),
+                                    &code_res);
+
+        Commands::doCommand(dup, &code_res);
+
+        Commands::doCommand(iconst_0, &code_res); // Пока что Value будет создаваться от нуля
+
+        Commands::doCommandTwoBytes(invokevirtual, ConstantValue::getIdConstByString(consts, constructor, C_MethodRef),
+                                    &code_res);// Вызываю конструктор, по идее
+
+        Commands::doCommand(astore, params.size(), &code_res); // Сохраняю ссылку на объект в новый параметр
+
+        params.push_back(varName); // Сохраняю имя переменной в учете
     }
 
 };
