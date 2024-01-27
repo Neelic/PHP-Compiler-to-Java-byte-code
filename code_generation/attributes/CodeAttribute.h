@@ -141,10 +141,10 @@ public:
                 break;
             case return_stmt:
                 if (node->expr_left == nullptr) {
-                    Commands::doCommand(_return, res);
+                    Commands::doCommand(_return, &res);
                 } else {
                     getCodeFromExpr(node->expr_left, currLine, 1);
-                    Commands::doCommand(areturn, res);
+                    Commands::doCommand(areturn, &res);
                 }
                 break;
             default:
@@ -180,7 +180,7 @@ public:
                 //Считаю размер тела в байтах
                 skipBytes += countByteSize(code_tmp);
                 //Записываю код проверки условия со сдвигом на размер тела
-                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, res);
+                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, &res);
                 //Записываю код тела в результат (тело сейчас в code_tmp)
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
@@ -240,7 +240,7 @@ public:
                 //Считаю размер тела в байтах, +3 с учетом команды goto для пропуска else
                 skipBytes += countByteSize(main_code) + 3;
                 //Записываю код проверки условия со сдвигом на размер тела
-                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, res);
+                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, &res);
                 //Записываю код тела в результат (тело сейчас в main_code)
                 res.insert(res.end(), main_code.begin(), main_code.end());
                 //Получаю байт код блока else
@@ -251,7 +251,7 @@ public:
                 //Считаю размер блока else
                 skipBytes = countByteSize(else_code);
                 //Записываю в конец главного блока комманду goto со сдвигом на размер else
-                Commands::doCommandTwoBytes(go_to, skipBytes, res);
+                Commands::doCommandTwoBytes(go_to, skipBytes, &res);
                 //Записываю в результат блок else
                 res.insert(res.end(), else_code.begin(), else_code.end());
                 break;
@@ -278,7 +278,7 @@ public:
                 //Считаю размер тела в байтах с учетом goto для выхода из конструкции
                 skipBytes = countByteSize(main_code) + 3;
                 //Записываю код проверки условия со сдвигом на размер тела
-                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, res);
+                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, &res);
                 //Записываю код тела в результат (тело сейчас в main_code)
                 res.insert(res.end(), main_code.begin(), main_code.end());
                 //Получаю код всех else if
@@ -287,10 +287,10 @@ public:
                     else_code.insert(else_code.end(), code_tmp.begin(), code_tmp.end());
                     skipBytes = countByteSize(else_code);
                     // Записываю в конец else if команду для перехода на строчку прямо перед конструкцией
-                    Commands::doCommandTwoBytes(go_to, -skipBytes, else_code);
+                    Commands::doCommandTwoBytes(go_to, -skipBytes, &else_code);
                 }
                 skipBytes = countByteSize(else_code); // Здесь в else_code - весь блок else if
-                Commands::doCommandTwoBytes(go_to, skipBytes, res); // Записываю сразу после main тела
+                Commands::doCommandTwoBytes(go_to, skipBytes, &res); // Записываю сразу после main тела
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end()); // Записываю в результат блок else if
                 break;
         }
@@ -328,9 +328,9 @@ public:
         // +3, учитывая размер goto в конце тела
         skipBytes = countByteSize(main_code);
 
-        Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes + 3, res);
+        Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes + 3, &res);
         res.insert(res.end(), main_code.begin(), main_code.end()); // Тело while
-        Commands::doCommandTwoBytes(go_to, -skipBytes, res);// Переход к условию цикла
+        Commands::doCommandTwoBytes(go_to, -skipBytes, &res);// Переход к условию цикла
     }
 
     vector<ValueAndBytes *> getCodeFromForStmt(ForStmtNode *node, int currLine) {
@@ -345,10 +345,65 @@ public:
         }
     }
 
-    vector<ValueAndBytes *>
-    getCodeFromExpr(ExprNode *node, int currLine, int toStack) {
-        if (node == nullptr) return {};
-        return {}; // Заглушка
+    vector<ValueAndBytes *> getCodeFromExpr(ExprNode *node, int currLine, int toStack) {
+        vector<ValueAndBytes *> res;
+        if (node == nullptr) return res;
+
+        vector<ValueAndBytes *> tmpVec;
+
+        switch (node->exprType) {
+            case plus_op:
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        ConstantValue::getIdConstByString(consts, new string("id"), C_MethodRef), //TODO id на Value.add(Value)
+                        &res
+                        );
+                break;
+            case minus_op:
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        ConstantValue::getIdConstByString(consts, new string("id"), C_MethodRef), //TODO id на Value.sub(Value)
+                        &res
+                );
+                break;
+            case mult_op:
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        ConstantValue::getIdConstByString(consts, new string("id"), C_MethodRef), //TODO id на Value.mul(Value)
+                        &res
+                );
+                break;
+            case div_op:
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        ConstantValue::getIdConstByString(consts, new string("id"), C_MethodRef), //TODO id на Value.div(Value)
+                        &res
+                );
+                break;
+            case variable:
+                //TODO aload_№ to bytes
+                break;
+                //TODO add constant
+        }
+
+
+        return res; // Заглушка
     }
 
     static int countByteSize(vector<ValueAndBytes *> &code) {

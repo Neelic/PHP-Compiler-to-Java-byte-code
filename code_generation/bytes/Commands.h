@@ -208,34 +208,34 @@ class Commands {
 public:
 
     // Функция для команд без параметров
-    static void doCommand(CodeCommandsNoParams type, vector<ValueAndBytes *> &res) {
-        res.push_back(new ValueAndBytes(type, 1));
+    static void doCommand(CodeCommandsNoParams type, vector<ValueAndBytes *> *res) {
+        res->push_back(new ValueAndBytes(type, 1));
     }
 
     // Функция для команд с одним однобайтовым параметром
-    static void doCommand(CodeCommandsOneParam type, int param, vector<ValueAndBytes *> &res) {
+    static void doCommand(CodeCommandsOneParam type, int param, vector<ValueAndBytes *> *res) {
 
-        res.push_back(new ValueAndBytes(type, 1));
+        res->push_back(new ValueAndBytes(type, 1));
 
-        res.push_back(new ValueAndBytes(param, 1));
+        res->push_back(new ValueAndBytes(param, 1));
     }
 
     // Функция для команд с одним двубайтовым параметром
-    static void doCommandTwoBytes(CodeCommandsOneParamTwoBytes type, int param, vector<ValueAndBytes *> &res) {
+    static void doCommandTwoBytes(CodeCommandsOneParamTwoBytes type, int param, vector<ValueAndBytes *> *res) {
 
-        res.push_back(new ValueAndBytes(type, 1));
+        res->push_back(new ValueAndBytes(type, 1));
 
-        res.push_back(new ValueAndBytes(param, 2));
+        res->push_back(new ValueAndBytes(param, 2));
     }
 
     // Функция для команды с двумя параметрами
-    static void doCommand(CodeCommandsTwoParams type, int param1, int param2, vector<ValueAndBytes *> &res) {
+    static void doCommand(CodeCommandsTwoParams type, int param1, int param2, vector<ValueAndBytes *> *res) {
 
-        res.push_back(new ValueAndBytes(type, 1));
+        res->push_back(new ValueAndBytes(type, 1));
 
-        res.push_back(new ValueAndBytes(param1, 1));
+        res->push_back(new ValueAndBytes(param1, 1));
 
-        res.push_back(new ValueAndBytes(param2, 1));
+        res->push_back(new ValueAndBytes(param2, 1));
 
     }
 
@@ -247,27 +247,27 @@ public:
     // таблицы сдвигов извлечется сдвиг с индекс – нижняя граница и произойдет переход по нему
     static void
     doTableSwitchCommand(int zeroAmount, int defaultShift, int topBorder, int BottomBorder, const vector<int> &shifts,
-                         vector<ValueAndBytes *> &res) {
+                         vector<ValueAndBytes *> *res) {
 
         // Записываю код комманды
-        res.push_back(new ValueAndBytes(tableswitch, 1));
+        res->push_back(new ValueAndBytes(tableswitch, 1));
 
         // Записываю вспомогательные нули
         for (zeroAmount; zeroAmount > 0; zeroAmount--) {
-            res.push_back(new ValueAndBytes((int) 0x00, 1));
+            res->push_back(new ValueAndBytes((int) 0x00, 1));
         }
 
         // Записываю сдвиг по умолчанию
-        res.push_back(new ValueAndBytes(defaultShift, 4));
+        res->push_back(new ValueAndBytes(defaultShift, 4));
 
         // Записываю границы
-        res.push_back(new ValueAndBytes(BottomBorder, 4));
+        res->push_back(new ValueAndBytes(BottomBorder, 4));
 
-        res.push_back(new ValueAndBytes(topBorder, 4));
+        res->push_back(new ValueAndBytes(topBorder, 4));
 
         // Записываю сдвиги для каждого случая
         for (int shift: shifts) {
-            res.push_back(new ValueAndBytes(shift, 4));
+            res->push_back(new ValueAndBytes(shift, 4));
         }
     }
 
@@ -275,27 +275,27 @@ public:
     //когда ключи являются произвольными целочисленными значениями. Поступивший на вход индекс будет
     //сравниваться со всему указанными ключами и если совпадет с одним из них, то произойдет переход по
     //соответствующему сдвигу. Если индекс не совпадет ни с одним ключом, то произойдет сдвиг по умолчанию
-    static void doLookUpSwitchCommand(int zeroAmount, const map<int, int> &shifts, vector<ValueAndBytes *> &res) {
+    static void doLookUpSwitchCommand(int zeroAmount, const map<int, int> &shifts, vector<ValueAndBytes *> *res) {
         // Записываю код комманды
-        res.push_back(new ValueAndBytes(lookupswitch, 1));
+        res->push_back(new ValueAndBytes(lookupswitch, 1));
 
         // Записываю вспомогательные нули
         for (zeroAmount; zeroAmount > 0; zeroAmount--) {
-            res.push_back(new ValueAndBytes((int) 0x00, 1));
+            res->push_back(new ValueAndBytes((int) 0x00, 1));
         }
 
         for (auto shift: shifts) {
-            res.push_back(new ValueAndBytes(shift.first, 2));
-            res.push_back(new ValueAndBytes(shift.second, 4));
+            res->push_back(new ValueAndBytes(shift.first, 2));
+            res->push_back(new ValueAndBytes(shift.second, 4));
         }
 
     }
 
     // создает массив заданного типа и размера в области динамически выделяемойпамяти («куче») и помещает ссылку на него на вершину стека
-    static void doNewArrayCommand(ConstantType arrayItemsType, vector<ValueAndBytes *> &res) {
+    static void doNewArrayCommand(ConstantType arrayItemsType, vector<ValueAndBytes *> *res) {
 
-        res.push_back(new ValueAndBytes(newarray, 1));
-        res.push_back(new ValueAndBytes(arrayItemsType, 1));
+        res->push_back(new ValueAndBytes(newarray, 1));
+        res->push_back(new ValueAndBytes(arrayItemsType, 1));
     }
 
 };
