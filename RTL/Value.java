@@ -14,6 +14,10 @@ public class Value {
     private int lastArrayIndex = -1;
     private boolean isRef = false;
 
+    public Value() {
+        typeVal = TypeValue.nullVal;
+    }
+
     public Value(int intVal) {
         typeVal = TypeValue.intVal;
         this.intVal = intVal;
@@ -1456,7 +1460,7 @@ public class Value {
                         return false;
                     }
                     case stringVal -> {
-                        return stringVal.compareTo(other.getIdString()) > 0;
+                        return stringVal.compareTo(other.getString()) > 0;
                     }
                 }
             }
