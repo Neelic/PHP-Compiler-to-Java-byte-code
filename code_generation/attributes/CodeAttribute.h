@@ -196,7 +196,7 @@ public:
                 //Считаю размер тела в байтах, +3 с учетом команды goto для пропуска else
                 skipBytes = countByteSize(code_tmp) + 3;
                 //Записываю код проверки условия со сдвигом на размер тела
-                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, res);
+                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, &res);
                 //Записываю код тела в результат (тело сейчас в code_tmp)
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 //Получаю байт код блока else
@@ -204,7 +204,7 @@ public:
                 //Считаю размер блока else
                 skipBytes = countByteSize(code_tmp);
                 //Записываю в конец главного блока комманду goto со сдвигом на размер else
-                Commands::doCommandTwoBytes(go_to, skipBytes, res);
+                Commands::doCommandTwoBytes(go_to, skipBytes, &res);
                 //Записываю в результат блок else
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
@@ -221,7 +221,7 @@ public:
                 //Считаю размер тела в байтах
                 skipBytes += countByteSize(main_code);
                 //Записываю код проверки условия со сдвигом на размер тела
-                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, res);
+                Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifeq, skipBytes, &res);
                 //Записываю код тела в результат (тело сейчас в main_code)
                 res.insert(res.end(), main_code.begin(), main_code.end());
                 break;
