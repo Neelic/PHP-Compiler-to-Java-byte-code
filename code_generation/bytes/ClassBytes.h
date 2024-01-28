@@ -137,8 +137,64 @@ public:
                 case class_expr_stmt_type:
                     tmp_class->addField(FieldBytes::fromStmtExpr(i->class_expr, consts));
                     break;
+                default:
+                    break;
             }
         }
+
+        return tmp_class;
+    }
+
+    // От старта
+    static ClassBytes *fromStartStmt(StartNode *node, SourceFileAttribute *sourceFile,
+                                     vector<ConstantValue *> *consts) {
+        if (node == nullptr) return nullptr;
+
+        auto tmp_name = ConstantValue::CreateUtf8(new string("<main>"), consts);
+        auto tmp_super = ConstantValue::getConstantByString(consts, new string("java/lang/Object"));
+
+        auto tmp_class = new ClassBytes(
+                Flags(ACC_PUBLIC + ACC_SUPER),
+                tmp_name,
+                tmp_super,
+                sourceFile,
+                consts
+        );
+        auto stmtList = vector<StmtNode *>();
+
+        for (auto i: node->top_stmt_list->vector) {
+            switch (i->type) {
+                case function_top_type:
+                    tmp_class->addMethod(
+                            MethodBytes::fromFunctionStmtDecl(i->func_stmt_decl,
+                                                              ClassAccessModList::CreateNode(
+                                                                      ClassAccessModNode::CreateNode(
+                                                                              ClassAccessMod::static_node)),
+                                                              consts));
+                    break;
+                case stmt_top_type:
+                    stmtList.push_back(i->stmt);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        auto mainFunctionName = ConstantValue::CreateUtf8(new string("main"), consts);
+
+        auto mainFunctionDesc = ConstantValue::CreateUtf8(new string("([LJava/lang/String;)V"), consts);
+
+        auto mainParams = vector<string *>();
+        mainParams.push_back(new string("args"));
+
+        auto codeList = new StmtList();
+
+        codeList->vector = stmtList;
+
+        auto mainFunction = MethodBytes(Flags(ACC_STATIC + ACC_PUBLIC), mainFunctionName, mainFunctionDesc,
+                                        CodeAttribute::fromStmtList(codeList, 1000, mainParams, consts), consts);
+
+        tmp_class->addMethod(&mainFunction);
 
         return tmp_class;
     }
