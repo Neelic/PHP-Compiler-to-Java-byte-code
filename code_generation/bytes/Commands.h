@@ -169,9 +169,6 @@ enum CodeCommandsOneParamTwoBytes {
 
     // вызывает статический метод класса.
     invokestatic = 0xB8,
-
-    // ключевое слово new
-    name_new = 0xBB,
 };
 
 enum CodeCommandsTwoParams {

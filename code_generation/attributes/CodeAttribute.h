@@ -100,7 +100,7 @@ public:
 
 
         for (auto i: params) {
-            Commands::doCommandTwoBytes(_new,)
+//            Commands::doCommandTwoBytes(_new,);
         }
 
         for (auto i: node->vector) {
@@ -637,23 +637,21 @@ public:
 
         switch (node->exprType) {
             case int_val:
-                Commands::doCommandTwoBytes(name_new, -1, &res); //TODO id class constant Value
+                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
                 Commands::doCommand(dup, &res);
                 tmpConstant1 = ConstantValue::CreateInteger(node->int_val, consts);
                 Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
                 Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(int)
-                Commands::doCommand(astore, -1, &res); //TODO number of local variable
                 break;
             case float_val:
-                Commands::doCommandTwoBytes(name_new, -1, &res); //TODO id class constant Value
+                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
                 Commands::doCommand(dup, &res);
                 tmpConstant1 = ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
                 Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
                 Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(float)
-                Commands::doCommand(astore, -1, &res); //TODO number of local variable
                 break;
             case string_val:
-                Commands::doCommandTwoBytes(name_new, -1, &res); //TODO id class constant Value
+                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
                 Commands::doCommand(dup, &res);
                 if (ConstantValue::getIdConstByString(consts, node->string_val) == -1)
                     tmpConstant1 = ConstantValue::CreateString(
@@ -666,7 +664,6 @@ public:
                 //TODO Сделать проверку на существование string constant и для инта и флоата
                 Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
                 Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(String)
-                Commands::doCommand(astore, -1, &res); //TODO number of local variable
                 break;
                 /// Assign
             case assign_op:
