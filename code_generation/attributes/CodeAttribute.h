@@ -28,6 +28,8 @@ private:
     vector<ConstantValue *> *consts;
     vector<string *> params; // Список id локальных переменных
 
+    int idClassConst = -1;
+
     int getAttrLength() {
         int res = 12; //exclude first 6 bytes
         res += getCodeLength();
@@ -634,36 +636,68 @@ public:
         vector<ValueAndBytes *> tmpVec;
         ConstantValue *tmpConstant1;
         ConstantValue *tmpConstant2;
+        idClassConst = idClass(new string("Value"));
 
         switch (node->exprType) {
             case int_val:
-                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
+                // create new value
+                Commands::doCommandTwoBytes(_new, idClassConst, &res);
                 Commands::doCommand(dup, &res);
-                tmpConstant1 = ConstantValue::CreateInteger(node->int_val, consts);
-                Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
-                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(int)
+                //if consts hasn't integer const
+                if (ConstantValue::getIdConstByString(consts, new string(to_string(node->int_val)), C_Integer) == -1)
+                    ConstantValue::CreateInteger(node->int_val, consts);
+                //load int to stack
+                Commands::doCommand(ldc,
+                                    ConstantValue::getIdConstByString(consts, new string(to_string(node->int_val))),
+                                    &res);
+                Commands::doCommandTwoBytes(
+                        invokespecial,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("<init>"),
+                                new string("(I)V")),
+                        &res); //id на Value(int)
                 break;
             case float_val:
-                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
+                // create new value
+                Commands::doCommandTwoBytes(_new, idClassConst, &res);
                 Commands::doCommand(dup, &res);
-                tmpConstant1 = ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
-                Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
-                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(float)
+                //if consts hasn't float const
+                if (ConstantValue::getIdConstByString(consts, new string(to_string(node->float_val)), C_Integer) == -1)
+                    ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
+                //load float to stack
+                Commands::doCommand(ldc,
+                                    ConstantValue::getIdConstByString(consts, new string(to_string(node->float_val))),
+                                    &res);
+                Commands::doCommandTwoBytes(
+                        invokespecial,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("<init>"),
+                                new string("(F)V")),
+                        &res); //id на Value(float)
                 break;
             case string_val:
-                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
+                // create new value
+                Commands::doCommandTwoBytes(_new, idClassConst, &res);
                 Commands::doCommand(dup, &res);
-                if (ConstantValue::getIdConstByString(consts, node->string_val) == -1)
-                    tmpConstant1 = ConstantValue::CreateString(
-                            ConstantValue::CreateUtf8(node->string_val, consts),
-                            consts);
-                else
-                    tmpConstant1 = ConstantValue::CreateString(
+                //if consts hasn't string const
+                if (ConstantValue::getIdConstByString(consts, node->string_val, C_String) == -1) {
+                    if (ConstantValue::getIdConstByString(consts, node->string_val) == -1)
+                        ConstantValue::CreateUtf8(node->string_val, consts);
+                    ConstantValue::CreateString(
                             ConstantValue::getConstantByString(consts, node->string_val),
                             consts);
-                //TODO Сделать проверку на существование string constant и для инта и флоата
-                Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
-                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(String)
+                }
+                //load string const
+                Commands::doCommand(ldc, ConstantValue::getIdConstByString(consts, node->string_val, C_String), &res);
+                Commands::doCommandTwoBytes(
+                        invokespecial,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("<init>"),
+                                new string("(Ljava/lang/String;)V")
+                        ), &res); //id на Value(String)
                 break;
                 /// Assign
             case assign_op:
@@ -684,8 +718,11 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id_add"),
-                                                          C_MethodRef), //TODO id на Value.add(Value)
+                        idMethodRef(
+                                new string("Value"),
+                                new string("add"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.add(Value)
                         &res
                 );
                 break;
@@ -699,8 +736,11 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id_sub"),
-                                                          C_MethodRef), //TODO id на Value.sub(Value)
+                        idMethodRef(
+                                new string("Value"),
+                                new string("sub"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.sub(Value)
                         &res
                 );
                 break;
@@ -714,8 +754,11 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id_mul"),
-                                                          C_MethodRef), //TODO id на Value.mul(Value)
+                        idMethodRef(
+                                new string("Value"),
+                                new string("mul"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.mul(Value)
                         &res
                 );
                 break;
@@ -729,8 +772,135 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id_div"),
-                                                          C_MethodRef), //TODO id на Value.div(Value)
+                        idMethodRef(
+                                new string("Value"),
+                                new string("div"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+                ///Logic ops
+            case bool_equal:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("equals"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case bool_equal_strict:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("equalsStrict"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case bool_not:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("not"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case bool_more:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("more"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case bool_less:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("less"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case bool_and:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("and"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case bool_or:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("or"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.div(Value)
                         &res
                 );
                 break;
@@ -741,9 +911,140 @@ public:
             case id_type:
                 //TODO const
                 break;
+                ///Array
+            case set_array_val:
+                break;
+            case add_array_val:
+                break;
+            case get_array_val:
+                ///Casts
+            case int_cast:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("toIntVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case float_cast:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("toFloatVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case bool_cast:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("toBoolVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case string_cast:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("toStringVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case array_cast:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("Value"),
+                                new string("toArrayVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
         }
 
         return res; // Заглушка
+    }
+
+    int idUtf8(string *value) {
+        if (ConstantValue::getIdConstByString(consts, value) == -1)
+            ConstantValue::CreateUtf8(value, consts);
+
+        return ConstantValue::getIdConstByString(consts, value);
+    }
+
+    int idClass(string *className) {
+        if (ConstantValue::getIdConstByString(consts, className, C_Class) == -1) {
+            idUtf8(className);
+            ConstantValue::CreateClass(
+                    ConstantValue::getConstantByString(consts, className),
+                    consts);
+        }
+
+        return ConstantValue::getIdConstByString(consts, className, C_Class);
+    }
+
+    int idMethodRef(string *className, string *nameMethod, string *typeMethod) {
+        idClass(className);
+
+        if (ConstantValue::getIdConstByString(consts, new string(*nameMethod + *typeMethod), C_NameAndType) == -1) {
+            idUtf8(nameMethod);
+
+            idUtf8(typeMethod);
+
+            ConstantValue::CreateNameAndType(
+                    ConstantValue::getConstantByString(consts, nameMethod),
+                    ConstantValue::getConstantByString(consts, typeMethod),
+                    consts
+            );
+        }
+
+        if (ConstantValue::getIdConstByString(consts,
+                                              new string(*className + '.' + *nameMethod + *typeMethod),
+                                              C_MethodRef) == -1) {
+            ConstantValue::CreateMethodRef(
+                    ConstantValue::getConstantByString(consts, className, C_Class),
+                    ConstantValue::getConstantByString(consts,
+                                                       new string(*nameMethod + *typeMethod),
+                                                       C_NameAndType),
+                    consts
+            );
+        }
+
+        return ConstantValue::getIdConstByString(consts, new string(*className + '.' + *nameMethod + *typeMethod),
+                                                 C_MethodRef);
     }
 
     static int countByteSize(vector<ValueAndBytes *> &code) {
@@ -769,7 +1070,7 @@ public:
         if (varName == nullptr) return;
 
         auto classId = new string("RTL/Value;");
-        auto constructor = new string("RTL/Value.()");
+        auto constructor = new string("RTL/Value.()V");
 
         auto arrayElementVar = findParamId(varName);
 

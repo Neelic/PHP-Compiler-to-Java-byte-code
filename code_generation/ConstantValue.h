@@ -110,7 +110,7 @@ public:
         constant->typeConst = C_NameAndType;
         int idName = getIdConst(consts, *name);
         int idDesc = getIdConst(consts, *descriptor);
-        *constant->id = *name->id + "(" + *descriptor->id + ")";
+        *constant->id = *name->id + *descriptor->id;
         constant->value = new ValueAndBytes((idName << 16) | idDesc, 4);
         consts->push_back(constant);
 
@@ -144,7 +144,7 @@ public:
         int idClass = getIdConst(consts, *classConst);
         int idNameAndType = getIdConst(consts, *nameAndType);
         constant->value = new ValueAndBytes((idClass << 16) | idNameAndType, 4);
-        *constant->id = *nameAndType->id;
+        *constant->id = *classConst->id + "." + *nameAndType->id;
         consts->push_back(constant);
 
         return constant;
@@ -164,6 +164,7 @@ public:
         auto constant = new ConstantValue;
         constant->typeConst = C_Float;
         constant->value = new ValueAndBytes(value, 4);
+        *constant->id = to_string(value);
         consts->push_back(constant);
 
         return constant;
