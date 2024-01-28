@@ -126,12 +126,12 @@ public:
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case break_stmt:
-                if (skipBytes > 0)
+                if (skipBytes >= 0)
                     skipBytes + 3;
                 Commands::doCommandTwoBytes(go_to, skipBytes, &res); // Заменяется на соответствующий переход
                 break;
             case continue_stmt:
-                if (skipBytes > 0)
+                if (skipBytes >= 0)
                     skipBytes + 3;
                 Commands::doCommandTwoBytes(go_to, skipBytes, &res); // Заменяется на соответствующий переход
                 break;
@@ -140,7 +140,8 @@ public:
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case switch_stmt:
-                // TODO
+                code_tmp = getCodeFromSwitchStmt(node->switch_stmt, currLine);
+                res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 break;
             case while_stmt:
                 code_tmp = getCodeFromWhileStmt(node->while_stmt, currLine);
@@ -165,6 +166,10 @@ public:
                     getCodeFromExpr(node->expr_left, currLine, 1);
                     Commands::doCommand(areturn, &res);
                 }
+                break;
+            case static_var:
+                break;
+            case global_var:
                 break;
             default:
                 break;
@@ -192,6 +197,7 @@ public:
             case only_if:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true, при переходе вперед нужно добавлять размер самого сравнения, то бишь 3
                 code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+                convertBoolToInt(&code_tmp);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 // Нахожу код тела
@@ -206,6 +212,7 @@ public:
             case if_else:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
                 code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+                convertBoolToInt(&code_tmp);
                 // Считаю, сколько строк было в подготовке условия
                 byteCount += countByteSize(code_tmp);
                 // Записываю подготовку условия в код
@@ -230,6 +237,7 @@ public:
             case end_if:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
                 code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+                convertBoolToInt(&code_tmp);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 // Нахожу код тела
@@ -247,6 +255,7 @@ public:
             case if_else_endif:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
                 code_tmp = getCodeFromExpr(node->expr, byteCount + 3, 1);
+                convertBoolToInt(&code_tmp);
                 // Считаю, сколько строк было в подготовке условия
                 byteCount += countByteSize(code_tmp);
                 // Записываю подготовку условия в код
@@ -287,6 +296,7 @@ public:
 
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
                 code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+                convertBoolToInt(&code_tmp);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                 // Нахожу код тела
@@ -329,6 +339,7 @@ public:
 
         // Условие продолжения цикла
         code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+        convertBoolToInt(&code_tmp);
         res.insert(res.end(), code_tmp.begin(), code_tmp.end());
 
         // Тело цикла
@@ -370,6 +381,7 @@ public:
 
         // Вычисление Условия продолжения цикла
         code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+        convertBoolToInt(&code_tmp);
         res.insert(res.end(), code_tmp.begin(), code_tmp.end());
 
         // Получение размера условия с учетом вычисления условия продолжения цикла
@@ -423,6 +435,7 @@ public:
 
         // Записываем вычисление условия из центрального выражения for
         code_tmp = getCodeFromExpr(node->expr_central, currLine, 1);
+        convertBoolToInt(&code_tmp);
         res.insert(res.end(), code_tmp.begin(), code_tmp.end());
 
         main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
@@ -434,6 +447,7 @@ public:
         return res;
     }
 
+    // !!! В случае чего избегаем как чумы !!!
     vector<ValueAndBytes *> getCodeFromForeachStmt(ForEachStmtNode *node, int currLine) {
         if (node == nullptr) return {};
 
@@ -455,6 +469,7 @@ public:
         code_tmp = getCodeFromExpr(node->expr_right, currLine, 0);
         res.insert(res.end(), code_tmp.begin(), code_tmp.end());
 
+        // Если в заголовке есть параметр для ключа
         if (node->id != nullptr) {
             //Создаю последнюю переменную в заголовке, если ее еще нет
             initializeNewVariable(node->id, &res);
@@ -586,6 +601,7 @@ public:
                     code_tmp = getCodeFromExpr(
                             ExprNode::CreateFromBoolCast(ExprNode::CreateFromBooleanOpEqual(node->expr, i->expr)),
                             currLine, 0);
+                    convertBoolToInt(&code_tmp);
                     ifSkip += countByteSize(code_tmp) + 3;// Потому что еще команда сравнения
                     break;
                 case default_stmt:
@@ -606,6 +622,7 @@ public:
                     code_tmp = getCodeFromExpr(
                             ExprNode::CreateFromBoolCast(ExprNode::CreateFromBooleanOpEqual(node->expr, i->expr)),
                             currLine, 0);
+                    convertBoolToInt(&code_tmp);
                     res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                     ifSkip -= countByteSize(code_tmp); // Вычитаю, так как переход происходит после вычисления условия
                     Commands::doCommandTwoBytes(CodeCommandsOneParamTwoBytes::ifne, ifSkip + skipList[countCase], &res);
@@ -631,27 +648,41 @@ public:
         vector<ValueAndBytes *> res;
         if (node == nullptr) return res;
 
+        auto classIdValueConst = ConstantValue::getIdConstByString(consts, new string("RTL/Value"),
+                                                                   ConstantType::C_Class); // Константа класса
+        // Константы конструкторов
+        auto constructorNewValueIntConst = ConstantValue::getIdConstByString(consts,
+                                                                             new string("RTL/Value.(I)LRTL/Value;"),
+                                                                             C_MethodRef);
+        auto constructorNewValueFloatConst = ConstantValue::getIdConstByString(consts,
+                                                                               new string("RTL/Value.(F)LRTL/Value;"),
+                                                                               C_MethodRef);
+        auto constructorNewValueStrConst = ConstantValue::getIdConstByString(consts,
+                                                                             new string("RTL/Value.()LRTL/Value;"),
+                                                                             C_MethodRef);// TODO: Добавить путь к явовской строке
+
+
         vector<ValueAndBytes *> tmpVec;
         ConstantValue *tmpConstant1;
         ConstantValue *tmpConstant2;
 
         switch (node->exprType) {
             case int_val:
-                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
+                Commands::doCommandTwoBytes(_new, classIdValueConst, &res);
                 Commands::doCommand(dup, &res);
                 tmpConstant1 = ConstantValue::CreateInteger(node->int_val, consts);
                 Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
-                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(int)
+                Commands::doCommandTwoBytes(invokespecial, constructorNewValueIntConst, &res);
                 break;
             case float_val:
-                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
+                Commands::doCommandTwoBytes(_new, classIdValueConst, &res);
                 Commands::doCommand(dup, &res);
                 tmpConstant1 = ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
                 Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
-                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(float)
+                Commands::doCommandTwoBytes(invokespecial, constructorNewValueFloatConst, &res);
                 break;
             case string_val:
-                Commands::doCommandTwoBytes(_new, -1, &res); //TODO id class constant Value
+                Commands::doCommandTwoBytes(_new, classIdValueConst, &res);
                 Commands::doCommand(dup, &res);
                 if (ConstantValue::getIdConstByString(consts, node->string_val) == -1)
                     tmpConstant1 = ConstantValue::CreateString(
@@ -663,15 +694,15 @@ public:
                             consts);
                 //TODO Сделать проверку на существование string constant и для инта и флоата
                 Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
-                Commands::doCommandTwoBytes(invokespecial, -1, &res); //TODO id method ref Value(String)
+                Commands::doCommandTwoBytes(invokespecial, constructorNewValueStrConst, &res);
                 break;
                 /// Assign
             case assign_op:
                 //get on stack right part
-                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                tmpVec = getCodeFromExpr(node->right, currLine, 1);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //op
-                Commands::doCommand(astore, -1, &res); //TODO get id number of variable
+                Commands::doCommand(astore, findParamId(node->left->id), &res);
                 break;
                 ///Math ops
             case plus_op:
@@ -684,7 +715,7 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id_add"),
+                        ConstantValue::getIdConstByString(consts, new string("RTL/Value/"),
                                                           C_MethodRef), //TODO id на Value.add(Value)
                         &res
                 );
@@ -768,8 +799,8 @@ public:
 
         if (varName == nullptr) return;
 
-        auto classId = new string("RTL/Value;");
-        auto constructor = new string("RTL/Value.()");
+        auto classId = new string("RTL/Value");
+        auto constructor = new string("RTL/Value.()LRTL/Value");
 
         auto arrayElementVar = findParamId(varName);
 
@@ -792,6 +823,23 @@ public:
         Commands::doCommand(astore, params.size(), code_res); // Сохраняю ссылку на объект в новый параметр
 
         params.push_back(varName); // Сохраняю имя переменной в учете
+    }
+
+    // Переводит Value(bool) в int, нужно для комманд сравнения. После выполнения в стеке должна лежать int 1 или 0
+    void convertBoolToInt(vector<ValueAndBytes *> *code_res) {
+        auto constructorConvert = new string("RTL/Value.toIntVal()LRTL/Value;");
+        auto constructorGetField = new string("RTL/Value.getInt()I");
+
+        //Приводит Value(bool) к Value(int)
+        Commands::doCommandTwoBytes(invokevirtual,
+                                    ConstantValue::getIdConstByString(consts, constructorConvert, C_MethodRef),
+                                    code_res);
+        // На всякий, чтобы не потерять
+        Commands::doCommand(dup, code_res);
+        //Получает int
+        Commands::doCommandTwoBytes(invokevirtual,
+                                    ConstantValue::getIdConstByString(consts, constructorGetField, C_MethodRef),
+                                    code_res);
     }
 
 };
