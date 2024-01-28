@@ -167,9 +167,30 @@ public:
                     Commands::doCommand(areturn, &res);
                 }
                 break;
+            case const_decl:
+                for (auto i: node->const_decl->vector) {
+                    initializeNewVariable(i->id, &res);
+                    //get on stack right part
+                    code_tmp = getCodeFromExpr(i->expr, currLine, 1);
+                    res.insert(res.end(), code_tmp.begin(), code_tmp.end());
+                    //op
+                    Commands::doCommand(astore, findParamId(i->id), &res);
+                }
+                break;
             case static_var:
+                for (auto i: node->static_var->vector) {
+                    initializeNewVariable(i->id, &res);
+                    //get on stack right part
+                    code_tmp = getCodeFromExpr(i->expr, currLine, 1);
+                    res.insert(res.end(), code_tmp.begin(), code_tmp.end());
+                    //op
+                    Commands::doCommand(astore, findParamId(i->id), &res);
+                }
                 break;
             case global_var:
+                for (auto i: node->global_var->vector) {
+                    initializeNewVariable(i->id, &res);
+                }
                 break;
             default:
                 break;

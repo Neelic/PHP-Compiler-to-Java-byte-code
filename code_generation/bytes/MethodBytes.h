@@ -355,8 +355,8 @@ public:
     static void addConstant(string *id, string *type, vector<ConstantValue *> &consts) {
         // Проверяю, что константа еще не добавлена
         if (ConstantValue::getConstantByString(&consts, id) == nullptr)
-            ConstantValue::CreateClass(ConstantValue::CreateUtf8(id, &consts),
-                                       &consts); // TODO: А куда дескриптор девать?
+            ConstantValue::CreateUtf8(id,
+                                      &consts); // Тут дескриптор и не нужен, потому что это не класс и не метод, а просто имя константы
     }
 };
 
