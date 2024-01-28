@@ -151,6 +151,9 @@ public:
         if (node == nullptr) return nullptr;
 
         auto tmp_name = ConstantValue::CreateUtf8(new string("<main>"), consts);
+
+        if (ConstantValue::getIdConstByString(consts, new string("java/lang/Object")) == -1)
+            ConstantValue::CreateUtf8(new string("java/lang/Object"), consts);
         auto tmp_super = ConstantValue::getConstantByString(consts, new string("java/lang/Object"));
 
         auto tmp_class = new ClassBytes(

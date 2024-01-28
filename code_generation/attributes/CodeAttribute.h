@@ -204,7 +204,7 @@ public:
                 Commands::doCommandTwoBytes(invokevirtual, idMethodRef(
                         new string("RTL/Functions"),
                         new string("echo"),
-                        new string("(LRTL/Value)V")), &res); // Выполняю функцию
+                        new string("(LRTL/Value;)V")), &res); // Выполняю функцию
 
                 break;
         }
