@@ -670,26 +670,12 @@ public:
     vector<ValueAndBytes *> getCodeFromExpr(ExprNode *node, int currLine, int toStack) {
         vector<ValueAndBytes *> res;
         if (node == nullptr) return res;
-
-        auto classIdValueConst = ConstantValue::getIdConstByString(consts, new string("RTL/Value"),
-                                                                   ConstantType::C_Class); // Константа класса
-        // Константы конструкторов
-        auto constructorNewValueIntConst = ConstantValue::getIdConstByString(consts,
-                                                                             new string("RTL/Value.(I)LRTL/Value;"),
-                                                                             C_MethodRef);
-        auto constructorNewValueFloatConst = ConstantValue::getIdConstByString(consts,
-                                                                               new string("RTL/Value.(F)LRTL/Value;"),
-                                                                               C_MethodRef);
-        auto constructorNewValueStrConst = ConstantValue::getIdConstByString(consts,
-                                                                             new string("RTL/Value.()LRTL/Value;"),
-                                                                             C_MethodRef);// TODO: Добавить путь к явовской строке
-
         int target;
 
         vector<ValueAndBytes *> tmpVec;
         ConstantValue *tmpConstant1;
         ConstantValue *tmpConstant2;
-        idClassConst = idClass(new string("Value"));
+        idClassConst = idClass(new string("RTL/Value"));
 
         switch (node->exprType) {
             case int_val:
@@ -706,7 +692,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokespecial,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("<init>"),
                                 new string("(I)V")),
                         &res); //id на Value(int)
@@ -725,7 +711,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokespecial,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("<init>"),
                                 new string("(F)V")),
                         &res); //id на Value(float)
@@ -747,7 +733,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokespecial,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("<init>"),
                                 new string("(Ljava/lang/String;)V")
                         ), &res); //id на Value(String)
@@ -772,7 +758,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("add"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.add(Value)
@@ -790,7 +776,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("sub"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.sub(Value)
@@ -808,7 +794,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("mul"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.mul(Value)
@@ -826,7 +812,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("div"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -845,7 +831,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("equals"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -863,7 +849,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("equalsStrict"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -878,7 +864,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("not"),
                                 new string("()LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -896,7 +882,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("more"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -914,7 +900,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("less"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -932,7 +918,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("and"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -950,7 +936,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("or"),
                                 new string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -980,7 +966,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("toIntVal"),
                                 new string("()LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -995,7 +981,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("toFloatVal"),
                                 new string("()LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -1010,7 +996,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("toBoolVal"),
                                 new string("()LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -1025,7 +1011,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("toStringVal"),
                                 new string("()LRTL/Value;")
                         ), //id на Value.div(Value)
@@ -1040,7 +1026,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("Value"),
+                                new string("RTL/Value"),
                                 new string("toArrayVal"),
                                 new string("()LRTL/Value;")
                         ), //id на Value.div(Value)
