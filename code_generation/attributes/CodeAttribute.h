@@ -673,9 +673,8 @@ public:
         int target;
 
         vector<ValueAndBytes *> tmpVec;
-        ConstantValue *tmpConstant1;
-        ConstantValue *tmpConstant2;
         idClassConst = idClass(new string("RTL/Value"));
+        string isVar;
 
         switch (node->exprType) {
             case int_val:
@@ -744,6 +743,8 @@ public:
                 tmpVec = getCodeFromExpr(node->right, currLine, 1);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //op
+                if (node->left->exprType == variable) isVar = "$";
+                if (findParamId(node->left->id) == -1) params.push_back(new string(isVar + *node->left->id));
                 Commands::doCommand(astore, findParamId(node->left->id), &res);
                 break;
                 ///Math ops
@@ -834,7 +835,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("equals"),
                                 new string("(LRTL/Value;)LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.equals(Value)
                         &res
                 );
                 break;
@@ -852,7 +853,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("equalsStrict"),
                                 new string("(LRTL/Value;)LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.equalsStrict(Value)
                         &res
                 );
                 break;
@@ -867,7 +868,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("not"),
                                 new string("()LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.not()
                         &res
                 );
                 break;
@@ -885,7 +886,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("more"),
                                 new string("(LRTL/Value;)LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.more(Value)
                         &res
                 );
                 break;
@@ -903,7 +904,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("less"),
                                 new string("(LRTL/Value;)LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.less(Value)
                         &res
                 );
                 break;
@@ -921,7 +922,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("and"),
                                 new string("(LRTL/Value;)LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.and(Value)
                         &res
                 );
                 break;
@@ -939,24 +940,121 @@ public:
                                 new string("RTL/Value"),
                                 new string("or"),
                                 new string("(LRTL/Value;)LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.or(Value)
                         &res
                 );
                 break;
                 ///Local params
             case variable:
+                if (findParamId(node->id) == -1) {
+                    params.push_back(new string('$' + *node->id));
+                    Commands::doCommandTwoBytes(_new, idClassConst, &res);
+                    Commands::doCommand(dup, &res);
+                    Commands::doCommandTwoBytes(
+                            invokespecial,
+                            idMethodRef(
+                                    new string("RTL/Value"),
+                                    new string("<init>"),
+                                    new string("()V")
+                            ), &res); //id на Value(String)
+                    Commands::doCommand(aload, findParamId(new string('$' + *node->id)), &res);
+                }
                 Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
             case id_type:
-                target = ConstantValue::getIdConstByStringAll(consts, node->id);
-                Commands::doCommand(aload, target, &res);
+                if (findParamId(node->id) == -1) throw runtime_error(
+                        "Fatal Error: Undefined constant \"" +
+                        *node->id + "\"");
+                Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
                 ///Array
             case set_array_val:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //cast to array
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("toArrayVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.toArrayVal()
+                        &res
+                );
+                //get on stack central part
+                tmpVec = getCodeFromExpr(node->central, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("addToArray"),
+                                new string("(LRTL/Value;LRTL/Value;)V")
+                        ),
+                        &res
+                );
                 break;
             case add_array_val:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //cast to array
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("toArrayVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.toArrayVal()
+                        &res
+                );
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("addToArray"),
+                                new string("(LRTL/Value;)V")
+                        ),
+                        &res
+                );
                 break;
             case get_array_val:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //cast to array
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("toArrayVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.toArrayVal()
+                        &res
+                );
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("getArrayVal"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ),
+                        &res
+                );
+                break;
                 ///Casts
             case int_cast:
                 //get on stack left part
@@ -969,7 +1067,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("toIntVal"),
                                 new string("()LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.toIntVal()
                         &res
                 );
                 break;
@@ -984,7 +1082,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("toFloatVal"),
                                 new string("()LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.toFloatVal()
                         &res
                 );
                 break;
@@ -999,7 +1097,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("toBoolVal"),
                                 new string("()LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.toBoolVal()
                         &res
                 );
                 break;
@@ -1014,7 +1112,7 @@ public:
                                 new string("RTL/Value"),
                                 new string("toStringVal"),
                                 new string("()LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.toStringVal()
                         &res
                 );
                 break;
@@ -1029,13 +1127,13 @@ public:
                                 new string("RTL/Value"),
                                 new string("toArrayVal"),
                                 new string("()LRTL/Value;")
-                        ), //id на Value.div(Value)
+                        ), //id на Value.toArrayVal()
                         &res
                 );
                 break;
         }
 
-        return res; // Заглушка
+        return res;
     }
 
     int idUtf8(string *value) {

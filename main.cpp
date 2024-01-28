@@ -56,19 +56,19 @@ int main(int argc, char *argv[]) {
             &consts);
     auto classConst = a.createClassConst();
     auto superClassConst = a.createSuperClassConst();
-    a.addMethod(
-            new MethodBytes(
-                    Flags(ACC_PUBLIC),
-                    ConstantValue::CreateUtf8(&init, &consts),
-                    ConstantValue::CreateUtf8(&voidDesc, &consts),
-                    new CodeAttribute(
-                            2,
-                            2,
-                            &codeVec,
-                            &consts
-                    ),
-                    &consts
-            ));
+//    a.addMethod(
+//            new MethodBytes(
+//                    Flags(ACC_PUBLIC),
+//                    ConstantValue::CreateUtf8(&init, &consts),
+//                    ConstantValue::CreateUtf8(&voidDesc, &consts),
+//                    new CodeAttribute(
+//                            2,
+//                            2,
+//                            &codeVec,
+//                            &consts
+//                    ),
+//                    &consts
+//            ));
     auto out = WriteBytesToFile("Main.class");
     auto classBytes = a.classToBytes();
     out.write(classBytes);

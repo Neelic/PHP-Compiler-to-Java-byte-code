@@ -1010,6 +1010,10 @@ public class Value {
         }
     }
 
+    public void addToArray(Value index, Value other) {
+        addToArray(index.toStringVal().getString(), other);
+    }
+
     public void addToArray(Value other) {
         if (typeVal == TypeValue.stringVal) {
             throw new FatalError("Uncaught Error: [] operator not supported for strings");
