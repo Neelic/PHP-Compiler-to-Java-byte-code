@@ -63,6 +63,14 @@ public:
         return -1;
     }
 
+    static int getIdConstByStringAll(const vector<ConstantValue *> *consts, string *id) {
+        for (int i = 0; i < consts->size(); i++) {
+            if (*(*consts)[i]->id == *id) return i + 1;
+        }
+
+        return -1;
+    }
+
     static ConstantValue *
     getConstantByString(vector<ConstantValue *> *consts, string *searchValue, ConstantType type = C_Utf8) {
         for (auto &i: *consts) {
