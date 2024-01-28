@@ -675,6 +675,7 @@ public:
         vector<ValueAndBytes *> tmpVec;
         idClassConst = idClass(new string("RTL/Value"));
         string isVar;
+        int n = 0;
 
         switch (node->exprType) {
             case int_val:
@@ -1055,7 +1056,6 @@ public:
                 }
                 Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
-
             case id_type:
                 if (findParamId(node->id) == -1)
                     throw runtime_error(
@@ -1227,6 +1227,32 @@ public:
                         &res
                 );
                 break;
+                /// Function call
+            case call_func:
+                for (auto var: node->listParams->vector) {
+                    tmpVec = getCodeFromExpr(var, currLine, toStack);
+                    res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                    n++;
+                }
+                Commands::doCommandTwoBytes(
+                        invokestatic,
+                        idMethodRef(
+                                new string("<main>"),
+                                node->id,
+                                new string("(" + repeatStr(n, "LRTL/Value;") + ")LRTL/Value;")
+                        ),
+                        &res
+                );
+                break;
+        }
+
+        return res;
+    }
+
+    string repeatStr(int n, const string& str) {
+        string res;
+        for (int i = 0; i < n; i++) {
+            res += str;
         }
 
         return res;
