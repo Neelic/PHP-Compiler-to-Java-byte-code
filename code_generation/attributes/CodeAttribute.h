@@ -790,9 +790,134 @@ public:
             case variable:
                 Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
+
             case id_type:
-                int target = ConstantValue::getIdConstByStringAll(consts, node->id);
-                Commands::doCommand(aload, target, &res);
+                Commands::doCommand(aload, ConstantValue::getIdConstByStringAll(consts, node->id), &res);
+                break;
+
+            case command_string_val:
+                break;
+            case this_keyword:
+                break;
+            case self_keyword:
+                break;
+            case parent_keyword:
+                break;
+            case assign_ref_op:
+                break;
+            case int_cast:
+                break;
+            case float_cast:
+                break;
+            case string_cast:
+                break;
+            case array_cast:
+                break;
+            case object_cast:
+                break;
+            case bool_cast:
+                break;
+            case class_inst_field_ref_op:
+                break;
+            case class_inst_field_by_ref_op:
+                break;
+            case class_inst_field_by_expr_ref:
+                break;
+            case class_inst_method_by_ref_op_dots:
+                break;
+            case class_inst_get_value_method_by_ref_op_dots:
+                break;
+            case set_class_field_op:
+                break;
+            case class_field_ref_op:
+                break;
+            case class_field_by_ref_op:
+                break;
+            case class_method_ref_op:
+                break;
+            case class_method_by_ref_op:
+                break;
+            case class_inst_field_ref_dots_op:
+                break;
+            case class_inst_field_by_ref_dots_op:
+                break;
+            case class_inst_field_by_expr_ref_dots_op:
+                break;
+            case instance_of:
+                break;
+            case mod_op:
+                break;
+            case pow_op:
+                break;
+            case concat_op:
+                break;
+            case bool_less:
+                break;
+            case bool_more:
+                break;
+            case bool_or:
+                break;
+            case bool_and:
+                break;
+            case bool_equal:
+                break;
+            case bool_equal_strict:
+                break;
+            case bool_equal_more:
+                break;
+            case bool_not:
+                break;
+            case logic_or:
+                break;
+            case logic_and:
+                break;
+            case logic_xor:
+                break;
+            case bool_equal_less:
+                break;
+            case bitwise_shift_l:
+                break;
+            case bitwise_shift_r:
+                break;
+            case bitwise_xor:
+                break;
+            case bitwise_and:
+                break;
+            case bitwise_or:
+                break;
+            case bitwise_not:
+                break;
+            case u_minus_op:
+                break;
+            case u_plus_op:
+                break;
+            case clone_op:
+                break;
+            case ternary_op:
+                break;
+            case ref_op:
+                break;
+            case get_array_val:
+                break;
+            case add_array_val:
+                break;
+            case set_array_val:
+                break;
+            case call_func:
+                break;
+            case call_get_value_func:
+                break;
+            case new_decl:
+                break;
+            case new_decl_no_params:
+                break;
+            case new_decl_no_id:
+                break;
+            case new_get_value_decl:
+                break;
+            case new_get_value_decl_no_params:
+                break;
+            case null_keyword:
                 break;
         }
 
