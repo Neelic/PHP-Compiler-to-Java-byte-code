@@ -1257,34 +1257,33 @@ public class Value {
         }
     }
 
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Value otherValue)) return false;
+    public Value equals(Value other) {
+        if (!(other instanceof Value otherValue)) return new Value(false);
 
         switch (typeVal) {
             case stringVal -> {
-                return stringVal.equals(otherValue.toStringVal().getString());
+                return new Value(stringVal.equals(otherValue.toStringVal().getString()));
             }
             case intVal -> {
                 switch (otherValue.getType()) {
                     case intVal, floatVal, boolVal, nullVal, objectVal -> {
-                        return intVal == otherValue.toFloatVal().getFloat();
+                        return new Value(intVal == otherValue.toFloatVal().getFloat());
                     }
                     case stringVal -> {
-                        return this.toStringVal().getString().equals(otherValue.getString());
+                        return new Value(this.toStringVal().getString().equals(otherValue.getString()));
                     }
                     case arrayVal -> {
-                        return false;
+                        return new Value(false);
                     }
                 }
             }
             case floatVal -> {
                 switch (otherValue.getType()) {
                     case intVal, floatVal, boolVal, nullVal, objectVal -> {
-                        return floatVal == otherValue.toFloatVal().getFloat();
+                        return new Value(floatVal == otherValue.toFloatVal().getFloat());
                     }
                     case stringVal -> {
-                        return this.toStringVal().getString().equals(otherValue.getString());
+                        return new Value(this.toStringVal().getString().equals(otherValue.getString()));
                     }
                     case arrayVal -> {
                         return this.toObject().equals(otherValue.toObject());
@@ -1294,13 +1293,13 @@ public class Value {
             case arrayVal -> {
                 switch (otherValue.getType()) {
                     case arrayVal -> {
-                        return arrayVal.equals(otherValue.arrayVal);
+                        return new Value(arrayVal.equals(otherValue.arrayVal));
                     }
                     case intVal, floatVal, stringVal, objectVal -> {
                         return this.toObject().equals(otherValue.toObject());
                     }
                     case nullVal, boolVal -> {
-                        return arrayVal.isEmpty() == !otherValue.toBoolVal().getBool();
+                        return new Value(arrayVal.isEmpty() == !otherValue.toBoolVal().getBool());
                     }
                 }
             }
@@ -1310,7 +1309,7 @@ public class Value {
             case objectVal -> {
                 switch (otherValue.getType()) {
                     case objectVal -> {
-                        return objVal.getClass() == otherValue.getObjVal().getClass();
+                        return new Value(objVal.getClass() == otherValue.getObjVal().getClass());
                     }
                     case intVal, floatVal, arrayVal, boolVal, nullVal -> {
                         if (otherValue.getType() != TypeValue.nullVal
@@ -1327,7 +1326,7 @@ public class Value {
                     }
                     case stringVal -> {
                         try {
-                            return objVal.__toString().equals(otherValue.getString());
+                            return new Value(objVal.__toString().equals(otherValue.getString()));
                         } catch (FatalError error) {
                             return this.equals(otherValue.toObject());
                         }
@@ -1337,79 +1336,80 @@ public class Value {
             default -> throw new FatalError("Unexpected value: " + typeVal);
         }
 
-        return false;
+        return new Value(false);
     }
 
-    public boolean equals(int other) {
+    public Value equals(int other) {
         return this.equals(new Value(other));
     }
 
-    public boolean equals(float other) {
+    public Value equals(float other) {
         return this.equals(new Value(other));
     }
 
-    public boolean equals(boolean other) {
+    public Value equals(boolean other) {
         return this.equals(new Value(other));
     }
 
-    public boolean equals(String other) {
+    public Value equals(String other) {
         return this.equals(new Value(other));
     }
 
-    public boolean equals(HashMap<String, Value> other) {
+    public Value equals(HashMap<String, Value> other) {
         return this.equals(new Value(other));
     }
 
-    public boolean equals(ObjValue other) {
+    public Value equals(ObjValue other) {
         return this.equals(new Value(other));
     }
 
-    public boolean equalsStrict(Value other) {
-        if (other == null || typeVal != other.getType()) return false;
-        if (typeVal == TypeValue.objectVal && typeVal == other.getType()) return objVal.equals(other.getObjVal());
+    public Value equalsStrict(Value other) {
+        if (other == null || typeVal != other.getType()) return new Value(false);
+        if (typeVal == TypeValue.objectVal && typeVal == other.getType())
+            return new Value(objVal.equals(other.getObjVal()));
 
         return equals(other);
     }
 
-    public boolean equalsStrict(int other) {
-        return equals(new Value(other));
+    public Value equalsStrict(int other) {
+        return equalsStrict(new Value(other));
     }
 
-    public boolean equalsStrict(float other) {
-        return equals(new Value(other));
+    public Value equalsStrict(float other) {
+        return equalsStrict(new Value(other));
     }
 
-    public boolean equalsStrict(boolean other) {
-        return equals(new Value(other));
+    public Value equalsStrict(boolean other) {
+        return equalsStrict(new Value(other));
     }
 
-    public boolean equalsStrict(String other) {
-        return equals(new Value(other));
+    public Value equalsStrict(String other) {
+        return equalsStrict(new Value(other));
     }
 
-    public boolean equalsStrict(HashMap<String, Value> other) {
-        return equals(new Value(other));
+    public Value equalsStrict(HashMap<String, Value> other) {
+        return equalsStrict(new Value(other));
     }
 
-    public boolean equalsStrict(ObjValue other) {
-        return equals(new Value(other));
+    public Value equalsStrict(ObjValue other) {
+        return equalsStrict(new Value(other));
     }
 
-    public boolean more(Value other) {
+    public Value more(Value other) {
         switch (typeVal) {
             case intVal -> {
                 switch (other.getType()) {
                     case intVal, floatVal, boolVal, nullVal -> {
-                        return intVal > other.toFloatVal().getFloat();
+                        return new Value(intVal > other.toFloatVal().getFloat());
                     }
                     case stringVal -> {
                         Value otherFloat = other.toFloatVal();
-                        if (otherFloat.getType() == TypeValue.nullVal) return false;
+                        if (otherFloat.getType() == TypeValue.nullVal) return new Value(false);
 
-                        return intVal > otherFloat.toFloatVal().getFloat();
+                        return new Value(intVal > otherFloat.toFloatVal().getFloat());
                     }
                     case arrayVal -> {
-                        return false;
+                        return new Value(false);
                     }
                     case objectVal -> {
                         System.out.println(
@@ -1417,23 +1417,23 @@ public class Value {
                                         + other.getObjVal().getClass()
                                         + " could not be converted to "
                                         + typeToString());
-                        return intVal > 1;
+                        return new Value(intVal > 1);
                     }
                 }
             }
             case floatVal -> {
                 switch (other.getType()) {
                     case intVal, floatVal, boolVal, nullVal -> {
-                        return floatVal > other.toFloatVal().getFloat();
+                        return new Value(floatVal > other.toFloatVal().getFloat());
                     }
                     case stringVal -> {
                         Value otherFloat = other.toFloatVal();
-                        if (otherFloat.getType() == TypeValue.nullVal) return false;
+                        if (otherFloat.getType() == TypeValue.nullVal) return new Value(false);
 
-                        return floatVal > otherFloat.toFloatVal().getFloat();
+                        return new Value(floatVal > otherFloat.toFloatVal().getFloat());
                     }
                     case arrayVal -> {
-                        return false;
+                        return new Value(false);
                     }
                     case objectVal -> {
                         System.out.println(
@@ -1441,7 +1441,7 @@ public class Value {
                                         + other.getObjVal().getClass()
                                         + " could not be converted to "
                                         + typeToString());
-                        return floatVal > 1;
+                        return new Value(floatVal > 1);
                     }
                 }
             }
@@ -1452,28 +1452,28 @@ public class Value {
                 switch (other.getType()) {
                     case intVal, floatVal, boolVal, nullVal -> {
                         Value thisFloat = toFloatVal();
-                        if (thisFloat.getType() == TypeValue.nullVal) return true;
+                        if (thisFloat.getType() == TypeValue.nullVal) return new Value(true);
 
-                        return thisFloat.toFloatVal().getFloat() > other.toFloatVal().getFloat();
+                        return new Value(thisFloat.toFloatVal().getFloat() > other.toFloatVal().getFloat());
                     }
                     case objectVal, arrayVal -> {
-                        return false;
+                        return new Value(false);
                     }
                     case stringVal -> {
-                        return stringVal.compareTo(other.getString()) > 0;
+                        return new Value(stringVal.compareTo(other.getString()) > 0);
                     }
                 }
             }
             case arrayVal -> {
                 switch (other.getType()) {
                     case intVal, floatVal, boolVal, nullVal, stringVal -> {
-                        return true;
+                        return new Value(true);
                     }
                     case arrayVal -> {
-                        return arrayVal.size() > other.getArrayVal().size();
+                        return new Value(arrayVal.size() > other.getArrayVal().size());
                     }
                     case objectVal -> {
-                        return false;
+                        return new Value(false);
                     }
                 }
             }
@@ -1489,62 +1489,62 @@ public class Value {
                     }
                     case stringVal -> {
                         try {
-                            return objVal.__toString().compareTo(other.getString()) > 0;
+                            return new Value(objVal.__toString().compareTo(other.getString()) > 0);
                         } catch (FatalError error) {
                             return (new Value(1)).more(other);
                         }
                     }
                     case arrayVal -> {
-                        return true;
+                        return new Value(true);
                     }
                     case objectVal -> {
-                        return false;
+                        return new Value(false);
                     }
                 }
             }
         }
-        return false;
+        return new Value(false);
     }
 
-    public boolean more(int other) {
+    public Value more(int other) {
         return more(new Value(other));
     }
 
-    public boolean more(float other) {
+    public Value more(float other) {
         return more(new Value(other));
     }
 
-    public boolean more(boolean other) {
+    public Value more(boolean other) {
         return more(new Value(other));
     }
 
-    public boolean more(String other) {
+    public Value more(String other) {
         return more(new Value(other));
     }
 
-    public boolean more(ObjValue other) {
+    public Value more(ObjValue other) {
         return more(new Value(other));
     }
 
-    public boolean more(HashMap<String, Value> other) {
+    public Value more(HashMap<String, Value> other) {
         return more(new Value(other));
     }
 
-    public boolean less(Value other) {
+    public Value less(Value other) {
         switch (typeVal) {
             case intVal -> {
                 switch (other.getType()) {
                     case intVal, floatVal, boolVal, nullVal -> {
-                        return intVal < other.toFloatVal().getFloat();
+                        return new Value(intVal < other.toFloatVal().getFloat());
                     }
                     case stringVal -> {
                         Value otherFloat = other.toFloatVal();
-                        if (otherFloat.getType() == TypeValue.nullVal) return false;
+                        if (otherFloat.getType() == TypeValue.nullVal) return new Value(false);
 
-                        return intVal < otherFloat.toFloatVal().getFloat();
+                        return new Value(intVal < otherFloat.toFloatVal().getFloat());
                     }
                     case arrayVal -> {
-                        return false;
+                        return new Value(false);
                     }
                     case objectVal -> {
                         System.out.println(
@@ -1552,23 +1552,23 @@ public class Value {
                                         + other.getObjVal().getClass()
                                         + " could not be converted to "
                                         + typeToString());
-                        return intVal < 1;
+                        return new Value(intVal < 1);
                     }
                 }
             }
             case floatVal -> {
                 switch (other.getType()) {
                     case intVal, floatVal, boolVal, nullVal -> {
-                        return floatVal < other.toFloatVal().getFloat();
+                        return new Value(floatVal < other.toFloatVal().getFloat());
                     }
                     case stringVal -> {
                         Value otherFloat = other.toFloatVal();
-                        if (otherFloat.getType() == TypeValue.nullVal) return true;
+                        if (otherFloat.getType() == TypeValue.nullVal) return new Value(true);
 
-                        return floatVal < otherFloat.toFloatVal().getFloat();
+                        return new Value(floatVal < otherFloat.toFloatVal().getFloat());
                     }
                     case arrayVal -> {
-                        return true;
+                        return new Value(true);
                     }
                     case objectVal -> {
                         System.out.println(
@@ -1576,7 +1576,7 @@ public class Value {
                                         + other.getObjVal().getClass()
                                         + " could not be converted to "
                                         + typeToString());
-                        return floatVal < 1;
+                        return new Value(floatVal < 1);
                     }
                 }
             }
@@ -1587,28 +1587,28 @@ public class Value {
                 switch (other.getType()) {
                     case intVal, floatVal, boolVal, nullVal -> {
                         Value thisFloat = toFloatVal();
-                        if (thisFloat.getType() == TypeValue.nullVal) return false;
+                        if (thisFloat.getType() == TypeValue.nullVal) return new Value(false);
 
-                        return thisFloat.toFloatVal().getFloat() < other.toFloatVal().getFloat();
+                        return new Value(thisFloat.toFloatVal().getFloat() < other.toFloatVal().getFloat());
                     }
                     case objectVal, arrayVal -> {
-                        return true;
+                        return new Value(true);
                     }
                     case stringVal -> {
-                        return stringVal.compareTo(other.getString()) < 0;
+                        return new Value(stringVal.compareTo(other.getString()) < 0);
                     }
                 }
             }
             case arrayVal -> {
                 switch (other.getType()) {
                     case intVal, floatVal, boolVal, nullVal, stringVal -> {
-                        return false;
+                        return new Value(false);
                     }
                     case arrayVal -> {
-                        return arrayVal.size() < other.getArrayVal().size();
+                        return new Value(arrayVal.size() < other.getArrayVal().size());
                     }
                     case objectVal -> {
-                        return true;
+                        return new Value(true);
                     }
                 }
             }
@@ -1624,45 +1624,45 @@ public class Value {
                     }
                     case stringVal -> {
                         try {
-                            return objVal.__toString().compareTo(other.getString()) < 0;
+                            return new Value(objVal.__toString().compareTo(other.getString()) < 0);
                         } catch (FatalError error) {
                             return (new Value(1)).less(other);
                         }
                     }
                     case arrayVal -> {
-                        return false;
+                        return new Value(false);
                     }
                     case objectVal -> {
-                        return true;
+                        return new Value(true);
                     }
                 }
             }
             default -> throw new FatalError("Unknown type");
         }
-        return false;
+        return new Value(false);
     }
 
-    public boolean less(int other) {
+    public Value less(int other) {
         return less(new Value(other));
     }
 
-    public boolean less(float other) {
+    public Value less(float other) {
         return less(new Value(other));
     }
 
-    public boolean less(boolean other) {
+    public Value less(boolean other) {
         return less(new Value(other));
     }
 
-    public boolean less(String other) {
+    public Value less(String other) {
         return less(new Value(other));
     }
 
-    public boolean less(ObjValue other) {
+    public Value less(ObjValue other) {
         return less(new Value(other));
     }
 
-    public boolean less(HashMap<String, Value> other) {
+    public Value less(HashMap<String, Value> other) {
         return less(new Value(other));
     }
 }
