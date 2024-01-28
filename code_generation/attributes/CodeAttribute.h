@@ -194,7 +194,18 @@ public:
                     initializeNewVariable(i->id, &res);
                 }
                 break;
-            default:
+            case t_echo_stmt:
+                Commands::doCommandTwoBytes(_new, ConstantValue::getIdConstByString(consts, new string("RTL/Functions"),
+                                                                                    ConstantType::C_Class),
+                                            &res); // Создаю объект класса RTL/Functions
+
+                getCodeFromExpr(node->expr_right, currLine, 1);// Нахожу параметр
+
+                Commands::doCommandTwoBytes(invokevirtual, idMethodRef(
+                        new string("RTL/Functions"),
+                        new string("echo"),
+                        new string("(LRTL/Value)V")), &res); // Выполняю функцию
+
                 break;
         }
 
@@ -1249,7 +1260,7 @@ public:
         return res;
     }
 
-    string repeatStr(int n, const string& str) {
+    string repeatStr(int n, const string &str) {
         string res;
         for (int i = 0; i < n; i++) {
             res += str;
