@@ -1243,8 +1243,6 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
                     default:
                         throw runtime_error("Fatal error: syntax error, unexpected token \"=\" in" + *file_name);
                 }
-
-                delete tmp;
             }
         case ExprType::plus_op:
         case ExprType::minus_op:
