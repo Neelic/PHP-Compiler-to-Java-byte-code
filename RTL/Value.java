@@ -138,7 +138,7 @@ public class Value {
 
     public Value concat(Value other) {
         if (other == null) other = new Value((ObjValue) null);
-        return addValue(other.toStringVal(), true);
+        return this.toStringVal().addValue(other.toStringVal(), true);
     }
 
     public Value concat(String other) {

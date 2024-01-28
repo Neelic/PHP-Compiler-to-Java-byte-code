@@ -820,6 +820,100 @@ public:
                         &res
                 );
                 break;
+            case pow_op:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("pow"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.pow(Value)
+                        &res
+                );
+                break;
+            case mod_op:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("div"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.mod(Value)
+                        &res
+                );
+                break;
+            case concat_op:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack right part
+                tmpVec = getCodeFromExpr(node->right, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("concat"),
+                                new string("(LRTL/Value;)LRTL/Value;")
+                        ), //id на Value.div(Value)
+                        &res
+                );
+                break;
+            case u_minus_op:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("toFloatVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.toFloatVal()
+                        &res
+                );
+                Commands::doCommand(iconst_m1, &res);
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("mul"),
+                                new string("(I)LRTL/Value;")
+                        ), //id на Value.toFloatVal()
+                        &res
+                );
+                break;
+            case u_plus_op:
+                //get on stack left part
+                tmpVec = getCodeFromExpr(node->left, currLine, toStack);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                new string("RTL/Value"),
+                                new string("toFloatVal"),
+                                new string("()LRTL/Value;")
+                        ), //id на Value.toFloatVal()
+                        &res
+                );
+                break;
                 ///Logic ops
             case bool_equal:
                 //get on stack left part
