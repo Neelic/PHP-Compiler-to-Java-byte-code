@@ -1,3 +1,6 @@
+#ifndef PHP_COMPILER_EXPR_FUNC_NODE
+#define PHP_COMPILER_EXPR_FUNC_NODE
+
 #include <vector>
 #include <string>
 
@@ -13,3 +16,5 @@ public:
     
     std::string* idTag() const;
 };
+
+#endif

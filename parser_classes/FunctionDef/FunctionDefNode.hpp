@@ -3,8 +3,7 @@
 
 #include <string>
 #include "FunctionDefType.cpp"
-
-class ExprFuncList;
+#include "ExprFuncList.hpp"
 
 class FunctionDefNode
 {

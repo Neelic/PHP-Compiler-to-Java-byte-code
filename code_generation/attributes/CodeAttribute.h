@@ -698,7 +698,8 @@ public:
                     ConstantValue::CreateInteger(node->int_val, consts);
                 //load int to stack
                 Commands::doCommand(ldc,
-                                    ConstantValue::getIdConstByString(consts, new string(to_string(node->int_val))),
+                                    ConstantValue::getIdConstByString(consts, new string(to_string(node->int_val)),
+                                                                      C_Integer),
                                     &res);
                 Commands::doCommandTwoBytes(
                         invokespecial,

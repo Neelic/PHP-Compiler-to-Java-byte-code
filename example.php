@@ -30,61 +30,13 @@
 <?php
 // Example class 
 
-class Person
-{
-    static public $name = 100;
-    private static $age;
-
-    public function __construct($name, $age)
-    {
-        $this->name = $name;
-    }
-
-    public function greet()
-    {
-        echo "Hello, \u{41} my \x41 name is " . $this->name . " and I am " . self::age . " years old." . PHP_EOL;
-    }
-
-    public static function statFunc($name)
-    {
-        echo "Hello,\ \ \my $name \is A \n \x and I am " . self::age . " years old." . PHP_EOL;
-    }
-}
-
-abstract class Example extends Person {
-    //use property, ai; //error
-    //abstract public $c = 1;
-    private const NAME = 1, abc = '123';
-    protected function b() {
-        parent::greet();
-    }
-    public abstract static function a();
-}
-
-interface objectO {}
-
-interface interfaceO extends objectO {
-    public function a($a = 1);
-}
-
-trait TraitName {
-    public static $a = 1;
-    #protected abstract function r();
-}
 $b = ( fLoat ) 100;
 
 function b () {}
 
-b()::a;
-
 // Creating instances of the Person class
-$person1 = new Person("John", 2.5);
-$person2 = new Person("Jane", 30);
-echo $person1::name[0];
 $str = '\n \\ \'';
 $nul = (int) 1;
-
-Person::statFunc('a');
 
 ('a' . 's')[0];
 
@@ -93,25 +45,25 @@ static $int = 1_000;
 // $octal = 0123;
 // $octal_other = 0o123;
 // $binary = 0b11111111;
-$interpolStr = "String interpol $int";
+// $interpolStr = "String interpol $int"; //Unsupported
 $interpolStrOther = "String interpol {$person->name}"; //TODO Ошибка на этом моменте;
 
 // Loops - for loop
 for ($i = 0; $i < count($persons); $i=$i+1) {
-    $persons[$i]->greet();
+//     $persons[$i]->greet();
 }
 
-foreach (($persons) as $ke => &$a) {
-    # code...
-    PHP_EOL;
-}
+// foreach (($persons) as $ke => &$a) {
+//     # code...
+//     PHP_EOL;
+// }
+//
+// // Loops - do-while loop
+// $k = 0;
+// do {
+//     $persons[$k]->greet();
+//     $k=$k+1;
+// } while ($k < count($persons));
 
-// Loops - do-while loop
-$k = 0;
-do {
-    $persons[$k]->greet();
-    $k=$k+1;
-} while ($k < count($persons));
 
-
-$rev = &$val;
+// $rev = &$val;

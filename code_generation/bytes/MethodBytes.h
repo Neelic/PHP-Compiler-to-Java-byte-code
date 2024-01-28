@@ -64,7 +64,7 @@ public:
         }
 
         // Для каждого параметра функции кроме последнего
-        for (int i = 0; i < node->function_def->expr_func_list->vector.size() - 1; i++) {
+        for (int i = 0; i < (int) (node->function_def->expr_func_list->vector.size() - 1); i++) {
             descriptor += "LRTL/Value;";
             params.push_back(
                     new string("$" + *node->function_def->expr_func_list->vector[i]->get_value_func->id_value));
