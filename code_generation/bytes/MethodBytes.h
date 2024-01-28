@@ -45,25 +45,39 @@ public:
         return res;
     }
 
-    static MethodBytes *fromFunctionStmtDecl(FunctionStmtDeclNode *node, Flags flags, vector<ConstantValue *> *consts) {
+    static MethodBytes *
+    fromFunctionStmtDecl(FunctionStmtDeclNode *node, ClassAccessModList *flagList, vector<ConstantValue *> *consts) {
         if (node == nullptr) return nullptr;
 
         // Собираю строку дескриптора
         auto descriptor = string("(");
 
+        auto params = vector<string *>();
+        auto currParam = string();
+        params.push_back(new string("$this")); // По умолчанию добавляю в список параметров первым элементом
+
+
+        for (auto i: flagList->vector) {
+            if (i->access_mod == ClassAccessMod::static_node) {
+                params.pop_back(); // Если метод статичен, убираю из списка параметров указатель на класс
+            }
+        }
+
         // Для каждого параметра функции кроме последнего
         for (int i = 0; i < node->function_def->expr_func_list->vector.size() - 1; i++) {
             descriptor += "LRTL/Value;";
+            params.push_back(
+                    new string("$" + *node->function_def->expr_func_list->vector[i]->get_value_func->id_value));
         }
         // Добавляю последний тип и закрываю
         descriptor += ")LRTL/Value;";
 
         return new MethodBytes(
-                flags,
+                *Flags::convertToFlags(flagList),
                 ConstantValue::CreateUtf8(node->function_def->func_id, consts),
                 ConstantValue::getConstantByString(consts, &descriptor) ?: ConstantValue::CreateUtf8(
                         &descriptor, consts),
-                nullptr, //Заменить на конвертацию vector<StmtList> в CodeAttribute
+                CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts),
                 consts
         );
     }

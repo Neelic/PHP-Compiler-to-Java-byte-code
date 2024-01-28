@@ -1126,8 +1126,6 @@ public:
 
         Commands::doCommand(dup, code_res);
 
-        Commands::doCommand(iconst_0, code_res); // Пока что Value будет создаваться от нуля
-
         Commands::doCommandTwoBytes(invokevirtual, ConstantValue::getIdConstByString(consts, constructor, C_MethodRef),
                                     code_res);// Вызываю конструктор, по идее
 

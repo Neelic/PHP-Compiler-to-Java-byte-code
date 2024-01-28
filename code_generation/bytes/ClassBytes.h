@@ -126,7 +126,7 @@ public:
                 case function_def:
                     tmp_class->addMethod(
                             MethodBytes::fromFunctionStmtDecl(i->function_stmt_decl,
-                                                              *Flags::convertToFlags(i->access_mod),
+                                                              i->access_mod,
                                                               consts));
                     break;
                 case function_decl_type:
