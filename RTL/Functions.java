@@ -25,7 +25,7 @@ public class Functions {
 
     public static void print(Value value) {
         if (value == null) return;
-        System.out.print(value.toStringVal().getIdString());
+        System.out.print(value.toStringVal().getString());
     }
 
     public static void print(String value) {
