@@ -1055,10 +1055,12 @@ public:
                 }
                 Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
+
             case id_type:
-                if (findParamId(node->id) == -1) throw runtime_error(
-                        "Fatal Error: Undefined constant \"" +
-                        *node->id + "\"");
+                if (findParamId(node->id) == -1)
+                    throw runtime_error(
+                            "Fatal Error: Undefined constant \"" +
+                            *node->id + "\"");
                 Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
                 ///Array
@@ -1317,10 +1319,12 @@ public:
 
         Commands::doCommand(dup, code_res);
 
-        Commands::doCommand(iconst_0, code_res); // Пока что Value будет создаваться от нуля
-
-        Commands::doCommandTwoBytes(invokevirtual, ConstantValue::getIdConstByString(consts, constructor, C_MethodRef),
-                                    code_res);// Вызываю конструктор, по идее
+        Commands::doCommandTwoBytes(
+                invokespecial,
+                idMethodRef(
+                        new string("RTL/Value"),
+                        new string("<init>"),
+                        new string("()V")), code_res); //id на Value(String)// Вызываю конструктор, по идее
 
         Commands::doCommand(astore, params.size(), code_res); // Сохраняю ссылку на объект в новый параметр
 
@@ -1329,18 +1333,18 @@ public:
 
     // Переводит Value(bool) в int, нужно для комманд сравнения. После выполнения в стеке должна лежать int 1 или 0
     void convertBoolToInt(vector<ValueAndBytes *> *code_res) {
-        auto constructorConvert = new string("RTL/Value.toIntVal()LRTL/Value;");
-        auto constructorGetField = new string("RTL/Value.getInt()I");
 
         //Приводит Value(bool) к Value(int)
         Commands::doCommandTwoBytes(invokevirtual,
-                                    ConstantValue::getIdConstByString(consts, constructorConvert, C_MethodRef),
+                                    idMethodRef(new string("RTL/Value"),
+                                                new string("toIntVal"),
+                                                new string("()LRTL/Value;")),
                                     code_res);
-        // На всякий, чтобы не потерять
-        Commands::doCommand(dup, code_res);
         //Получает int
         Commands::doCommandTwoBytes(invokevirtual,
-                                    ConstantValue::getIdConstByString(consts, constructorGetField, C_MethodRef),
+                                    idMethodRef(new string("RTL/Value"),
+                                                new string("getInt"),
+                                                new string("()LRTL/Value;")),
                                     code_res);
     }
 
