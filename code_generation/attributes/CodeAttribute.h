@@ -684,6 +684,7 @@ public:
                                                                              new string("RTL/Value.()LRTL/Value;"),
                                                                              C_MethodRef);// TODO: Добавить путь к явовской строке
 
+        int target;
 
         vector<ValueAndBytes *> tmpVec;
         ConstantValue *tmpConstant1;
@@ -961,7 +962,7 @@ public:
                 Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
             case id_type:
-                int target = ConstantValue::getIdConstByStringAll(consts, node->id);
+                target = ConstantValue::getIdConstByStringAll(consts, node->id);
                 Commands::doCommand(aload, target, &res);
                 break;
                 ///Array
