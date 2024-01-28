@@ -1237,6 +1237,11 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
                         node->left = tmp->left;
                         node->id = tmp->id;
                         break;
+                    case ExprType::variable:
+                        // Тип все идет по плану
+                        break;
+                    default:
+                        throw runtime_error("Fatal error: syntax error, unexpected token \"=\" in" + *file_name);
                 }
 
                 delete tmp;
@@ -1261,6 +1266,7 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
         case ExprType::logic_or:
         case ExprType::logic_xor:
         case ExprType::call_func:
+        case ExprType::new_decl:
         case ExprType::new_decl_no_id:
             inspectExpr(node->left, variablesScope, constsScope, functionsScope, isInClass, context);
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
@@ -1288,7 +1294,6 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             inspectExpr(node->right, variablesScope, constsScope, functionsScope, isInClass, context);
             break;
         case ExprType::id_type:
-        case ExprType::new_decl:
         case ExprType::variable:
             if (!isDeclaredVariable(node->id, variables) && !isDeclaredVariable(node->id, variablesScope)) {
                 switch (context) {
