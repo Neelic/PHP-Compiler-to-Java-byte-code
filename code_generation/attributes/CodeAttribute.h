@@ -699,7 +699,7 @@ public:
                 Commands::doCommandTwoBytes(_new, classIdValueConst, &res);
                 Commands::doCommand(dup, &res);
                 tmpConstant1 = ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
-                Commands::doCommand(ldc, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
+                Commands::doCommandTwoBytes(ldc_w, ConstantValue::getIdConst(consts, *tmpConstant1), &res);
                 Commands::doCommandTwoBytes(invokespecial, constructorNewValueFloatConst, &res);
                 break;
             case string_val:
@@ -736,7 +736,7 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("RTL/Value/"),
+                        ConstantValue::getIdConstByString(consts, new string("RTL/Value.add(LRTL/Value;)LRTL/Value;"),
                                                           C_MethodRef), //TODO id на Value.add(Value)
                         &res
                 );
@@ -751,7 +751,7 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id_sub"),
+                        ConstantValue::getIdConstByString(consts, new string("RTL/Value.sub(LRTL/Value;)LRTL/Value;"),
                                                           C_MethodRef), //TODO id на Value.sub(Value)
                         &res
                 );
@@ -766,7 +766,7 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id_mul"),
+                        ConstantValue::getIdConstByString(consts, new string("RTL/Value.mul(LRTL/Value;)LRTL/Value;"),
                                                           C_MethodRef), //TODO id на Value.mul(Value)
                         &res
                 );
@@ -781,17 +781,18 @@ public:
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
-                        ConstantValue::getIdConstByString(consts, new string("id_div"),
+                        ConstantValue::getIdConstByString(consts, new string("RTL/Value.div(LRTL/Value;)LRTL/Value;"),
                                                           C_MethodRef), //TODO id на Value.div(Value)
                         &res
                 );
                 break;
                 ///Local params
             case variable:
-                //TODO aload № to bytes
+                Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
             case id_type:
-                //TODO const
+                int target = ConstantValue::getIdConstByStringAll(consts, node->id);
+                Commands::doCommand(aload, target, &res);
                 break;
         }
 
