@@ -1665,4 +1665,16 @@ public class Value {
     public Value less(HashMap<String, Value> other) {
         return less(new Value(other));
     }
+
+    public Value and(Value other) {
+        return new Value(this.toBoolVal().getBool() && other.toBoolVal().getBool());
+    }
+
+    public Value or(Value other) {
+        return new Value(this.toBoolVal().getBool() || other.toBoolVal().getBool());
+    }
+
+    public Value not() {
+        return new Value(!this.toBoolVal().getBool());
+    }
 }
