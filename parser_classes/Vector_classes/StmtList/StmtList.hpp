@@ -1,9 +1,9 @@
+#ifndef PHP_COMPILER_STMT_LIST_NODE
+#define PHP_COMPILER_STMT_LIST_NODE
+
 #include <vector>
 
 class StmtNode;
-
-#ifndef STMT_LIST_H
-#define STMT_LIST_H
 
 #include <string>
 

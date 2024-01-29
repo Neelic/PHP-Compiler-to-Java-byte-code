@@ -2,6 +2,7 @@
 #define PHP_COMPILER_STMT_NODE
 
 #include "../Stmt/StmtType.cpp"
+#include "StmtList.hpp"
 // #include "../Vector classes/ConstDeclList/ConstDeclList.hpp";
 #include <vector>
 #include <string>
@@ -31,8 +32,6 @@ class MatchStmtNode;
 class ConstDeclNode;
 
 class HtmlStmtNode;
-
-class StmtList;
 
 class ConstDeclList;
 

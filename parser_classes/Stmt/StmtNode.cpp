@@ -29,6 +29,7 @@ StmtNode *StmtNode::CreateFromSwitchStmt(SwitchStmtNode *switch_stmt) {
 
 StmtNode *StmtNode::CreateFromStmtList(StmtList *stmtList) {
     StmtNode *tmp = new StmtNode();
+    if (stmtList == nullptr) stmtList = new StmtList();
     tmp->stmtList = stmtList;
     tmp->type = StmtType::stmt_list;
     tmp->cur_id = StmtNode::GLOBAL_ID++;

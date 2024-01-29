@@ -108,6 +108,8 @@ public:
         for (auto i: node->vector) {
             res->getCodeFromStmtNode(i, 0);
         }
+
+        return res;
     }
 
     vector<ValueAndBytes *> getCodeFromStmtNode(StmtNode *node, int currLine, int skipBytes = 0) {
@@ -201,7 +203,7 @@ public:
 
                 getCodeFromExpr(node->expr_right, currLine, 1);// Нахожу параметр
 
-                Commands::doCommandTwoBytes(invokevirtual, idMethodRef(
+                Commands::doCommandTwoBytes(invokestatic, idMethodRef(
                         new string("RTL/Functions"),
                         new string("echo"),
                         new string("(LRTL/Value;)V")), &res); // Выполняю функцию
@@ -459,6 +461,7 @@ public:
         // Добавляем действие из последнего выражения for к телу цикла
         code_tmp = getCodeFromExpr(node->expr_right, currLine, 0);
         main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
+        code_tmp = vector<ValueAndBytes *>();
 
         skipBytes = countByteSize(main_code);
         //Записываем безусловный переход при старте for
@@ -1069,10 +1072,15 @@ public:
                 Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
             case id_type:
-                if (findParamId(node->id) == -1)
-                    throw runtime_error(
-                            "Fatal Error: Undefined constant \"" +
-                            *node->id + "\"");
+                if (findParamId(node->id) == -1) {
+                    if (isPredConst(node->id)) {
+                        setPredConstCode(node->id, &res);
+                    } else
+                        throw runtime_error(
+                                "Fatal Error: Undefined constant \"" +
+                                *node->id + "\"");
+                }
+
                 Commands::doCommand(aload, findParamId(node->id), &res);
                 break;
                 ///Array
@@ -1261,7 +1269,33 @@ public:
         return res;
     }
 
-    string repeatStr(int n, const string &str) {
+    static bool isPredConst(string *id) {
+        return *id == "true" || *id == "false";
+    }
+
+    void setPredConstCode(string *id, vector<ValueAndBytes *> *res) {
+        if (-1 != findParamId(id)) return;
+
+        params.push_back(id);
+        // create new value
+        Commands::doCommandTwoBytes(_new, idClassConst, res);
+        Commands::doCommand(dup, res);
+
+        if (*id == "true") Commands::doCommand(iconst_1, res);
+        else if (*id == "false") Commands::doCommand(iconst_0, res);
+
+        Commands::doCommandTwoBytes(
+                invokespecial,
+                idMethodRef(
+                        new string("RTL/Value"),
+                        new string("<init>"),
+                        new string("(I)V")),
+                res); //id на Value(int)
+
+        Commands::doCommand(astore, findParamId(id), res);
+    }
+
+    static string repeatStr(int n, const string &str) {
         string res;
         for (int i = 0; i < n; i++) {
             res += str;
