@@ -72,10 +72,21 @@ public:
         // Добавляю последний тип и закрываю
         descriptor += ")LRTL/Value;";
 
+        auto constName = ConstantValue::CreateUtf8(*node->function_def->func_id, consts);
+
+        auto constDesc = ConstantValue::CreateUtf8(descriptor, consts);
+
+        auto constParent = ConstantValue::getConstantByString(consts, string("java/lang/Object"),
+                                                              ConstantType::C_Class); // По идее должен существовать со старта
+
+        auto nameAndType = ConstantValue::CreateNameAndType(constName, constDesc, consts);
+
+        ConstantValue::CreateMethodRef(constParent, nameAndType, consts);
+
         return {
                 *Flags::convertToFlags(flagList),
-                ConstantValue::CreateUtf8(*node->function_def->func_id, consts),
-                ConstantValue::CreateUtf8(descriptor, consts),
+                constName,
+                constDesc,
                 CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts),
                 consts
         };
@@ -91,10 +102,21 @@ public:
         // Добавляю последний тип и закрываю
         descriptor += ")LRTL/Value;";
 
+        auto constName = ConstantValue::CreateUtf8(*node->func_id, consts);
+
+        auto constDesc = ConstantValue::CreateUtf8(descriptor, consts);
+
+        auto constParent = ConstantValue::getConstantByString(consts, string("java/lang/Object"),
+                                                              ConstantType::C_Class); // По идее должен существовать со старта
+
+        auto nameAndType = ConstantValue::CreateNameAndType(constName, constDesc, consts);
+
+        ConstantValue::CreateMethodRef(constParent, nameAndType, consts);
+
         return {
                 flags,
-                ConstantValue::CreateUtf8(*node->func_id, consts),
-                ConstantValue::CreateUtf8(descriptor, consts),
+                constName,
+                constDesc,
                 nullptr,
                 consts
         };
@@ -107,6 +129,13 @@ public:
 
         auto constDescriptor = ConstantValue::CreateUtf8(descriptorString, _consts);
         auto constName = ConstantValue::CreateUtf8(nameString, _consts);
+
+        auto constParent = ConstantValue::getConstantByString(_consts, string("java/lang/Object"),
+                                                              ConstantType::C_Class); // По идее должен существовать со старта
+
+        auto nameAndType = ConstantValue::CreateNameAndType(constName, constDescriptor, _consts);
+
+        ConstantValue::CreateMethodRef(constParent, nameAndType, _consts);
 
         auto _code = new vector<ValueAndBytes>();
 
