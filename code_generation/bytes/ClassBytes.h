@@ -93,7 +93,7 @@ public:
         //methods
         res.push_back(new ValueAndBytes((int) methods.size(), 2));
         for (auto method: methods) {
-            auto methodBytes = method->methodToBytes();
+            auto methodBytes = method->methodToBytes(consts);
             res.insert(res.end(), methodBytes.begin(), methodBytes.end());
         }
         //source file attribute

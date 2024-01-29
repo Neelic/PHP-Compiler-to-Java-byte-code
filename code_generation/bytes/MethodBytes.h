@@ -27,7 +27,7 @@ public:
         if (descriptor->getTypeConst() != C_Utf8) throw runtime_error("Descriptor is not Utf-8");
     }
 
-    vector<const ValueAndBytes *> methodToBytes() {
+    vector<const ValueAndBytes *> methodToBytes(vector<ConstantValue *> *_consts) {
         auto res = vector<const ValueAndBytes *>();
 
         res.push_back(flags.flagToBytes());
@@ -48,6 +48,8 @@ public:
     static MethodBytes *
     fromFunctionStmtDecl(FunctionStmtDeclNode *node, ClassAccessModList *flagList, vector<ConstantValue *> *consts) {
         if (node == nullptr) return nullptr;
+
+        getAllConstants(node, *consts);
 
         // Собираю строку дескриптора
         auto descriptor = string("(");
@@ -109,9 +111,10 @@ public:
 
         auto res = vector<ConstantValue *>();
 
+        if (node->stmt_list == nullptr) return;
+
         for (auto stmtNode: node->stmt_list->vector) {
-
-
+            findAllConstInStmtNode(stmtNode, consts);
         }
     }
 
