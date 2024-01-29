@@ -103,7 +103,7 @@ public:
     static MethodBytes generateInitMethod(vector<ConstantValue> *_consts) {
 
         auto descriptorString = string("()V");
-        auto nameString = string("java/lang/Object");
+        auto nameString = string("<init>");
 
         auto constDescriptor = ConstantValue::CreateUtf8(descriptorString, _consts);
         auto constName = ConstantValue::CreateUtf8(nameString, _consts);
