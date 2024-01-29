@@ -1173,7 +1173,7 @@ public class Value {
                 return new Value(objVal.__toString());
             }
             case nullVal -> {
-                return new Value(String.valueOf(0));
+                return new Value("");
             }
             default -> throw new FatalError("Unknown type");
         }
@@ -1368,7 +1368,7 @@ public class Value {
     }
 
     public Value equalsStrict(Value other) {
-        if (other == null || typeVal != other.getType()) return new Value(false);
+        if (other == null || typeVal != other.getType()) return new Value();
         if (typeVal == TypeValue.objectVal && typeVal == other.getType())
             return new Value(objVal.equals(other.getObjVal()));
 

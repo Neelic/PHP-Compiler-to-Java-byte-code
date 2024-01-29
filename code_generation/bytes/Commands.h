@@ -14,6 +14,7 @@ enum CodeCommandsNoParams {
     //Работа со стеком
 
     //iconst - однобайтовая комманда, загружает небольшое число на стек
+    aconst_null = 0x1,
     iconst_m1 = 0x2,
     iconst_0 = 0x3,
     iconst_1 = 0x4,

@@ -1274,7 +1274,7 @@ public:
     }
 
     static bool isPredConst(string *id) {
-        return *id == "true" || *id == "false";
+        return *id == "true" || *id == "false" || *id == "null";
     }
 
     void setPredConstCode(const string &id, vector<ValueAndBytes> *res) {
@@ -1285,16 +1285,26 @@ public:
         Commands::doCommandTwoBytes(_new, idClassConst, res);
         Commands::doCommand(dup, res);
 
-        if (id == "true") Commands::doCommand(iconst_1, res);
-        else if (id == "false") Commands::doCommand(iconst_0, res);
+        if (id == "null") {
+            Commands::doCommandTwoBytes(
+                    invokespecial,
+                    idMethodRef(
+                            string("RTL/Value"),
+                            string("<init>"),
+                            string("()V")),
+                    res); //id на Value()
+        } else {
+            if (id == "true") Commands::doCommand(iconst_1, res);
+            else if (id == "false") Commands::doCommand(iconst_0, res);
 
-        Commands::doCommandTwoBytes(
-                invokespecial,
-                idMethodRef(
-                        string("RTL/Value"),
-                        string("<init>"),
-                        string("(I)V")),
-                res); //id на Value(int)
+            Commands::doCommandTwoBytes(
+                    invokespecial,
+                    idMethodRef(
+                            string("RTL/Value"),
+                            string("<init>"),
+                            string("(Z)V")),
+                    res); //id на Value(int)
+        }
 
         Commands::doCommand(astore, findParamId(id), res);
     }
