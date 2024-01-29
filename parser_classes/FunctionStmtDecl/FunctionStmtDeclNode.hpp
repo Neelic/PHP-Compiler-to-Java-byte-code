@@ -1,7 +1,7 @@
 #include <string>
+#include "StmtList.hpp"
 
 class FunctionDefNode;
-class StmtList;
 
 class FunctionStmtDeclNode
 {
