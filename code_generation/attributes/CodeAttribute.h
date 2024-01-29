@@ -62,17 +62,24 @@ public:
 
     vector<ValueAndBytes> attributeToBytes() const {
         auto res = vector<ValueAndBytes>();
-
+        //name id
         res.emplace_back(ConstantValue::getIdConst(consts, name), 2);
+        //attribute len
         res.emplace_back(getAttrLength(), 4);
+        //max stack
         res.emplace_back(maxStack, 2);
+        //max locals
         res.emplace_back(maxLocals, 2);
 
+        //code length
         res.emplace_back(getCodeLength(), 4);
+        //code bytes
         res.insert(res.end(), code->begin(), code->end());
-        res.emplace_back((int) 0, 2);
 
-//        res.push_back(new ValueAndBytes((int) attributes.size(), 2));
+        //exception table count
+        res.emplace_back((int) 0, 2);
+        //code attributes count
+        res.emplace_back((int) 0, 2);
 //        for (auto table: attributes) {
 //            auto tableBytes = table->attributeToBytes();
 //            res.insert(res.end(), tableBytes.begin(), tableBytes.end());
