@@ -112,6 +112,8 @@ public:
             res->getCodeFromStmtNode(i, 0);
         }
 
+        Commands::doCommand(_return, res->code);
+
         return res;
     }
 
