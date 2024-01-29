@@ -53,7 +53,8 @@ public:
                   vector<string> *params)
             : maxStack(maxStack), maxLocals(maxLocals), code(code), consts(consts), params(params) {
         auto nameStr = string("Code");
-        name = ConstantValue::CreateUtf8(nameStr, consts);
+        name = (ConstantValue::getIdConstByString(consts, "Code") == -1) ? ConstantValue::CreateUtf8(nameStr, consts) :
+               ConstantValue::getConstantByString(consts, "Code");
     }
 
     void addCodeValueByte(ValueAndBytes &value) {
@@ -1274,7 +1275,7 @@ public:
         return *id == "true" || *id == "false";
     }
 
-    void setPredConstCode(const string& id, vector<ValueAndBytes> *res) {
+    void setPredConstCode(const string &id, vector<ValueAndBytes> *res) {
         if (-1 != findParamId(id)) return;
 
         params->push_back(id);
@@ -1305,14 +1306,14 @@ public:
         return res;
     }
 
-    int idUtf8(const string& value) const {
+    int idUtf8(const string &value) const {
         if (ConstantValue::getIdConstByString(consts, value) == -1)
             ConstantValue::CreateUtf8(value, consts);
 
         return ConstantValue::getIdConstByString(consts, value);
     }
 
-    int idClass(const string& className) const {
+    int idClass(const string &className) const {
         if (ConstantValue::getIdConstByString(consts, className, C_Class) == -1) {
             idUtf8(className);
             ConstantValue::CreateClass(
@@ -1323,7 +1324,7 @@ public:
         return ConstantValue::getIdConstByString(consts, className, C_Class);
     }
 
-    int idMethodRef(const string& className, const string& nameMethod, const string& typeMethod) {
+    int idMethodRef(const string &className, const string &nameMethod, const string &typeMethod) {
         idClass(className);
 
         if (ConstantValue::getIdConstByString(consts, string(nameMethod + typeMethod), C_NameAndType) == -1) {
@@ -1364,7 +1365,7 @@ public:
         return res;
     }
 
-    int findParamId(const string& value) const {
+    int findParamId(const string &value) const {
         for (int i = 0; i < params->size(); i++) {
             if ((*params)[i] == value)
                 return i;
@@ -1372,7 +1373,7 @@ public:
         return -1;
     }
 
-    void initializeNewVariable(const string& varName, vector<ValueAndBytes> *code_res) {
+    void initializeNewVariable(const string &varName, vector<ValueAndBytes> *code_res) {
         auto classId = string("RTL/Value;");
         auto constructor = string("RTL/Value.()V");
 
