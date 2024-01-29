@@ -105,8 +105,13 @@ public:
         auto descriptorString = string("()V");
         auto nameString = string("<init>");
 
-        auto constDescriptor = ConstantValue::CreateUtf8(descriptorString, _consts);
-        auto constName = ConstantValue::CreateUtf8(nameString, _consts);
+        auto constDescriptor = (ConstantValue::getIdConstByString(_consts, descriptorString) == -1) ?
+                               ConstantValue::CreateUtf8(descriptorString, _consts) :
+                               ConstantValue::getConstantByString(_consts, descriptorString);
+
+        auto constName = (ConstantValue::getIdConstByString(_consts, nameString) == -1) ?
+                         ConstantValue::CreateUtf8(nameString, _consts) :
+                         ConstantValue::getConstantByString(_consts, nameString);
 
         auto _code = new vector<ValueAndBytes>();
 
