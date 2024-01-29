@@ -25,7 +25,7 @@ private:
     ConstantType typeConst = C_Utf8;
     ValueAndBytes value{0, 0};
     // id константы в виде строки, для поиска
-    string *id = new string();
+    string id;
 
 public:
     ConstantValue() = default;
@@ -38,7 +38,7 @@ public:
         return value;
     }
 
-    string *getIdString() const {
+    string getIdString() const {
         return id;
     }
 
@@ -55,9 +55,9 @@ public:
         return -1;
     }
 
-    static int getIdConstByString(const vector<ConstantValue> *consts, string *id, ConstantType type = C_Utf8) {
+    static int getIdConstByString(const vector<ConstantValue> *consts, const string& id, ConstantType type = C_Utf8) {
         for (int i = 0; i < consts->size(); i++) {
-            if ((*consts)[i].typeConst == type && *(*consts)[i].id == *id) return i + 1;
+            if ((*consts)[i].typeConst == type && (*consts)[i].id == id) return i + 1;
         }
 
         return -1;
@@ -65,16 +65,16 @@ public:
 
     static int getIdConstByStringAll(const vector<ConstantValue> *consts, string *id) {
         for (int i = 0; i < consts->size(); i++) {
-            if (*(*consts)[i].id == *id) return i + 1;
+            if ((*consts)[i].id == *id) return i + 1;
         }
 
         return -1;
     }
 
     static ConstantValue
-    getConstantByString(const vector<ConstantValue> *consts, string *searchValue, ConstantType type = C_Utf8) {
+    getConstantByString(const vector<ConstantValue> *consts, const string& searchValue, ConstantType type = C_Utf8) {
         for (auto i: *consts) {
-            if (i.typeConst == type && *i.id == *searchValue) {
+            if (i.typeConst == type && i.id == searchValue) {
                 return i;
             }
         }
@@ -86,10 +86,10 @@ public:
         return typeConst == other.typeConst && value == other.value;
     }
 
-    static ConstantValue CreateUtf8(string *value, vector<ConstantValue> *consts) {
+    static ConstantValue CreateUtf8(const string& value, vector<ConstantValue> *consts) {
         auto constant = ConstantValue();
         constant.typeConst = C_Utf8;
-        constant.value = ValueAndBytes(*value);
+        constant.value = ValueAndBytes(value);
         constant.id = value;
 
         if (isContainsConst(consts, constant)) throw runtime_error("Const is already exist");
@@ -98,14 +98,14 @@ public:
         return constant;
     }
 
-    static ConstantValue CreateClass(ConstantValue name, vector<ConstantValue> &consts) {
+    static ConstantValue CreateClass(const ConstantValue& name, vector<ConstantValue> *consts) {
         if (name.getTypeConst() != C_Utf8) throw runtime_error("Name is not utf-8");
 
         auto constant = ConstantValue();
-        *constant.id = *name.id;
+        constant.id = name.id;
         constant.typeConst = C_Class;
-        constant.value = ValueAndBytes(getIdConst(&consts, name), 2);
-        consts.push_back(constant);
+        constant.value = ValueAndBytes(getIdConst(consts, name), 2);
+        consts->push_back(constant);
 
         return constant;
     }
@@ -119,14 +119,14 @@ public:
         constant.typeConst = C_NameAndType;
         int idName = getIdConst(consts, name);
         int idDesc = getIdConst(consts, descriptor);
-        *constant.id = *name.id + *descriptor.id;
+        constant.id = name.id + descriptor.id;
         constant.value = ValueAndBytes((idName << 16) | idDesc, 4);
         consts->push_back(constant);
 
         return constant;
     }
 
-    static ConstantValue CreateMethodRef(ConstantValue classConst, ConstantValue nameAndType,
+    static ConstantValue CreateMethodRef(const ConstantValue& classConst, const ConstantValue& nameAndType,
                                          vector<ConstantValue> *consts) {
         if (classConst.getTypeConst() != C_Class) throw runtime_error("Class const is not Class type");
         if (nameAndType.getTypeConst() != C_NameAndType) throw runtime_error("Name&Type const is not N&T type");
@@ -136,8 +136,8 @@ public:
         int idClass = getIdConst(consts, classConst);
         int idNameAndType = getIdConst(consts, nameAndType);
         constant.value = ValueAndBytes((idClass << 16) | idNameAndType, 4);
-        *constant.id = *classConst.id + "." +
-                        *nameAndType.id; // Чтобы искать по классу и имени, формат Class.method(descriptor)
+        constant.id = classConst.id + "." +
+                        nameAndType.id; // Чтобы искать по классу и имени, формат Class.method(descriptor)
         consts->push_back(constant);
 
         return constant;
@@ -153,7 +153,7 @@ public:
         int idClass = getIdConst(consts, *classConst);
         int idNameAndType = getIdConst(consts, *nameAndType);
         constant.value = ValueAndBytes((idClass << 16) | idNameAndType, 4);
-        *constant.id = *classConst->id + "." + *nameAndType->id;
+        constant.id = classConst->id + "." + nameAndType->id;
         consts->push_back(constant);
 
         return constant;
@@ -163,7 +163,7 @@ public:
         auto constant = ConstantValue();
         constant.typeConst = C_Integer;
         constant.value = ValueAndBytes(value, 4);
-        *constant.id = to_string(value);
+        constant.id = to_string(value);
         consts->push_back(constant);
 
         return constant;
@@ -173,19 +173,19 @@ public:
         auto constant = ConstantValue();
         constant.typeConst = C_Float;
         constant.value = ValueAndBytes(value, 4);
-        *constant.id = to_string(value);
+        constant.id = to_string(value);
         consts->push_back(constant);
 
         return constant;
     }
 
-    static ConstantValue CreateString(ConstantValue string, vector<ConstantValue> *consts) {
+    static ConstantValue CreateString(const ConstantValue& string, vector<ConstantValue> *consts) {
         if (string.getTypeConst() != C_Utf8) throw runtime_error("String is not utf-8");
 
         auto constant = ConstantValue();
         constant.typeConst = C_String;
         constant.value = ValueAndBytes(getIdConst(consts, string), 2);
-        *constant.id = *string.id;
+        constant.id = string.id;
         consts->push_back(constant);
 
         return constant;

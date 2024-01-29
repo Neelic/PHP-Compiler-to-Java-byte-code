@@ -17,11 +17,11 @@ private:
     const ConstantValue name;
     const ConstantValue descriptor;
     const CodeAttribute *code = nullptr;
-    vector<ConstantValue> consts;
+    vector<ConstantValue> *consts;
 
 public:
-    MethodBytes(Flags flags, const ConstantValue& name, const ConstantValue& descriptor, const CodeAttribute *code,
-                vector<ConstantValue> &consts) :
+    MethodBytes(Flags flags, const ConstantValue &name, const ConstantValue &descriptor, const CodeAttribute *code,
+                vector<ConstantValue> *consts) :
             flags(flags), name(name), descriptor(descriptor), code(code), consts(consts) {
         if (name.getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
         if (descriptor.getTypeConst() != C_Utf8) throw runtime_error("Descriptor is not Utf-8");
@@ -45,47 +45,43 @@ public:
         return res;
     }
 
-    static MethodBytes *
+    static MethodBytes
     fromFunctionStmtDecl(FunctionStmtDeclNode *node, ClassAccessModList *flagList, vector<ConstantValue> *consts) {
-        if (node == nullptr) return nullptr;
-
         getAllConstants(node, *consts);
 
         // Собираю строку дескриптора
         auto descriptor = string("(");
 
-        auto params = vector<string *>();
+        auto params = new vector<string>();
         auto currParam = string();
-        params.push_back(new string("$this")); // По умолчанию добавляю в список параметров первым элементом
+        params->push_back(string("$this")); // По умолчанию добавляю в список параметров первым элементом
 
 
         for (auto i: flagList->vector) {
             if (i->access_mod == ClassAccessMod::static_node) {
-                params.pop_back(); // Если метод статичен, убираю из списка параметров указатель на класс
+                params->pop_back(); // Если метод статичен, убираю из списка параметров указатель на класс
             }
         }
 
         // Для каждого параметра функции кроме последнего
         for (int i = 0; i < (int) (node->function_def->expr_func_list->vector.size() - 1); i++) {
             descriptor += "LRTL/Value;";
-            params.push_back(
-                    new string("$" + *node->function_def->expr_func_list->vector[i]->get_value_func->id_value));
+            params->push_back(
+                    string("$" + *node->function_def->expr_func_list->vector[i]->get_value_func->id_value));
         }
         // Добавляю последний тип и закрываю
         descriptor += ")LRTL/Value;";
 
-        return new MethodBytes(
+        return {
                 *Flags::convertToFlags(flagList),
-                ConstantValue::CreateUtf8(node->function_def->func_id, consts),
-                ConstantValue::CreateUtf8(&descriptor, consts),
+                ConstantValue::CreateUtf8(*node->function_def->func_id, consts),
+                ConstantValue::CreateUtf8(descriptor, consts),
                 CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts),
-                *consts
-        );
+                consts
+        };
     }
 
-    static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue> *consts) {
-        if (node == nullptr) return nullptr;
-
+    static MethodBytes fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue> *consts) {
         // Собираю строку дескриптора
         auto descriptor = string("(");
         // Для каждого параметра функции кроме последнего
@@ -95,14 +91,13 @@ public:
         // Добавляю последний тип и закрываю
         descriptor += ")LRTL/Value;";
 
-        return new MethodBytes(
+        return {
                 flags,
-                ConstantValue::CreateUtf8(node->func_id, consts),
-                ConstantValue::CreateUtf8(
-                        &descriptor, consts),
+                ConstantValue::CreateUtf8(*node->func_id, consts),
+                ConstantValue::CreateUtf8(descriptor, consts),
                 nullptr,
-                *consts
-        );
+                consts
+        };
     }
 
     static void getAllConstants(FunctionStmtDeclNode *node, vector<ConstantValue> &consts) {
@@ -124,7 +119,6 @@ public:
         auto res = vector<ConstantValue *>();
 
         switch (node->type) {
-
             case expr:
                 findConstantInExpr(node->expr_left, *consts);
                 break;
@@ -141,14 +135,14 @@ public:
             case static_var:
                 for (auto i: node->static_var->vector) {
                     if (i->id != nullptr) {
-                        addConstant(i->id, new string("LRTL/Value;"), *consts);
+                        addConstant(*i->id, new string("LRTL/Value;"), *consts);
                     }
                 }
                 break;
             case global_var:
                 for (auto i: node->global_var->vector) {
                     if (i->id != nullptr) {
-                        addConstant(i->id, new string("LRTL/Value;"), *consts);
+                        addConstant(*i->id, new string("LRTL/Value;"), *consts);
                     }
                 }
                 break;
@@ -271,7 +265,7 @@ public:
         findConstantInExpr(node->expr_right, consts);
 
         if (node->id != nullptr) {
-            addConstant(node->id, new string("LRTL/Value;"), consts);
+            addConstant(*node->id, new string("LRTL/Value;"), consts);
         }
 
         if (node->stmt != nullptr) {
@@ -285,7 +279,7 @@ public:
 
     static void findConstsInConstDeclNode(ConstDeclNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
-        addConstant(node->id, new string("LRTL/Value;"), consts);
+        addConstant(*node->id, new string("LRTL/Value;"), consts);
     }
 
     static void findConstantInExpr(ExprNode *node, vector<ConstantValue> &consts) {
@@ -295,8 +289,9 @@ public:
             case assign_ref_op:
             case assign_op:
                 findConstantInExpr(node->right, consts);
+                break;
             case variable:
-                addConstant(node->id, new string("LRTL/Value;"), consts);
+                addConstant(*node->id, new string("LRTL/Value;"), consts);
                 break;
             case ExprType::u_minus_op:
             case ExprType::u_plus_op:
@@ -368,7 +363,7 @@ public:
     }
 
     // Выделил в отдельную функцию, чтоб было не так больно исправлять
-    static void addConstant(string *id, string *type, vector<ConstantValue> &consts) {
+    static void addConstant(const string &id, string *type, vector<ConstantValue> &consts) {
         ConstantValue::CreateUtf8(id,
                                   &consts); // Тут дескриптор и не нужен, потому что это не класс и не метод, а просто имя константы
     }

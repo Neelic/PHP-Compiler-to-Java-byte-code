@@ -19,7 +19,7 @@ public:
             : fileName(fileName), consts(consts) {
         if (fileName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("File name is not utf-8 type");
         auto tmpStr = string("SourceFile");
-        nameAttr = ConstantValue::CreateUtf8(&tmpStr, consts);
+        nameAttr = ConstantValue::CreateUtf8(tmpStr, consts);
     }
 
     vector<ValueAndBytes> attributeToBytes() {

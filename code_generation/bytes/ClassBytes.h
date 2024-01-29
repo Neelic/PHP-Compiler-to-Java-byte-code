@@ -22,8 +22,8 @@ private:
     ConstantValue name;
     ConstantValue superClass;
     Flags flags;
-    vector<FieldBytes *> fields;
-    vector<const MethodBytes *> methods;
+    vector<FieldBytes> fields;
+    vector<MethodBytes> methods;
     SourceFileAttribute *sourceFile;
 
     vector<ConstantValue> *consts;
@@ -39,26 +39,26 @@ public:
         if (superClass.getTypeConst() != C_Utf8) throw runtime_error("Super class is not Utf-8");
     }
 
-    void addField(FieldBytes *field) {
+    void addField(const FieldBytes& field) {
         fields.push_back(field);
     }
 
-    void addMethod(MethodBytes *method) {
+    void addMethod(const MethodBytes& method) {
         methods.push_back(method);
     }
 
-    vector<ConstantValue> getConsts() {
-        return *consts;
+    vector<ConstantValue> *getConsts() {
+        return consts;
     }
 
     ConstantValue createClassConst() {
         isCreatedClassConst = true;
-        return ConstantValue::CreateClass(name, *consts);
+        return ConstantValue::CreateClass(name, consts);
     }
 
     ConstantValue createSuperClassConst() {
         isCreatedSuperClassConst = true;
-        return ConstantValue::CreateClass(superClass, *consts);
+        return ConstantValue::CreateClass(superClass, consts);
     }
 
     vector<ValueAndBytes> classToBytes() {
@@ -92,13 +92,13 @@ public:
         //fields
         res.emplace_back((int) fields.size(), 2);
         for (auto field: fields) {
-            auto fieldBytes = field->fieldToBytes();
+            auto fieldBytes = field.fieldToBytes();
             res.insert(res.end(), fieldBytes.begin(), fieldBytes.end());
         }
         //methods
         res.emplace_back((int) methods.size(), 2);
-        for (auto method: methods) {
-            auto methodBytes = method->methodToBytes(*consts);
+        for (const auto& method: methods) {
+            auto methodBytes = method.methodToBytes(*consts);
             res.insert(res.end(), methodBytes.begin(), methodBytes.end());
         }
         //source file attribute
@@ -110,12 +110,12 @@ public:
     }
 
     static ClassBytes *
-    fromClassStmtDeclNode(ClassStmtDeclNode *node, Flags &flags, string *superClass, SourceFileAttribute *sourceFile,
+    fromClassStmtDeclNode(ClassStmtDeclNode *node, Flags &flags, const string& superClass, SourceFileAttribute *sourceFile,
                           vector<ConstantValue> *consts) {
 
         if (node == nullptr) return nullptr;
 
-        auto tmp_name = ConstantValue::CreateUtf8(node->class_def->class_id, consts);
+        auto tmp_name = ConstantValue::CreateUtf8(*node->class_def->class_id, consts);
         auto tmp_super = ConstantValue::getConstantByString(consts, superClass);
 
         auto tmp_class = new ClassBytes(
@@ -140,7 +140,7 @@ public:
                                                                  consts));
                     break;
                 case class_expr_stmt_type:
-                    tmp_class->addField(FieldBytes::fromStmtExpr(i->class_expr, *consts));
+                    tmp_class->addField(FieldBytes::fromStmtExpr(i->class_expr, consts));
                     break;
                 default:
                     break;
@@ -155,11 +155,11 @@ public:
                                      vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
-        auto tmp_name = ConstantValue::CreateUtf8(new string("<main>"), consts);
+        auto tmp_name = ConstantValue::CreateUtf8(string("<main>"), consts);
 
-        if (ConstantValue::getIdConstByString(consts, new string("java/lang/Object")) == -1)
-            ConstantValue::CreateUtf8(new string("java/lang/Object"), consts);
-        auto tmp_super = ConstantValue::getConstantByString(consts, new string("java/lang/Object"));
+        if (ConstantValue::getIdConstByString(consts, string("java/lang/Object")) == -1)
+            ConstantValue::CreateUtf8(string("java/lang/Object"), consts);
+        auto tmp_super = ConstantValue::getConstantByString(consts, string("java/lang/Object"));
 
         auto tmp_class = new ClassBytes(
                 Flags(ACC_PUBLIC + ACC_SUPER),
@@ -188,12 +188,12 @@ public:
             }
         }
 
-        auto mainFunctionName = ConstantValue::CreateUtf8(new string("main"), consts);
+        auto mainFunctionName = ConstantValue::CreateUtf8(string("main"), consts);
 
-        auto mainFunctionDesc = ConstantValue::CreateUtf8(new string("([Ljava/lang/String;)V"), consts);
+        auto mainFunctionDesc = ConstantValue::CreateUtf8(string("([Ljava/lang/String;)V"), consts);
 
-        auto mainParams = vector<string *>();
-        mainParams.push_back(new string("args"));
+        auto mainParams = new vector<string>();
+        mainParams->push_back(string("args"));
 
         auto codeList = new StmtList();
 
@@ -206,21 +206,21 @@ public:
         const CodeAttribute *tmpCode = CodeAttribute::fromStmtList(codeList, 1000, mainParams, consts);
 
         auto mainFunction = MethodBytes(Flags(ACC_STATIC + ACC_PUBLIC), mainFunctionName, mainFunctionDesc,
-                                        tmpCode, *consts);
+                                        tmpCode, consts);
 
-        tmp_class->addMethod(&mainFunction);
+        tmp_class->addMethod(mainFunction);
 
         return tmp_class;
     }
 
 
     // На будущее
-    static ClassBytes *fromInterfaceStmtDecl(InterfaceStmtDeclNode *node, Flags &flags, string *superClass,
+    static ClassBytes *fromInterfaceStmtDecl(InterfaceStmtDeclNode *node, Flags &flags, const string& superClass,
                                              SourceFileAttribute *sourceFile,
                                              vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
-        auto tmp_name = ConstantValue::CreateUtf8(node->expr_definition->id, consts);
+        auto tmp_name = ConstantValue::CreateUtf8(*node->expr_definition->id, consts);
         auto tmp_super = ConstantValue::getConstantByString(consts, superClass);
 
         auto tmp_class = new ClassBytes(

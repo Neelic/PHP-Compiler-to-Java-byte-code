@@ -16,20 +16,23 @@
 
 class FieldBytes {
 private:
-    vector<ConstantValue> consts;
-    Flags flags;
+
+    vector<ConstantValue> *consts;
+    Flags flags = Flags(0);
     ConstantValue fieldName;
     ConstantValue descriptor;
     vector<ConstantValueAttribute *> attributes;
 public:
-    FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags &flags, vector<ConstantValue> &consts) :
+    FieldBytes() {}
+
+    FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags &flags, vector<ConstantValue> *consts) :
             descriptor(descriptor), fieldName(fieldName), flags(flags), consts(consts) {
         if (fieldName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Field name is not utf-8 type");
         if (descriptor.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Descriptor is not utf-8 type");
     }
 
     FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags &flags,
-               vector<ConstantValueAttribute *> &attributes, vector<ConstantValue> &consts) :
+               vector<ConstantValueAttribute *> &attributes, vector<ConstantValue> *consts) :
             descriptor(descriptor), fieldName(fieldName), flags(flags), consts(consts), attributes(attributes) {
         if (fieldName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Field name is not utf-8 type");
         if (descriptor.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Descriptor is not utf-8 type");
@@ -47,8 +50,8 @@ public:
         vector<ValueAndBytes> res;
         //flags
         res.push_back(*flags.flagToBytes());
-        res.emplace_back(ConstantValue::getIdConst(&consts, fieldName), 2);
-        res.emplace_back(ConstantValue::getIdConst(&consts, descriptor), 2);
+        res.emplace_back(ConstantValue::getIdConst(consts, fieldName), 2);
+        res.emplace_back(ConstantValue::getIdConst(consts, descriptor), 2);
 
         res.emplace_back((int) attributes.size(), 2);
 
@@ -60,15 +63,13 @@ public:
         return res;
     }
 
-    static FieldBytes *fromConstDeclNode(ConstDeclNode *node, Flags flag, vector<ConstantValue> &consts) {
-        if (node == nullptr) return nullptr;
+    static FieldBytes fromConstDeclNode(ConstDeclNode *node, Flags flag, vector<ConstantValue> *consts) {
 
+        auto tmp_name = ConstantValue::CreateUtf8(*node->id, consts);
 
-        auto tmp_name = ConstantValue::CreateUtf8(node->id, &consts);
+        auto tmp_type = ConstantValue::CreateUtf8(string("LRTL/Value;"), consts);
 
-        auto tmp_type = ConstantValue::CreateUtf8(new string("LRTL/Value;"), &consts);
-
-        auto tmp = new FieldBytes(
+        auto tmp = FieldBytes(
                 tmp_name,
                 tmp_type,
                 flag,
@@ -78,10 +79,8 @@ public:
         return tmp;
     }
 
-    static FieldBytes *fromStmtExpr(ClassExprNode *node, vector<ConstantValue> &consts) {
-        if (node == nullptr) return nullptr;
-
-        FieldBytes *tmp;
+    static FieldBytes fromStmtExpr(ClassExprNode *node, vector<ConstantValue> *consts) {
+        FieldBytes tmp = FieldBytes();
 
         auto tmp_flags = Flags(ACC_PUBLIC);
 
@@ -93,17 +92,17 @@ public:
 
             case ClassExprType::const_class_type:
                 for (auto i: node->const_decl_list->vector) {
-                    tmp = fromConstDeclNode(i, tmp_flags, consts);
+                    tmp = fromConstDeclNode(i, tmp_flags, consts);;
                 }
                 break;
             case ClassExprType::get_value_assign_class_type:
 
             case ClassExprType::get_value_class_type:
-                auto tmp_name = ConstantValue::CreateUtf8(node->id, &consts);
+                auto tmp_name = ConstantValue::CreateUtf8(*node->id, consts);
 
-                auto tmp_type = ConstantValue::CreateUtf8(new string("LRTL/Value;"), &consts);
+                auto tmp_type = ConstantValue::CreateUtf8(string("LRTL/Value;"), consts);
 
-                tmp = new FieldBytes(
+                tmp = FieldBytes(
                         tmp_name,
                         tmp_type,
                         tmp_flags,

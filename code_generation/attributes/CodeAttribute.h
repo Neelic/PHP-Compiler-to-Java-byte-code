@@ -25,7 +25,7 @@ private:
     int maxLocals;
     vector<ValueAndBytes> *code;
     vector<ConstantValue> *consts;
-    vector<string *> params; // Список id локальных переменных
+    vector<string> *params; // Список id локальных переменных
 
     int idClassConst = -1;
 
@@ -50,10 +50,10 @@ private:
 
 public:
     CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes> *code, vector<ConstantValue> *consts,
-                  vector<string *> &params)
+                  vector<string> *params)
             : maxStack(maxStack), maxLocals(maxLocals), code(code), consts(consts), params(params) {
         auto nameStr = string("Code");
-        name = ConstantValue::CreateUtf8(&nameStr, consts);
+        name = ConstantValue::CreateUtf8(nameStr, consts);
     }
 
     void addCodeValueByte(ValueAndBytes &value) {
@@ -82,7 +82,7 @@ public:
     }
 
     static const CodeAttribute *
-    fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue> *consts) {
+    fromStmtList(StmtList *node, int maxLocals, vector<string> *params, vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
         auto code_res = new vector<ValueAndBytes>();
@@ -96,7 +96,7 @@ public:
         );
 
 
-        for (auto i: params) {
+        for (auto i: *params) {
 //            Commands::doCommandTwoBytes(_new,);
         }
 
@@ -168,40 +168,40 @@ public:
                 break;
             case const_decl:
                 for (auto i: node->const_decl->vector) {
-                    initializeNewVariable(i->id, &res);
+                    initializeNewVariable(*i->id, &res);
                     //get on stack right part
                     code_tmp = getCodeFromExpr(i->expr, currLine, 1);
                     res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                     //op
-                    Commands::doCommand(astore, findParamId(i->id), &res);
+                    Commands::doCommand(astore, findParamId(*i->id), &res);
                 }
                 break;
             case static_var:
                 for (auto i: node->static_var->vector) {
-                    initializeNewVariable(i->id, &res);
+                    initializeNewVariable(*i->id, &res);
                     //get on stack right part
                     code_tmp = getCodeFromExpr(i->expr, currLine, 1);
                     res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                     //op
-                    Commands::doCommand(astore, findParamId(i->id), &res);
+                    Commands::doCommand(astore, findParamId(*i->id), &res);
                 }
                 break;
             case global_var:
                 for (auto i: node->global_var->vector) {
-                    initializeNewVariable(i->id, &res);
+                    initializeNewVariable(*i->id, &res);
                 }
                 break;
             case t_echo_stmt:
-                Commands::doCommandTwoBytes(_new, ConstantValue::getIdConstByString(consts, new string("RTL/Functions"),
+                Commands::doCommandTwoBytes(_new, ConstantValue::getIdConstByString(consts, string("RTL/Functions"),
                                                                                     ConstantType::C_Class),
                                             &res); // Создаю объект класса RTL/Functions
 
                 getCodeFromExpr(node->expr_right, currLine, 1);// Нахожу параметр
 
                 Commands::doCommandTwoBytes(invokestatic, idMethodRef(
-                        new string("RTL/Functions"),
-                        new string("echo"),
-                        new string("(LRTL/Value;)V")), &res); // Выполняю функцию
+                        string("RTL/Functions"),
+                        string("echo"),
+                        string("(LRTL/Value;)V")), &res); // Выполняю функцию
 
                 break;
         }
@@ -490,8 +490,8 @@ public:
         int byteCount = currLine;
         int skipBytes = 0;
 
-        auto loopIndex = new string(); // Хранит имя переменной, служащей индексом для обхода массива
-        auto arrayItem = new string(); //Хранит имя переменной для текущего элемента массива
+        auto loopIndex = string(); // Хранит имя переменной, служащей индексом для обхода массива
+        auto arrayItem = string(); //Хранит имя переменной для текущего элемента массива
 
         // Записываем первое выражение из for
         code_tmp = getCodeFromExpr(node->expr_left, currLine, 0);
@@ -504,32 +504,31 @@ public:
         // Если в заголовке есть параметр для ключа
         if (node->id != nullptr) {
             //Создаю последнюю переменную в заголовке, если ее еще нет
-            initializeNewVariable(node->id, &res);
+            initializeNewVariable(*node->id, &res);
 
-            *loopIndex = *node->expr_right->id;
-            *arrayItem = *node->id;
+            loopIndex = *node->expr_right->id;
+            arrayItem = *node->id;
 
             // Подготавливаю индекс для обхода массива и обращения к значениям
             Commands::doCommand(iconst_0, &res);
 
-            Commands::doCommand(istore, findParamId(node->expr_right->id), &res);
+            Commands::doCommand(istore, findParamId(*node->expr_right->id), &res);
 
         } else {
             // Подготавливаю индекс для обхода массива и обращения к значениям
-            auto loopIndexTemp = new string("loopIndex");
+            auto loopIndexTemp = string("loopIndex");
             initializeNewVariable(loopIndex, &res);
 
             Commands::doCommand(iconst_0, &res);
             Commands::doCommand(istore, findParamId(loopIndex), &res);
 
-            *loopIndex = *loopIndexTemp;
-            *arrayItem = *node->expr_right->id;
-            delete loopIndexTemp;
+            loopIndex = loopIndexTemp;
+            arrayItem = *node->expr_right->id;
         }
 
         // В начале цикла получаем текущий элемент массива
         // Записываю в стек ссылку на массив и индекс элемента
-        Commands::doCommand(aload, findParamId(node->expr_left->id), &main_code);
+        Commands::doCommand(aload, findParamId(*node->expr_left->id), &main_code);
         Commands::doCommand(iload, findParamId(loopIndex), &main_code);
         //Загружаю элемент массива по индексу на стек и сохраняю в переменную текущего элемента массива
         Commands::doCommand(aaload, &main_code);
@@ -554,7 +553,7 @@ public:
         Commands::doCommandTwoBytes(go_to, skipBytes + 3, &res);
 
         // Добавляем в main_code вычисление условия из центрального выражения for
-        Commands::doCommand(aload, findParamId(node->expr_left->id), &main_code);
+        Commands::doCommand(aload, findParamId(*node->expr_left->id), &main_code);
         Commands::doCommand(arraylength, &res); // Получаю размер массива
 
         Commands::doCommand(iload, findParamId(loopIndex), &main_code); // Получаю текущий индекс массива
@@ -682,7 +681,7 @@ public:
         int target;
 
         vector<ValueAndBytes> tmpVec;
-        idClassConst = idClass(new string("RTL/Value"));
+        idClassConst = idClass(string("RTL/Value"));
         string isVar;
         int n = 0;
 
@@ -692,19 +691,19 @@ public:
                 Commands::doCommandTwoBytes(_new, idClassConst, &res);
                 Commands::doCommand(dup, &res);
                 //if consts hasn't integer const
-                if (ConstantValue::getIdConstByString(consts, new string(to_string(node->int_val)), C_Integer) == -1)
+                if (ConstantValue::getIdConstByString(consts, string(to_string(node->int_val)), C_Integer) == -1)
                     ConstantValue::CreateInteger(node->int_val, consts);
                 //load int to stack
                 Commands::doCommand(ldc,
-                                    ConstantValue::getIdConstByString(consts, new string(to_string(node->int_val)),
+                                    ConstantValue::getIdConstByString(consts, string(to_string(node->int_val)),
                                                                       C_Integer),
                                     &res);
                 Commands::doCommandTwoBytes(
                         invokespecial,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("<init>"),
-                                new string("(I)V")),
+                                string("RTL/Value"),
+                                string("<init>"),
+                                string("(I)V")),
                         &res); //id на Value(int)
                 break;
             case float_val:
@@ -712,18 +711,18 @@ public:
                 Commands::doCommandTwoBytes(_new, idClassConst, &res);
                 Commands::doCommand(dup, &res);
                 //if consts hasn't float const
-                if (ConstantValue::getIdConstByString(consts, new string(to_string(node->float_val)), C_Integer) == -1)
+                if (ConstantValue::getIdConstByString(consts, string(to_string(node->float_val)), C_Integer) == -1)
                     ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
                 //load float to stack
                 Commands::doCommand(ldc,
-                                    ConstantValue::getIdConstByString(consts, new string(to_string(node->float_val))),
+                                    ConstantValue::getIdConstByString(consts, string(to_string(node->float_val))),
                                     &res);
                 Commands::doCommandTwoBytes(
                         invokespecial,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("<init>"),
-                                new string("(F)V")),
+                                string("RTL/Value"),
+                                string("<init>"),
+                                string("(F)V")),
                         &res); //id на Value(float)
                 break;
             case string_val:
@@ -731,21 +730,21 @@ public:
                 Commands::doCommandTwoBytes(_new, idClassConst, &res);
                 Commands::doCommand(dup, &res);
                 //if consts hasn't string const
-                if (ConstantValue::getIdConstByString(consts, node->string_val, C_String) == -1) {
-                    if (ConstantValue::getIdConstByString(consts, node->string_val) == -1)
-                        ConstantValue::CreateUtf8(node->string_val, consts);
+                if (ConstantValue::getIdConstByString(consts, *node->string_val, C_String) == -1) {
+                    if (ConstantValue::getIdConstByString(consts, *node->string_val) == -1)
+                        ConstantValue::CreateUtf8(*node->string_val, consts);
                     ConstantValue::CreateString(
-                            ConstantValue::getConstantByString(consts, node->string_val),
+                            ConstantValue::getConstantByString(consts, *node->string_val),
                             consts);
                 }
                 //load string const
-                Commands::doCommand(ldc, ConstantValue::getIdConstByString(consts, node->string_val, C_String), &res);
+                Commands::doCommand(ldc, ConstantValue::getIdConstByString(consts, *node->string_val, C_String), &res);
                 Commands::doCommandTwoBytes(
                         invokespecial,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("<init>"),
-                                new string("(Ljava/lang/String;)V")
+                                string("RTL/Value"),
+                                string("<init>"),
+                                string("(Ljava/lang/String;)V")
                         ), &res); //id на Value(String)
                 break;
                 /// Assign
@@ -755,8 +754,8 @@ public:
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //op
                 if (node->left->exprType == variable) isVar = "$";
-                if (findParamId(node->left->id) == -1) params.push_back(new string(isVar + *node->left->id));
-                Commands::doCommand(astore, findParamId(node->left->id), &res);
+                if (findParamId(*node->left->id) == -1) params->emplace_back(isVar + *node->left->id);
+                Commands::doCommand(astore, findParamId(*node->left->id), &res);
                 break;
                 ///Math ops
             case plus_op:
@@ -770,9 +769,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("add"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("add"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.add(Value)
                         &res
                 );
@@ -788,9 +787,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("sub"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("sub"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.sub(Value)
                         &res
                 );
@@ -806,9 +805,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("mul"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("mul"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.mul(Value)
                         &res
                 );
@@ -824,9 +823,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("div"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("div"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
                         &res
                 );
@@ -842,9 +841,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("pow"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("pow"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.pow(Value)
                         &res
                 );
@@ -860,9 +859,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("div"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("div"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.mod(Value)
                         &res
                 );
@@ -878,9 +877,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("concat"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("concat"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.div(Value)
                         &res
                 );
@@ -893,9 +892,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toFloatVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toFloatVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toFloatVal()
                         &res
                 );
@@ -903,9 +902,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("mul"),
-                                new string("(I)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("mul"),
+                                string("(I)LRTL/Value;")
                         ), //id на Value.toFloatVal()
                         &res
                 );
@@ -918,9 +917,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toFloatVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toFloatVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toFloatVal()
                         &res
                 );
@@ -937,9 +936,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("equals"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("equals"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.equals(Value)
                         &res
                 );
@@ -955,9 +954,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("equalsStrict"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("equalsStrict"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.equalsStrict(Value)
                         &res
                 );
@@ -970,9 +969,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("not"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("not"),
+                                string("()LRTL/Value;")
                         ), //id на Value.not()
                         &res
                 );
@@ -988,9 +987,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("more"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("more"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.more(Value)
                         &res
                 );
@@ -1006,9 +1005,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("less"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("less"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.less(Value)
                         &res
                 );
@@ -1024,9 +1023,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("and"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("and"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.and(Value)
                         &res
                 );
@@ -1042,41 +1041,41 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("or"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("or"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.or(Value)
                         &res
                 );
                 break;
                 ///Local params
             case variable:
-                if (findParamId(node->id) == -1) {
-                    params.push_back(new string('$' + *node->id));
+                if (findParamId(*node->id) == -1) {
+                    params->emplace_back('$' + *node->id);
                     Commands::doCommandTwoBytes(_new, idClassConst, &res);
                     Commands::doCommand(dup, &res);
                     Commands::doCommandTwoBytes(
                             invokespecial,
                             idMethodRef(
-                                    new string("RTL/Value"),
-                                    new string("<init>"),
-                                    new string("()V")
+                                    string("RTL/Value"),
+                                    string("<init>"),
+                                    string("()V")
                             ), &res); //id на Value(String)
-                    Commands::doCommand(aload, findParamId(new string('$' + *node->id)), &res);
+                    Commands::doCommand(aload, findParamId(string('$' + *node->id)), &res);
                 }
-                Commands::doCommand(aload, findParamId(node->id), &res);
+                Commands::doCommand(aload, findParamId(*node->id), &res);
                 break;
             case id_type:
-                if (findParamId(node->id) == -1) {
+                if (findParamId(*node->id) == -1) {
                     if (isPredConst(node->id)) {
-                        setPredConstCode(node->id, &res);
+                        setPredConstCode(*node->id, &res);
                     } else
                         throw runtime_error(
                                 "Fatal Error: Undefined constant \"" +
                                 *node->id + "\"");
                 }
 
-                Commands::doCommand(aload, findParamId(node->id), &res);
+                Commands::doCommand(aload, findParamId(*node->id), &res);
                 break;
                 ///Array
             case set_array_val:
@@ -1087,9 +1086,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toArrayVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toArrayVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toArrayVal()
                         &res
                 );
@@ -1103,9 +1102,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("addToArray"),
-                                new string("(LRTL/Value;LRTL/Value;)V")
+                                string("RTL/Value"),
+                                string("addToArray"),
+                                string("(LRTL/Value;LRTL/Value;)V")
                         ),
                         &res
                 );
@@ -1118,9 +1117,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toArrayVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toArrayVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toArrayVal()
                         &res
                 );
@@ -1131,9 +1130,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("addToArray"),
-                                new string("(LRTL/Value;)V")
+                                string("RTL/Value"),
+                                string("addToArray"),
+                                string("(LRTL/Value;)V")
                         ),
                         &res
                 );
@@ -1146,9 +1145,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toArrayVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toArrayVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toArrayVal()
                         &res
                 );
@@ -1159,9 +1158,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("getArrayVal"),
-                                new string("(LRTL/Value;)LRTL/Value;")
+                                string("RTL/Value"),
+                                string("getArrayVal"),
+                                string("(LRTL/Value;)LRTL/Value;")
                         ),
                         &res
                 );
@@ -1175,9 +1174,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toIntVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toIntVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toIntVal()
                         &res
                 );
@@ -1190,9 +1189,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toFloatVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toFloatVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toFloatVal()
                         &res
                 );
@@ -1205,9 +1204,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toBoolVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toBoolVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toBoolVal()
                         &res
                 );
@@ -1220,9 +1219,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toStringVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toStringVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toStringVal()
                         &res
                 );
@@ -1235,9 +1234,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
-                                new string("RTL/Value"),
-                                new string("toArrayVal"),
-                                new string("()LRTL/Value;")
+                                string("RTL/Value"),
+                                string("toArrayVal"),
+                                string("()LRTL/Value;")
                         ), //id на Value.toArrayVal()
                         &res
                 );
@@ -1252,9 +1251,9 @@ public:
                 Commands::doCommandTwoBytes(
                         invokestatic,
                         idMethodRef(
-                                new string("<main>"),
-                                node->id,
-                                new string("(" + repeatStr(n, "LRTL/Value;") + ")LRTL/Value;")
+                                string("<main>"),
+                                *node->id,
+                                string("(" + repeatStr(n, "LRTL/Value;") + ")LRTL/Value;")
                         ),
                         &res
                 );
@@ -1268,23 +1267,23 @@ public:
         return *id == "true" || *id == "false";
     }
 
-    void setPredConstCode(string *id, vector<ValueAndBytes> *res) {
+    void setPredConstCode(const string& id, vector<ValueAndBytes> *res) {
         if (-1 != findParamId(id)) return;
 
-        params.push_back(id);
-        // create new value
+        params->push_back(id);
+        // cre->te new value
         Commands::doCommandTwoBytes(_new, idClassConst, res);
         Commands::doCommand(dup, res);
 
-        if (*id == "true") Commands::doCommand(iconst_1, res);
-        else if (*id == "false") Commands::doCommand(iconst_0, res);
+        if (id == "true") Commands::doCommand(iconst_1, res);
+        else if (id == "false") Commands::doCommand(iconst_0, res);
 
         Commands::doCommandTwoBytes(
                 invokespecial,
                 idMethodRef(
-                        new string("RTL/Value"),
-                        new string("<init>"),
-                        new string("(I)V")),
+                        string("RTL/Value"),
+                        string("<init>"),
+                        string("(I)V")),
                 res); //id на Value(int)
 
         Commands::doCommand(astore, findParamId(id), res);
@@ -1299,28 +1298,28 @@ public:
         return res;
     }
 
-    int idUtf8(string *value) const {
+    int idUtf8(const string& value) const {
         if (ConstantValue::getIdConstByString(consts, value) == -1)
             ConstantValue::CreateUtf8(value, consts);
 
         return ConstantValue::getIdConstByString(consts, value);
     }
 
-    int idClass(string *className) const {
+    int idClass(const string& className) const {
         if (ConstantValue::getIdConstByString(consts, className, C_Class) == -1) {
             idUtf8(className);
             ConstantValue::CreateClass(
                     ConstantValue::getConstantByString(consts, className),
-                    *consts);
+                    consts);
         }
 
         return ConstantValue::getIdConstByString(consts, className, C_Class);
     }
 
-    int idMethodRef(string *className, string *nameMethod, string *typeMethod) {
+    int idMethodRef(const string& className, const string& nameMethod, const string& typeMethod) {
         idClass(className);
 
-        if (ConstantValue::getIdConstByString(consts, new string(*nameMethod + *typeMethod), C_NameAndType) == -1) {
+        if (ConstantValue::getIdConstByString(consts, string(nameMethod + typeMethod), C_NameAndType) == -1) {
             idUtf8(nameMethod);
 
             idUtf8(typeMethod);
@@ -1333,18 +1332,18 @@ public:
         }
 
         if (ConstantValue::getIdConstByString(consts,
-                                              new string(*className + '.' + *nameMethod + *typeMethod),
+                                              string(className + '.' + nameMethod + typeMethod),
                                               C_MethodRef) == -1) {
             ConstantValue::CreateMethodRef(
                     ConstantValue::getConstantByString(consts, className, C_Class),
                     ConstantValue::getConstantByString(consts,
-                                                       new string(*nameMethod + *typeMethod),
+                                                       string(nameMethod + typeMethod),
                                                        C_NameAndType),
                     consts
             );
         }
 
-        return ConstantValue::getIdConstByString(consts, new string(*className + '.' + *nameMethod + *typeMethod),
+        return ConstantValue::getIdConstByString(consts, string(className + '.' + nameMethod + typeMethod),
                                                  C_MethodRef);
     }
 
@@ -1358,20 +1357,17 @@ public:
         return res;
     }
 
-    int findParamId(string *value) const {
-        for (int i = 0; i < params.size(); i++) {
-            if (*params[i] == *value)
+    int findParamId(const string& value) const {
+        for (int i = 0; i < params->size(); i++) {
+            if ((*params)[i] == value)
                 return i;
         }
         return -1;
     }
 
-    void initializeNewVariable(string *varName, vector<ValueAndBytes> *code_res) {
-
-        if (varName == nullptr) return;
-
-        auto classId = new string("RTL/Value;");
-        auto constructor = new string("RTL/Value.()V");
+    void initializeNewVariable(const string& varName, vector<ValueAndBytes> *code_res) {
+        auto classId = string("RTL/Value;");
+        auto constructor = string("RTL/Value.()V");
 
         auto arrayElementVar = findParamId(varName);
 
@@ -1389,13 +1385,13 @@ public:
         Commands::doCommandTwoBytes(
                 invokespecial,
                 idMethodRef(
-                        new string("RTL/Value"),
-                        new string("<init>"),
-                        new string("()V")), code_res); //id на Value(String)// Вызываю конструктор, по идее
+                        string("RTL/Value"),
+                        string("<init>"),
+                        string("()V")), code_res); //id на Value(String)// Вызываю конструктор, по идее
 
-        Commands::doCommand(astore, (int) params.size(), code_res); // Сохраняю ссылку на объект в новый параметр
+        Commands::doCommand(astore, (int) params->size(), code_res); // Сохраняю ссылку на объект в новый параметр
 
-        params.push_back(varName); // Сохраняю имя переменной в учете
+        params->push_back(varName); // Сохраняю имя переменной в учете
     }
 
     // Переводит Value(bool) в int, нужно для комманд сравнения. После выполнения в стеке должна лежать int 1 или 0
@@ -1403,15 +1399,15 @@ public:
 
         //Приводит Value(bool) к Value(int)
         Commands::doCommandTwoBytes(invokevirtual,
-                                    idMethodRef(new string("RTL/Value"),
-                                                new string("toIntVal"),
-                                                new string("()LRTL/Value;")),
+                                    idMethodRef(string("RTL/Value"),
+                                                string("toIntVal"),
+                                                string("()LRTL/Value;")),
                                     code_res);
         //Получает int
         Commands::doCommandTwoBytes(invokevirtual,
-                                    idMethodRef(new string("RTL/Value"),
-                                                new string("getInt"),
-                                                new string("()LRTL/Value;")),
+                                    idMethodRef(string("RTL/Value"),
+                                                string("getInt"),
+                                                string("()LRTL/Value;")),
                                     code_res);
     }
 
