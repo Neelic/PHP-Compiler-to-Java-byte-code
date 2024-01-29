@@ -31,8 +31,8 @@ public:
         auto res = vector<ValueAndBytes>();
 
         res.push_back(*flags.flagToBytes());
-        res.emplace_back(ConstantValue::getIdConst(_consts, name), 2);
-        res.emplace_back(ConstantValue::getIdConst(_consts, descriptor), 2);
+        res.emplace_back(ConstantValue::getIdConst(&_consts, name), 2);
+        res.emplace_back(ConstantValue::getIdConst(&_consts, descriptor), 2);
 
         if (code != nullptr) {
             res.emplace_back(1, 2);
@@ -46,10 +46,10 @@ public:
     }
 
     static MethodBytes *
-    fromFunctionStmtDecl(FunctionStmtDeclNode *node, ClassAccessModList *flagList, vector<ConstantValue> consts) {
+    fromFunctionStmtDecl(FunctionStmtDeclNode *node, ClassAccessModList *flagList, vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
-        getAllConstants(node, consts);
+        getAllConstants(node, *consts);
 
         // Собираю строку дескриптора
         auto descriptor = string("(");
@@ -79,11 +79,11 @@ public:
                 ConstantValue::CreateUtf8(node->function_def->func_id, consts),
                 ConstantValue::CreateUtf8(&descriptor, consts),
                 CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts),
-                consts
+                *consts
         );
     }
 
-    static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue> consts) {
+    static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
         // Собираю строку дескриптора
@@ -101,7 +101,7 @@ public:
                 ConstantValue::CreateUtf8(
                         &descriptor, consts),
                 nullptr,
-                consts
+                *consts
         );
     }
 
@@ -113,11 +113,11 @@ public:
         if (node->stmt_list == nullptr) return;
 
         for (auto stmtNode: node->stmt_list->vector) {
-            findAllConstInStmtNode(stmtNode, consts);
+            findAllConstInStmtNode(stmtNode, &consts);
         }
     }
 
-    static void findAllConstInStmtNode(StmtNode *node, vector<ConstantValue> &consts) {
+    static void findAllConstInStmtNode(StmtNode *node, vector<ConstantValue> *consts) {
 
         if (node == nullptr) return;
 
@@ -126,13 +126,13 @@ public:
         switch (node->type) {
 
             case expr:
-                findConstantInExpr(node->expr_left, consts);
+                findConstantInExpr(node->expr_left, *consts);
                 break;
             case if_stmt:
-                findAllConstantsInIfStmt(node->if_stmt, consts);
+                findAllConstantsInIfStmt(node->if_stmt, *consts);
                 break;
             case switch_stmt:
-                findAllConstantsInSwitchStmt(node->switch_stmt, consts);
+                findAllConstantsInSwitchStmt(node->switch_stmt, *consts);
                 break;
             case stmt_list:
                 for (auto i: node->stmtList->vector)
@@ -141,32 +141,32 @@ public:
             case static_var:
                 for (auto i: node->static_var->vector) {
                     if (i->id != nullptr) {
-                        addConstant(i->id, new string("LRTL/Value;"), consts);
+                        addConstant(i->id, new string("LRTL/Value;"), *consts);
                     }
                 }
                 break;
             case global_var:
                 for (auto i: node->global_var->vector) {
                     if (i->id != nullptr) {
-                        addConstant(i->id, new string("LRTL/Value;"), consts);
+                        addConstant(i->id, new string("LRTL/Value;"), *consts);
                     }
                 }
                 break;
             case while_stmt:
-                findConstsInWhileStmt(node->while_stmt, consts);
+                findConstsInWhileStmt(node->while_stmt, *consts);
                 break;
             case do_while_stmt:
-                findConstsInDoWhile(node->do_while_stmt, consts);
+                findConstsInDoWhile(node->do_while_stmt, *consts);
                 break;
             case for_stmt:
                 findConstsInForStmt(node->for_stmt, consts);
                 break;
             case foreach_stmt:
-                findConstsInForEachStmt(node->foreach_stmt, consts);
+                findConstsInForEachStmt(node->foreach_stmt, *consts);
                 break;
             case const_decl:
                 for (auto i: node->const_decl->vector) {
-                    findConstsInConstDeclNode(i, consts);
+                    findConstsInConstDeclNode(i, *consts);
                 }
                 break;
         }
@@ -178,17 +178,17 @@ public:
         if (node->expr != nullptr)
             findConstantInExpr(node->expr, consts);
         if (node->stmt_main != nullptr)
-            findAllConstInStmtNode(node->stmt_main, consts);
+            findAllConstInStmtNode(node->stmt_main, &consts);
         if (node->stmt_else != nullptr)
-            findAllConstInStmtNode(node->stmt_else, consts);
+            findAllConstInStmtNode(node->stmt_else, &consts);
         if (node->stmtListMain != nullptr) {
             for (auto i: node->stmtListMain->vector) {
-                findAllConstInStmtNode(i, consts);
+                findAllConstInStmtNode(i, &consts);
             }
         }
         if (node->stmtListElse != nullptr) {
             for (auto i: node->stmtListElse->vector) {
-                findAllConstInStmtNode(i, consts);
+                findAllConstInStmtNode(i, &consts);
             }
         }
         if (node->listElse != nullptr) {
@@ -211,7 +211,7 @@ public:
                     findConstantInExpr(i->expr, consts);
                 if (i->stmtList != nullptr) {
                     for (auto j: i->stmtList->vector) {
-                        findAllConstInStmtNode(j, consts);
+                        findAllConstInStmtNode(j, &consts);
                     }
                 }
             }
@@ -228,11 +228,11 @@ public:
 
         switch (node->type) {
             case while_stmt_type:
-                findAllConstInStmtNode(node->stmt, consts);
+                findAllConstInStmtNode(node->stmt, &consts);
                 break;
             case end_while_stmt_type:
                 for (auto i: node->stmtList->vector) {
-                    findAllConstInStmtNode(i, consts);
+                    findAllConstInStmtNode(i, &consts);
                 }
                 break;
         }
@@ -243,13 +243,13 @@ public:
 
         findConstantInExpr(node->expr, consts);
 
-        findAllConstInStmtNode(node->stmt, consts);
+        findAllConstInStmtNode(node->stmt, &consts);
     }
 
-    static void findConstsInForStmt(ForStmtNode *node, vector<ConstantValue> &consts) {
+    static void findConstsInForStmt(ForStmtNode *node, vector<ConstantValue> *consts) {
         if (node == nullptr) return;
 
-        findConstantInExpr(node->expr_left, consts);
+        findConstantInExpr(node->expr_left, *consts);
 
         switch (node->type) {
 
@@ -275,10 +275,10 @@ public:
         }
 
         if (node->stmt != nullptr) {
-            findAllConstInStmtNode(node->stmt, consts);
+            findAllConstInStmtNode(node->stmt, &consts);
         } else if (node->stmtList != nullptr) {
             for (auto i: node->stmtList->vector) {
-                findAllConstInStmtNode(node->stmt, consts);
+                findAllConstInStmtNode(node->stmt, &consts);
             }
         }
     }
@@ -370,7 +370,7 @@ public:
     // Выделил в отдельную функцию, чтоб было не так больно исправлять
     static void addConstant(string *id, string *type, vector<ConstantValue> &consts) {
         ConstantValue::CreateUtf8(id,
-                                  consts); // Тут дескриптор и не нужен, потому что это не класс и не метод, а просто имя константы
+                                  &consts); // Тут дескриптор и не нужен, потому что это не класс и не метод, а просто имя константы
     }
 };
 

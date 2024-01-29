@@ -46,9 +46,9 @@ int main(int argc, char *argv[]) {
     ClassBytes *a = ClassBytes::fromStartStmt(
             startNode,
             new SourceFileAttribute(
-                    ConstantValue::CreateUtf8(new string("Main.java"), consts),
-                    consts),
-            consts);
+                    ConstantValue::CreateUtf8(new string("Main.java"), &consts),
+                    &consts),
+            &consts);
     auto classBytes = a->classToBytes();
     auto out = WriteBytesToFile(new string("Main.class"));
     out.write(classBytes);

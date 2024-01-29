@@ -30,9 +30,9 @@ public:
 
     vector<ValueAndBytes> attributeToBytes() {
         auto res = vector<ValueAndBytes>();
-        res.emplace_back(ConstantValue::getIdConst(consts, *name), 2);
+        res.emplace_back(ConstantValue::getIdConst(&consts, *name), 2);
         res.emplace_back(bytesLength, 4);
-        res.emplace_back(ConstantValue::getIdConst(consts, *value), 2);
+        res.emplace_back(ConstantValue::getIdConst(&consts, *value), 2);
 
         return res;
     }

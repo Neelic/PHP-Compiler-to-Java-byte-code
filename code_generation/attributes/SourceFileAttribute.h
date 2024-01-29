@@ -12,10 +12,10 @@ class SourceFileAttribute {
 private:
     ConstantValue nameAttr;
     ConstantValue fileName;
-    vector<ConstantValue> consts;
+    vector<ConstantValue> *consts;
 
 public:
-    SourceFileAttribute(const ConstantValue& fileName, const vector<ConstantValue>& consts)
+    SourceFileAttribute(const ConstantValue &fileName, vector<ConstantValue> *consts)
             : fileName(fileName), consts(consts) {
         if (fileName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("File name is not utf-8 type");
         auto tmpStr = string("SourceFile");

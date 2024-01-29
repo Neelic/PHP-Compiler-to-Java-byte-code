@@ -24,7 +24,7 @@ private:
     int maxStack;
     int maxLocals;
     vector<ValueAndBytes> *code;
-    vector<ConstantValue> &consts ;
+    vector<ConstantValue> *consts;
     vector<string *> params; // Список id локальных переменных
 
     int idClassConst = -1;
@@ -49,7 +49,7 @@ private:
     }
 
 public:
-    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes> *code, vector<ConstantValue> &consts ,
+    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes> *code, vector<ConstantValue> *consts,
                   vector<string *> &params)
             : maxStack(maxStack), maxLocals(maxLocals), code(code), consts(consts), params(params) {
         auto nameStr = string("Code");
@@ -82,7 +82,7 @@ public:
     }
 
     static const CodeAttribute *
-    fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue> &consts ) {
+    fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
         auto code_res = new vector<ValueAndBytes>();
@@ -1311,7 +1311,7 @@ public:
             idUtf8(className);
             ConstantValue::CreateClass(
                     ConstantValue::getConstantByString(consts, className),
-                    consts);
+                    *consts);
         }
 
         return ConstantValue::getIdConstByString(consts, className, C_Class);

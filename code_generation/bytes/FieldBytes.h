@@ -47,8 +47,8 @@ public:
         vector<ValueAndBytes> res;
         //flags
         res.push_back(*flags.flagToBytes());
-        res.emplace_back(ConstantValue::getIdConst(consts, fieldName), 2);
-        res.emplace_back(ConstantValue::getIdConst(consts, descriptor), 2);
+        res.emplace_back(ConstantValue::getIdConst(&consts, fieldName), 2);
+        res.emplace_back(ConstantValue::getIdConst(&consts, descriptor), 2);
 
         res.emplace_back((int) attributes.size(), 2);
 
@@ -64,9 +64,9 @@ public:
         if (node == nullptr) return nullptr;
 
 
-        auto tmp_name = ConstantValue::CreateUtf8(node->id, consts);
+        auto tmp_name = ConstantValue::CreateUtf8(node->id, &consts);
 
-        auto tmp_type = ConstantValue::CreateUtf8(new string("LRTL/Value;"), consts);
+        auto tmp_type = ConstantValue::CreateUtf8(new string("LRTL/Value;"), &consts);
 
         auto tmp = new FieldBytes(
                 tmp_name,
@@ -99,9 +99,9 @@ public:
             case ClassExprType::get_value_assign_class_type:
 
             case ClassExprType::get_value_class_type:
-                auto tmp_name = ConstantValue::CreateUtf8(node->id, consts);
+                auto tmp_name = ConstantValue::CreateUtf8(node->id, &consts);
 
-                auto tmp_type = ConstantValue::CreateUtf8(new string("LRTL/Value;"), consts);
+                auto tmp_type = ConstantValue::CreateUtf8(new string("LRTL/Value;"), &consts);
 
                 tmp = new FieldBytes(
                         tmp_name,

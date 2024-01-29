@@ -26,15 +26,15 @@ private:
     vector<const MethodBytes *> methods;
     SourceFileAttribute *sourceFile;
 
-    vector<ConstantValue> consts;
+    vector<ConstantValue> *consts;
 
     bool isCreatedClassConst = false;
     bool isCreatedSuperClassConst = false;
 
 public:
     ClassBytes(Flags flags, const ConstantValue& name, const ConstantValue& superClass, SourceFileAttribute *file,
-               vector<ConstantValue> consts)
-            : flags(flags), name(name), superClass(superClass), sourceFile(file), consts(std::move(consts)) {
+               vector<ConstantValue> *consts)
+            : flags(flags), name(name), superClass(superClass), sourceFile(file), consts(consts) {
         if (name.getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
         if (superClass.getTypeConst() != C_Utf8) throw runtime_error("Super class is not Utf-8");
     }
@@ -48,17 +48,17 @@ public:
     }
 
     vector<ConstantValue> getConsts() {
-        return consts;
+        return *consts;
     }
 
     ConstantValue createClassConst() {
         isCreatedClassConst = true;
-        return ConstantValue::CreateClass(name, consts);
+        return ConstantValue::CreateClass(name, *consts);
     }
 
     ConstantValue createSuperClassConst() {
         isCreatedSuperClassConst = true;
-        return ConstantValue::CreateClass(superClass, consts);
+        return ConstantValue::CreateClass(superClass, *consts);
     }
 
     vector<ValueAndBytes> classToBytes() {
@@ -70,9 +70,9 @@ public:
         auto version = ValueAndBytes(65, 4);
         res.push_back(version);
         //consts
-        auto countConsts = ValueAndBytes((int) consts.size(), 2);
+        auto countConsts = ValueAndBytes((int) consts->size(), 2);
         res.push_back(countConsts);
-        for (const auto& constValue: consts) {
+        for (const auto &constValue: *consts) {
             auto tagConst = constValue.getTypeConst();
             auto bytesConst = ValueAndBytes(tagConst, 1);
             res.push_back(bytesConst); //tag const
@@ -98,7 +98,7 @@ public:
         //methods
         res.emplace_back((int) methods.size(), 2);
         for (auto method: methods) {
-            auto methodBytes = method->methodToBytes(consts);
+            auto methodBytes = method->methodToBytes(*consts);
             res.insert(res.end(), methodBytes.begin(), methodBytes.end());
         }
         //source file attribute
@@ -111,7 +111,7 @@ public:
 
     static ClassBytes *
     fromClassStmtDeclNode(ClassStmtDeclNode *node, Flags &flags, string *superClass, SourceFileAttribute *sourceFile,
-                          vector<ConstantValue> consts) {
+                          vector<ConstantValue> *consts) {
 
         if (node == nullptr) return nullptr;
 
@@ -140,7 +140,7 @@ public:
                                                                  consts));
                     break;
                 case class_expr_stmt_type:
-                    tmp_class->addField(FieldBytes::fromStmtExpr(i->class_expr, consts));
+                    tmp_class->addField(FieldBytes::fromStmtExpr(i->class_expr, *consts));
                     break;
                 default:
                     break;
@@ -152,7 +152,7 @@ public:
 
     // От старта
     static ClassBytes *fromStartStmt(StartNode *node, SourceFileAttribute *sourceFile,
-                                     vector<ConstantValue> consts) {
+                                     vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
         auto tmp_name = ConstantValue::CreateUtf8(new string("<main>"), consts);
@@ -199,10 +199,14 @@ public:
 
         codeList->vector = stmtList;
 
+        for (auto stmtNode: codeList->vector) {
+            MethodBytes::findAllConstInStmtNode(stmtNode, consts);
+        }
+
         const CodeAttribute *tmpCode = CodeAttribute::fromStmtList(codeList, 1000, mainParams, consts);
 
         auto mainFunction = MethodBytes(Flags(ACC_STATIC + ACC_PUBLIC), mainFunctionName, mainFunctionDesc,
-                                        tmpCode, consts);
+                                        tmpCode, *consts);
 
         tmp_class->addMethod(&mainFunction);
 
@@ -213,7 +217,7 @@ public:
     // На будущее
     static ClassBytes *fromInterfaceStmtDecl(InterfaceStmtDeclNode *node, Flags &flags, string *superClass,
                                              SourceFileAttribute *sourceFile,
-                                             vector<ConstantValue> consts) {
+                                             vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
         auto tmp_name = ConstantValue::CreateUtf8(node->expr_definition->id, consts);
