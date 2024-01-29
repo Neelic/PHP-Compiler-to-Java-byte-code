@@ -70,7 +70,7 @@ public:
         auto version = ValueAndBytes(65, 4);
         res.push_back(version);
         //consts
-        auto countConsts = ValueAndBytes((int) consts->size(), 2);
+        auto countConsts = ValueAndBytes((int) consts->size() + 1, 2);
         res.push_back(countConsts);
         for (const auto &constValue: *consts) {
             auto tagConst = constValue.getTypeConst();

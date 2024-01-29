@@ -200,8 +200,7 @@ public:
                 }
                 break;
             case t_echo_stmt:
-                Commands::doCommandTwoBytes(_new, ConstantValue::getIdConstByString(consts, string("RTL/Functions"),
-                                                                                    ConstantType::C_Class),
+                Commands::doCommandTwoBytes(_new, idClass("RTL/Functions"),
                                             &res); // Создаю объект класса RTL/Functions
 
                 getCodeFromExpr(node->expr_right, currLine, 1);// Нахожу параметр
