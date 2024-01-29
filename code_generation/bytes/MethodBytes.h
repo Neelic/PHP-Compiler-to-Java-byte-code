@@ -145,7 +145,10 @@ public:
         auto _code = new vector<ValueAndBytes>();
 
         Commands::doCommand(aload_0, _code);
-        Commands::doCommandTwoBytes(invokespecial, 1, _code);
+        Commands::doCommandTwoBytes(invokespecial,
+                                    ConstantValue::getIdConstByString(_consts,
+                                                                      string("java/lang/Object.<init>()V")),
+                                    _code);
         Commands::doCommand(_return, _code);
 
         auto _codeAttr = new const CodeAttribute(10, 1000, _code, _consts, new vector<string>());

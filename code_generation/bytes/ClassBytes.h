@@ -155,7 +155,7 @@ public:
                                      vector<ConstantValue> *consts) {
         if (node == nullptr) return nullptr;
 
-        auto tmp_name = ConstantValue::CreateUtf8(string("<main>"), consts);
+        auto tmp_name = ConstantValue::CreateUtf8(string("_main"), consts);
 
         if (ConstantValue::getIdConstByString(consts, string("java/lang/Object")) == -1)
             ConstantValue::CreateUtf8(string("java/lang/Object"), consts);
