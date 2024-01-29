@@ -66,7 +66,7 @@ public:
     const char *getValue() const {
         if (type == intVal) {
             return (const char *) &valueInt;
-        } else if (valueFloat == floatVal) {
+        } else if (type == floatVal) {
             return (const char *) &valueFloat;
         } else if (type == charVal)
             return valueChar.c_str();

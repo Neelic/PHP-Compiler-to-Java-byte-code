@@ -721,11 +721,11 @@ public:
                 Commands::doCommandTwoBytes(_new, idClassConst, &res);
                 Commands::doCommand(dup, &res);
                 //if consts hasn't float const
-                if (ConstantValue::getIdConstByString(consts, string(to_string(node->float_val)), C_Integer) == -1)
+                if (ConstantValue::getIdConstByString(consts, string(to_string(node->float_val)), C_Float) == -1)
                     ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
                 //load float to stack
                 Commands::doCommand(ldc,
-                                    ConstantValue::getIdConstByString(consts, string(to_string(node->float_val))),
+                                    ConstantValue::getIdConstByString(consts,to_string(node->float_val), C_Float),
                                     &res);
                 Commands::doCommandTwoBytes(
                         invokespecial,
