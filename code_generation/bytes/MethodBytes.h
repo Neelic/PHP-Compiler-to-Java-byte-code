@@ -76,8 +76,27 @@ public:
 
         auto constDesc = ConstantValue::CreateUtf8(descriptor, consts);
 
-        auto constParent = ConstantValue::getConstantByString(consts, string("java/lang/Object"),
-                                                              ConstantType::C_Class); // По идее должен существовать со старта
+        ConstantValue constParent;
+        ConstantValue constParentName;
+
+        if (ConstantValue::getIdConstByString(consts, string("java/lang/Object"),
+                                              ConstantType::C_Class) != -1) {
+
+            constParent = ConstantValue::getConstantByString(consts, string("java/lang/Object"),
+                                                             ConstantType::C_Class);
+        } else {
+
+            if (ConstantValue::getIdConstByString(consts, string("java/lang/Object")) != -1) {
+
+                constParentName = ConstantValue::getConstantByString(consts, string("java/lang/Object"));
+                constParent = ConstantValue::CreateClass(constParentName, consts);
+
+            } else {
+
+                constParentName = ConstantValue::CreateUtf8(string("java/lang/Object"), consts);
+                constParent = ConstantValue::CreateClass(constParentName, consts);
+            }
+        }
 
         auto nameAndType = ConstantValue::CreateNameAndType(constName, constDesc, consts);
 
@@ -106,8 +125,27 @@ public:
 
         auto constDesc = ConstantValue::CreateUtf8(descriptor, consts);
 
-        auto constParent = ConstantValue::getConstantByString(consts, string("java/lang/Object"),
-                                                              ConstantType::C_Class); // По идее должен существовать со старта
+        ConstantValue constParent;
+        ConstantValue constParentName;
+
+        if (ConstantValue::getIdConstByString(consts, string("java/lang/Object"),
+                                              ConstantType::C_Class) != -1) {
+
+            constParent = ConstantValue::getConstantByString(consts, string("java/lang/Object"),
+                                                             ConstantType::C_Class);
+        } else {
+
+            if (ConstantValue::getIdConstByString(consts, string("java/lang/Object")) != -1) {
+
+                constParentName = ConstantValue::getConstantByString(consts, string("java/lang/Object"));
+                constParent = ConstantValue::CreateClass(constParentName, consts);
+
+            } else {
+
+                constParentName = ConstantValue::CreateUtf8(string("java/lang/Object"), consts);
+                constParent = ConstantValue::CreateClass(constParentName, consts);
+            }
+        }
 
         auto nameAndType = ConstantValue::CreateNameAndType(constName, constDesc, consts);
 
@@ -135,8 +173,27 @@ public:
                          ConstantValue::CreateUtf8(nameString, _consts) :
                          ConstantValue::getConstantByString(_consts, nameString);
 
-        auto constParent = ConstantValue::getConstantByString(_consts, string("java/lang/Object"),
-                                                              ConstantType::C_Class); // По идее должен существовать со старта
+        ConstantValue constParent;
+        ConstantValue constParentName;
+
+        if (ConstantValue::getIdConstByString(_consts, string("java/lang/Object"),
+                                              ConstantType::C_Class) != -1) {
+
+            constParent = ConstantValue::getConstantByString(_consts, string("java/lang/Object"),
+                                                             ConstantType::C_Class);
+        } else {
+
+            if (ConstantValue::getIdConstByString(_consts, string("java/lang/Object")) != -1) {
+
+                constParentName = ConstantValue::getConstantByString(_consts, string("java/lang/Object"));
+                constParent = ConstantValue::CreateClass(constParentName, _consts);
+
+            } else {
+
+                constParentName = ConstantValue::CreateUtf8(string("java/lang/Object"), _consts);
+                constParent = ConstantValue::CreateClass(constParentName, _consts);
+            }
+        }
 
         auto nameAndType = ConstantValue::CreateNameAndType(constName, constDescriptor, _consts);
 
