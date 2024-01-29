@@ -14,32 +14,32 @@
 class MethodBytes {
 private:
     Flags flags;
-    ConstantValue *name;
-    ConstantValue *descriptor;
-    CodeAttribute *code = nullptr;
+    const ConstantValue *name;
+    const ConstantValue *descriptor;
+    const CodeAttribute *code = nullptr;
     vector<ConstantValue *> *consts;
 
 public:
-    MethodBytes(Flags flags, ConstantValue *name, ConstantValue *descriptor, CodeAttribute *code,
+    MethodBytes(Flags flags, ConstantValue *name, ConstantValue *descriptor, const CodeAttribute *code,
                 vector<ConstantValue *> *consts) :
             flags(flags), name(name), descriptor(descriptor), code(code), consts(consts) {
         if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
         if (descriptor->getTypeConst() != C_Utf8) throw runtime_error("Descriptor is not Utf-8");
     }
 
-    vector<const ValueAndBytes *> methodToBytes(vector<ConstantValue *> *_consts) {
-        auto res = vector<const ValueAndBytes *>();
+    vector<ValueAndBytes> methodToBytes() const {
+        auto res = vector<ValueAndBytes>();
 
-        res.push_back(flags.flagToBytes());
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *name), 2));
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *descriptor), 2));
+        res.push_back(*flags.flagToBytes());
+        res.emplace_back(ConstantValue::getIdConst(consts, *name), 2);
+        res.emplace_back(ConstantValue::getIdConst(consts, *descriptor), 2);
 
         if (code != nullptr) {
-            res.push_back(new ValueAndBytes(1, 2));
+            res.emplace_back(1, 2);
             auto codeByteVector = code->attributeToBytes();
             res.insert(res.end(), codeByteVector.begin(), codeByteVector.end());
         } else {
-            res.push_back(new ValueAndBytes((int) 0, 2));
+            res.emplace_back((int) 0, 2);
         }
 
         return res;

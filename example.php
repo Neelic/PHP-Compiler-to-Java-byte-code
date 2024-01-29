@@ -32,7 +32,7 @@
 
 $b = ( fLoat ) 100;
 
-function b () {}
+//function b () {}
 
 // Creating instances of the Person class
 $str = '\n \\ \'';

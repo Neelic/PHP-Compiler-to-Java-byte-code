@@ -23,14 +23,13 @@ private:
     ConstantValue *name;
     int maxStack;
     int maxLocals;
-    vector<ValueAndBytes *> *code;
-//    vector<TableAttribute *> attributes; // TODO: Нормально бы удалить TableAttribute
+    vector<ValueAndBytes> *code;
     vector<ConstantValue *> *consts;
     vector<string *> params; // Список id локальных переменных
 
     int idClassConst = -1;
 
-    int getAttrLength() {
+    int getAttrLength() const {
         int res = 12; //exclude first 6 bytes
         res += getCodeLength();
 //        for (auto table: attributes) {
@@ -40,38 +39,38 @@ private:
         return res;
     }
 
-    int getCodeLength() {
+    int getCodeLength() const {
         int res = 0;
-        for (auto bytes: *code) {
-            res += bytes->getBytes();
+        for (const auto &bytes: *code) {
+            res += bytes.getBytes();
         }
 
         return res;
     }
 
 public:
-    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes *> *code, vector<ConstantValue *> *consts,
+    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes> *code, vector<ConstantValue *> *consts,
                   vector<string *> &params)
             : maxStack(maxStack), maxLocals(maxLocals), code(code), consts(consts), params(params) {
         auto nameStr = string("Code");
         name = ConstantValue::CreateUtf8(&nameStr, consts);
     }
 
-    void addCodeValueByte(ValueAndBytes *value) {
+    void addCodeValueByte(ValueAndBytes &value) {
         code->push_back(value);
     }
 
-    vector<ValueAndBytes *> attributeToBytes() {
-        auto res = vector<ValueAndBytes *>();
+    vector<ValueAndBytes> attributeToBytes() const {
+        auto res = vector<ValueAndBytes>();
 
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *name), 2));
-        res.push_back(new ValueAndBytes(getAttrLength(), 4));
-        res.push_back(new ValueAndBytes(maxStack, 2));
-        res.push_back(new ValueAndBytes(maxLocals, 2));
+        res.emplace_back(ConstantValue::getIdConst(consts, *name), 2);
+        res.emplace_back(getAttrLength(), 4);
+        res.emplace_back(maxStack, 2);
+        res.emplace_back(maxLocals, 2);
 
-        res.push_back(new ValueAndBytes(getCodeLength(), 4));
+        res.emplace_back(getCodeLength(), 4);
         res.insert(res.end(), code->begin(), code->end());
-        res.push_back(new ValueAndBytes((int) 0, 2));
+        res.emplace_back((int) 0, 2);
 
 //        res.push_back(new ValueAndBytes((int) attributes.size(), 2));
 //        for (auto table: attributes) {
@@ -82,23 +81,19 @@ public:
         return res;
     }
 
-    static CodeAttribute *
+    static const CodeAttribute *
     fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue *> *consts) {
         if (node == nullptr) return nullptr;
-        CodeAttribute *res;
 
-        auto code_res = vector<ValueAndBytes *>();
+        auto code_res = new vector<ValueAndBytes>();
 
-        int byteCount = 0;
-
-        res = new CodeAttribute(
+        auto *res = new CodeAttribute(
                 (int) 10,
                 1000,
-                &code_res,
+                code_res,
                 consts,
                 params
-        ); // TODO:  Какого черта он не создается
-
+        );
 
 
         for (auto i: params) {
@@ -112,11 +107,11 @@ public:
         return res;
     }
 
-    vector<ValueAndBytes *> getCodeFromStmtNode(StmtNode *node, int currLine, int skipBytes = 0) {
+    vector<ValueAndBytes> getCodeFromStmtNode(StmtNode *node, int currLine, int skipBytes = 0) {
         if (node == nullptr) return {};
 
-        auto res = vector<ValueAndBytes *>();
-        auto code_tmp = vector<ValueAndBytes *>();
+        auto res = vector<ValueAndBytes>();
+        auto code_tmp = vector<ValueAndBytes>();
 
         switch (node->type) {
             case stmt_list:
@@ -217,13 +212,13 @@ public:
         return res;
     }
 
-    vector<ValueAndBytes *> getCodeFromIfStmt(IfStmtNode *node, int currLine) {
+    vector<ValueAndBytes> getCodeFromIfStmt(IfStmtNode *node, int currLine) {
         if (node == nullptr) return {};
 
-        auto res = vector<ValueAndBytes *>();
-        auto main_code = vector<ValueAndBytes *>();
-        auto else_code = vector<ValueAndBytes *>();
-        auto code_tmp = vector<ValueAndBytes *>();
+        auto res = vector<ValueAndBytes>();
+        auto main_code = vector<ValueAndBytes>();
+        auto else_code = vector<ValueAndBytes>();
+        auto code_tmp = vector<ValueAndBytes>();
 
         int byteCount = currLine;
         int skipBytes = 0;
@@ -363,12 +358,12 @@ public:
         return res;
     }
 
-    vector<ValueAndBytes *> getCodeFromWhileStmt(WhileStmtNode *node, int currLine) {
+    vector<ValueAndBytes> getCodeFromWhileStmt(WhileStmtNode *node, int currLine) {
         if (node == nullptr) return {};
 
-        auto res = vector<ValueAndBytes *>();
-        auto main_code = vector<ValueAndBytes *>();
-        auto code_tmp = vector<ValueAndBytes *>();
+        auto res = vector<ValueAndBytes>();
+        auto main_code = vector<ValueAndBytes>();
+        auto code_tmp = vector<ValueAndBytes>();
 
         int byteCount = currLine;
         int skipBytes = 0;
@@ -401,12 +396,12 @@ public:
         return res;
     }
 
-    vector<ValueAndBytes *> getCodeFromDoWhileStmt(DoWhileStmtNode *node, int currLine) {
+    vector<ValueAndBytes> getCodeFromDoWhileStmt(DoWhileStmtNode *node, int currLine) {
         if (node == nullptr) return {};
 
-        auto res = vector<ValueAndBytes *>();
-        auto main_code = vector<ValueAndBytes *>();
-        auto code_tmp = vector<ValueAndBytes *>();
+        auto res = vector<ValueAndBytes>();
+        auto main_code = vector<ValueAndBytes>();
+        auto code_tmp = vector<ValueAndBytes>();
 
         int byteCount = currLine;
         int skipBytes = 0;
@@ -430,12 +425,12 @@ public:
 
     }
 
-    vector<ValueAndBytes *> getCodeFromForStmt(ForStmtNode *node, int currLine) {
+    vector<ValueAndBytes> getCodeFromForStmt(ForStmtNode *node, int currLine) {
         if (node == nullptr) return {};
 
-        auto res = vector<ValueAndBytes *>();
-        auto main_code = vector<ValueAndBytes *>();
-        auto code_tmp = vector<ValueAndBytes *>();
+        auto res = vector<ValueAndBytes>();
+        auto main_code = vector<ValueAndBytes>();
+        auto code_tmp = vector<ValueAndBytes>();
 
         int byteCount = currLine;
         int skipBytes = 0;
@@ -461,7 +456,7 @@ public:
         // Добавляем действие из последнего выражения for к телу цикла
         code_tmp = getCodeFromExpr(node->expr_right, currLine, 0);
         main_code.insert(main_code.end(), code_tmp.begin(), code_tmp.end());
-        code_tmp = vector<ValueAndBytes *>();
+        code_tmp = vector<ValueAndBytes>();
 
         skipBytes = countByteSize(main_code);
         //Записываем безусловный переход при старте for
@@ -485,12 +480,12 @@ public:
     }
 
     // !!! В случае чего избегаем как чумы !!!
-    vector<ValueAndBytes *> getCodeFromForeachStmt(ForEachStmtNode *node, int currLine) {
+    vector<ValueAndBytes> getCodeFromForeachStmt(ForEachStmtNode *node, int currLine) {
         if (node == nullptr) return {};
 
-        auto res = vector<ValueAndBytes *>();
-        auto main_code = vector<ValueAndBytes *>();
-        auto code_tmp = vector<ValueAndBytes *>();
+        auto res = vector<ValueAndBytes>();
+        auto main_code = vector<ValueAndBytes>();
+        auto code_tmp = vector<ValueAndBytes>();
 
         int byteCount = currLine;
         int skipBytes = 0;
@@ -576,13 +571,13 @@ public:
 
     }
 
-    vector<ValueAndBytes *> getCodeFromSwitchStmt(SwitchStmtNode *node, int currLine) {
+    vector<ValueAndBytes> getCodeFromSwitchStmt(SwitchStmtNode *node, int currLine) {
 
         if (node == nullptr) return {};
 
-        auto res = vector<ValueAndBytes *>();
-        auto main_code = vector<ValueAndBytes *>();
-        auto code_tmp = vector<ValueAndBytes *>();
+        auto res = vector<ValueAndBytes>();
+        auto main_code = vector<ValueAndBytes>();
+        auto code_tmp = vector<ValueAndBytes>();
 
         int byteCount = countByteSize(*code);
         int skipBytes = 3; // Сразу с учетом команды goto end;
@@ -681,12 +676,12 @@ public:
 
     }
 
-    vector<ValueAndBytes *> getCodeFromExpr(ExprNode *node, int currLine, int toStack) {
-        vector<ValueAndBytes *> res;
+    vector<ValueAndBytes> getCodeFromExpr(ExprNode *node, int currLine, int toStack) {
+        vector<ValueAndBytes> res;
         if (node == nullptr) return res;
         int target;
 
-        vector<ValueAndBytes *> tmpVec;
+        vector<ValueAndBytes> tmpVec;
         idClassConst = idClass(new string("RTL/Value"));
         string isVar;
         int n = 0;
@@ -1273,7 +1268,7 @@ public:
         return *id == "true" || *id == "false";
     }
 
-    void setPredConstCode(string *id, vector<ValueAndBytes *> *res) {
+    void setPredConstCode(string *id, vector<ValueAndBytes> *res) {
         if (-1 != findParamId(id)) return;
 
         params.push_back(id);
@@ -1304,14 +1299,14 @@ public:
         return res;
     }
 
-    int idUtf8(string *value) {
+    int idUtf8(string *value) const {
         if (ConstantValue::getIdConstByString(consts, value) == -1)
             ConstantValue::CreateUtf8(value, consts);
 
         return ConstantValue::getIdConstByString(consts, value);
     }
 
-    int idClass(string *className) {
+    int idClass(string *className) const {
         if (ConstantValue::getIdConstByString(consts, className, C_Class) == -1) {
             idUtf8(className);
             ConstantValue::CreateClass(
@@ -1322,7 +1317,7 @@ public:
         return ConstantValue::getIdConstByString(consts, className, C_Class);
     }
 
-    int idMethodRef(string *className, string *nameMethod, string *typeMethod) {
+    int idMethodRef(string *className, string *nameMethod, string *typeMethod) const {
         idClass(className);
 
         if (ConstantValue::getIdConstByString(consts, new string(*nameMethod + *typeMethod), C_NameAndType) == -1) {
@@ -1353,17 +1348,17 @@ public:
                                                  C_MethodRef);
     }
 
-    static int countByteSize(vector<ValueAndBytes *> &code) {
+    static int countByteSize(vector<ValueAndBytes> &code) {
         int res = 0;
 
-        for (auto i: code) {
-            res += i->getBytes();
+        for (const auto &i: code) {
+            res += i.getBytes();
         }
 
         return res;
     }
 
-    int findParamId(string *value) {
+    int findParamId(string *value) const {
         for (int i = 0; i < params.size(); i++) {
             if (*params[i] == *value)
                 return i;
@@ -1371,7 +1366,7 @@ public:
         return -1;
     }
 
-    void initializeNewVariable(string *varName, vector<ValueAndBytes *> *code_res) {
+    void initializeNewVariable(string *varName, vector<ValueAndBytes> *code_res) {
 
         if (varName == nullptr) return;
 
@@ -1398,13 +1393,13 @@ public:
                         new string("<init>"),
                         new string("()V")), code_res); //id на Value(String)// Вызываю конструктор, по идее
 
-        Commands::doCommand(astore, params.size(), code_res); // Сохраняю ссылку на объект в новый параметр
+        Commands::doCommand(astore, (int) params.size(), code_res); // Сохраняю ссылку на объект в новый параметр
 
         params.push_back(varName); // Сохраняю имя переменной в учете
     }
 
     // Переводит Value(bool) в int, нужно для комманд сравнения. После выполнения в стеке должна лежать int 1 или 0
-    void convertBoolToInt(vector<ValueAndBytes *> *code_res) {
+    void convertBoolToInt(vector<ValueAndBytes> *code_res) const {
 
         //Приводит Value(bool) к Value(int)
         Commands::doCommandTwoBytes(invokevirtual,

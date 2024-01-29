@@ -22,12 +22,12 @@ public:
         nameAttr = ConstantValue::CreateUtf8(&tmpStr, consts);
     }
 
-    vector<ValueAndBytes *> attributeToBytes() {
-        auto res = vector<ValueAndBytes *>();
+    vector<ValueAndBytes> attributeToBytes() {
+        auto res = vector<ValueAndBytes>();
 
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *nameAttr), 2));
-        res.push_back(new ValueAndBytes(2, 4));
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *fileName), 2));
+        res.emplace_back(ConstantValue::getIdConst(consts, *nameAttr), 2);
+        res.emplace_back(2, 4);
+        res.emplace_back(ConstantValue::getIdConst(consts, *fileName), 2);
 
         return res;
     }

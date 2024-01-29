@@ -23,7 +23,7 @@ enum ConstantType {
 class ConstantValue {
 private:
     ConstantType typeConst = C_Utf8;
-    ValueAndBytes *value = nullptr;
+    const ValueAndBytes *value = nullptr;
     // id константы в виде строки, для поиска
     string *id = new string();
 
@@ -34,7 +34,7 @@ public:
         return typeConst;
     }
 
-    ValueAndBytes *getValue() const {
+    const ValueAndBytes *getValue() const {
         return value;
     }
 
@@ -47,7 +47,7 @@ public:
                       [&val](auto var) { return *var == val; });
     }
 
-    static int getIdConst(const vector<ConstantValue *> *consts, ConstantValue &searchValue) {
+    static int getIdConst(const vector<ConstantValue *> *consts, ConstantValue searchValue) {
         for (int i = 0; i < consts->size(); i++) {
             if (searchValue == *(*consts)[i]) return i + 1;
         }

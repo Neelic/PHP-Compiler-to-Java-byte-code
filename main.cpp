@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) {
                     ConstantValue::CreateUtf8(new string("Main.java"), &consts),
                     &consts),
             &consts);
-    auto out = WriteBytesToFile("Main.class");
     auto classBytes = a->classToBytes();
+    auto out = WriteBytesToFile(new string("Main.class"));
     out.write(classBytes);
     out.close();
 

@@ -28,11 +28,11 @@ public:
         this->consts = consts;
     }
 
-    vector<ValueAndBytes *> attributeToBytes() {
-        auto res = vector<ValueAndBytes *>();
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *name), 2));
-        res.push_back(new ValueAndBytes(bytesLength, 4));
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, *value), 2));
+    vector<ValueAndBytes> attributeToBytes() {
+        auto res = vector<ValueAndBytes>();
+        res.emplace_back(ConstantValue::getIdConst(consts, *name), 2);
+        res.emplace_back(bytesLength, 4);
+        res.emplace_back(ConstantValue::getIdConst(consts, *value), 2);
 
         return res;
     }

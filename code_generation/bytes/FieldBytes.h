@@ -43,14 +43,14 @@ public:
         attributes.push_back(attr);
     }
 
-    vector<const ValueAndBytes *> fieldToBytes() {
-        vector<const ValueAndBytes *> res;
+    vector<ValueAndBytes> fieldToBytes() {
+        vector<ValueAndBytes> res;
         //flags
-        res.push_back(flags.flagToBytes());
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, fieldName), 2));
-        res.push_back(new ValueAndBytes(ConstantValue::getIdConst(consts, descriptor), 2));
+        res.push_back(*flags.flagToBytes());
+        res.emplace_back(ConstantValue::getIdConst(consts, fieldName), 2);
+        res.emplace_back(ConstantValue::getIdConst(consts, descriptor), 2);
 
-        res.push_back(new ValueAndBytes((int) attributes.size(), 2));
+        res.emplace_back((int) attributes.size(), 2);
 
         for (auto *attr: attributes) {
             auto attrBytes = attr->attributeToBytes();

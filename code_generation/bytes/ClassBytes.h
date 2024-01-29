@@ -21,7 +21,7 @@ private:
     ConstantValue *superClass;
     Flags flags;
     vector<FieldBytes *> fields;
-    vector<MethodBytes *> methods;
+    vector<const MethodBytes *> methods;
     SourceFileAttribute *sourceFile;
 
     vector<ConstantValue *> *consts;
@@ -59,45 +59,48 @@ public:
         return ConstantValue::CreateClass(superClass, consts);
     }
 
-    vector<const ValueAndBytes *> classToBytes() {
+    vector<ValueAndBytes> classToBytes() {
         if (!isCreatedClassConst) createClassConst();
         if (!isCreatedSuperClassConst) createSuperClassConst();
 
-        auto res = vector<const ValueAndBytes *>();
-        res.push_back(new ValueAndBytes((int) 0xCAFEBABE, 4));
-        res.push_back(new ValueAndBytes(65, 4));
+        auto res = vector<ValueAndBytes>();
+        res.emplace_back((int) 0xCAFEBABE, 4);
+        auto version = ValueAndBytes(65, 4);
+        res.push_back(version);
         //consts
-        res.push_back(new ValueAndBytes((int) consts->size(), 2));
+        auto countConsts = ValueAndBytes((int) consts->size(), 2);
+        res.push_back(countConsts);
         for (auto constValue: *consts) {
             auto tagConst = constValue->getTypeConst();
-            res.push_back(new ValueAndBytes(tagConst, 1)); //tag const
-            if (tagConst == C_Utf8) res.push_back(new ValueAndBytes(constValue->getValue()->getBytes(), 2));
-            res.push_back(constValue->getValue()); //value const
+            auto bytesConst = ValueAndBytes(tagConst, 1);
+            res.push_back(bytesConst); //tag const
+            if (tagConst == C_Utf8) res.emplace_back(constValue->getValue()->getBytes(), 2);
+            res.push_back(*constValue->getValue()); //value const
         }
         //flags
-        res.push_back(flags.flagToBytes());
+        res.push_back(*flags.flagToBytes());
         //this class
-        res.push_back(new ValueAndBytes(
-                ConstantValue::getIdConstByString(consts, name->getIdString(), C_Class), 2));
+        res.emplace_back(
+                ConstantValue::getIdConstByString(consts, name->getIdString(), C_Class), 2);
         //super class
-        res.push_back(new ValueAndBytes(
-                ConstantValue::getIdConstByString(consts, superClass->getIdString(), C_Class), 2));
+        res.emplace_back(
+                ConstantValue::getIdConstByString(consts, superClass->getIdString(), C_Class), 2);
         //interfaces
-        res.push_back(new ValueAndBytes((int) 0, 2));
+        res.emplace_back((int) 0, 2);
         //fields
-        res.push_back(new ValueAndBytes((int) fields.size(), 2));
+        res.emplace_back((int) fields.size(), 2);
         for (auto field: fields) {
             auto fieldBytes = field->fieldToBytes();
             res.insert(res.end(), fieldBytes.begin(), fieldBytes.end());
         }
         //methods
-        res.push_back(new ValueAndBytes((int) methods.size(), 2));
+        res.emplace_back((int) methods.size(), 2);
         for (auto method: methods) {
-            auto methodBytes = method->methodToBytes(consts);
+            auto methodBytes = method->methodToBytes();
             res.insert(res.end(), methodBytes.begin(), methodBytes.end());
         }
         //source file attribute
-        res.push_back(new ValueAndBytes(1, 2));
+        res.emplace_back(1, 2);
         auto sourceBytes = sourceFile->attributeToBytes();
         res.insert(res.end(), sourceBytes.begin(), sourceBytes.end());
 
@@ -185,7 +188,7 @@ public:
 
         auto mainFunctionName = ConstantValue::CreateUtf8(new string("main"), consts);
 
-        auto mainFunctionDesc = ConstantValue::CreateUtf8(new string("([LJava/lang/String;)V"), consts);
+        auto mainFunctionDesc = ConstantValue::CreateUtf8(new string("([Ljava/lang/String;)V"), consts);
 
         auto mainParams = vector<string *>();
         mainParams.push_back(new string("args"));
@@ -194,8 +197,10 @@ public:
 
         codeList->vector = stmtList;
 
+        const CodeAttribute *tmpCode = CodeAttribute::fromStmtList(codeList, 1000, mainParams, consts);
+
         auto mainFunction = MethodBytes(Flags(ACC_STATIC + ACC_PUBLIC), mainFunctionName, mainFunctionDesc,
-                                        CodeAttribute::fromStmtList(codeList, 1000, mainParams, consts), consts);
+                                        tmpCode, consts);
 
         tmp_class->addMethod(&mainFunction);
 

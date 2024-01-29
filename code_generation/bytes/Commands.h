@@ -210,34 +210,34 @@ class Commands {
 public:
 
     // Функция для команд без параметров
-    static void doCommand(CodeCommandsNoParams type, vector<ValueAndBytes *> *res) {
-        res->push_back(new ValueAndBytes(type, 1));
+    static void doCommand(CodeCommandsNoParams type, vector<ValueAndBytes> *res) {
+        res->emplace_back(type, 1);
     }
 
     // Функция для команд с одним однобайтовым параметром
-    static void doCommand(CodeCommandsOneParam type, int param, vector<ValueAndBytes *> *res) {
+    static void doCommand(CodeCommandsOneParam type, int param, vector<ValueAndBytes> *res) {
 
-        res->push_back(new ValueAndBytes(type, 1));
+        res->emplace_back(type, 1);
 
-        res->push_back(new ValueAndBytes(param, 1));
+        res->emplace_back(param, 1);
     }
 
     // Функция для команд с одним двубайтовым параметром
-    static void doCommandTwoBytes(CodeCommandsOneParamTwoBytes type, int param, vector<ValueAndBytes *> *res) {
+    static void doCommandTwoBytes(CodeCommandsOneParamTwoBytes type, int param, vector<ValueAndBytes> *res) {
 
-        res->push_back(new ValueAndBytes(type, 1));
+        res->emplace_back(type, 1);
 
-        res->push_back(new ValueAndBytes(param, 2));
+        res->emplace_back(param, 2);
     }
 
     // Функция для команды с двумя параметрами
-    static void doCommand(CodeCommandsTwoParams type, int param1, int param2, vector<ValueAndBytes *> *res) {
+    static void doCommand(CodeCommandsTwoParams type, int param1, int param2, vector<ValueAndBytes> *res) {
 
-        res->push_back(new ValueAndBytes(type, 1));
+        res->emplace_back(type, 1);
 
-        res->push_back(new ValueAndBytes(param1, 1));
+        res->emplace_back(param1, 1);
 
-        res->push_back(new ValueAndBytes(param2, 1));
+        res->emplace_back(param2, 1);
 
     }
 
