@@ -202,8 +202,8 @@ public:
                 }
                 break;
             case t_echo_stmt:
-                Commands::doCommandTwoBytes(_new, idClass("RTL/Functions"),
-                                            &res); // Создаю объект класса RTL/Functions
+//                Commands::doCommandTwoBytes(_new, idClass("RTL/Functions"),
+//                                            &res); // Создаю объект класса RTL/Functions
 
                 code_tmp = getCodeFromExpr(node->expr_right, currLine, 1);// Нахожу параметр
                 res.insert(res.end(), code_tmp.begin(), code_tmp.end());
