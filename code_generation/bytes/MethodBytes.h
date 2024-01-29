@@ -14,25 +14,25 @@
 class MethodBytes {
 private:
     Flags flags;
-    const ConstantValue *name;
-    const ConstantValue *descriptor;
+    const ConstantValue name;
+    const ConstantValue descriptor;
     const CodeAttribute *code = nullptr;
-    vector<ConstantValue *> *consts;
+    vector<ConstantValue> consts;
 
 public:
-    MethodBytes(Flags flags, ConstantValue *name, ConstantValue *descriptor, const CodeAttribute *code,
-                vector<ConstantValue *> *consts) :
+    MethodBytes(Flags flags, const ConstantValue& name, const ConstantValue& descriptor, const CodeAttribute *code,
+                vector<ConstantValue> &consts) :
             flags(flags), name(name), descriptor(descriptor), code(code), consts(consts) {
-        if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
-        if (descriptor->getTypeConst() != C_Utf8) throw runtime_error("Descriptor is not Utf-8");
+        if (name.getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
+        if (descriptor.getTypeConst() != C_Utf8) throw runtime_error("Descriptor is not Utf-8");
     }
 
-    vector<ValueAndBytes> methodToBytes() const {
+    vector<ValueAndBytes> methodToBytes(vector<ConstantValue> &_consts) const {
         auto res = vector<ValueAndBytes>();
 
         res.push_back(*flags.flagToBytes());
-        res.emplace_back(ConstantValue::getIdConst(consts, *name), 2);
-        res.emplace_back(ConstantValue::getIdConst(consts, *descriptor), 2);
+        res.emplace_back(ConstantValue::getIdConst(_consts, name), 2);
+        res.emplace_back(ConstantValue::getIdConst(_consts, descriptor), 2);
 
         if (code != nullptr) {
             res.emplace_back(1, 2);
@@ -46,10 +46,10 @@ public:
     }
 
     static MethodBytes *
-    fromFunctionStmtDecl(FunctionStmtDeclNode *node, ClassAccessModList *flagList, vector<ConstantValue *> *consts) {
+    fromFunctionStmtDecl(FunctionStmtDeclNode *node, ClassAccessModList *flagList, vector<ConstantValue> consts) {
         if (node == nullptr) return nullptr;
 
-        getAllConstants(node, *consts);
+        getAllConstants(node, consts);
 
         // Собираю строку дескриптора
         auto descriptor = string("(");
@@ -77,14 +77,13 @@ public:
         return new MethodBytes(
                 *Flags::convertToFlags(flagList),
                 ConstantValue::CreateUtf8(node->function_def->func_id, consts),
-                ConstantValue::getConstantByString(consts, &descriptor) ?: ConstantValue::CreateUtf8(
-                        &descriptor, consts),
+                ConstantValue::CreateUtf8(&descriptor, consts),
                 CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts),
                 consts
         );
     }
 
-    static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue *> *consts) {
+    static MethodBytes *fromFunctionDefStmtDecl(FunctionDefNode *node, Flags flags, vector<ConstantValue> consts) {
         if (node == nullptr) return nullptr;
 
         // Собираю строку дескриптора
@@ -99,14 +98,14 @@ public:
         return new MethodBytes(
                 flags,
                 ConstantValue::CreateUtf8(node->func_id, consts),
-                ConstantValue::getConstantByString(consts, &descriptor) ?: ConstantValue::CreateUtf8(
+                ConstantValue::CreateUtf8(
                         &descriptor, consts),
                 nullptr,
                 consts
         );
     }
 
-    static void getAllConstants(FunctionStmtDeclNode *node, vector<ConstantValue *> &consts) {
+    static void getAllConstants(FunctionStmtDeclNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
         auto res = vector<ConstantValue *>();
@@ -118,7 +117,7 @@ public:
         }
     }
 
-    static void findAllConstInStmtNode(StmtNode *node, vector<ConstantValue *> &consts) {
+    static void findAllConstInStmtNode(StmtNode *node, vector<ConstantValue> &consts) {
 
         if (node == nullptr) return;
 
@@ -173,7 +172,7 @@ public:
         }
     }
 
-    static void findAllConstantsInIfStmt(IfStmtNode *node, vector<ConstantValue *> &consts) {
+    static void findAllConstantsInIfStmt(IfStmtNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
         if (node->expr != nullptr)
@@ -199,7 +198,7 @@ public:
         }
     }
 
-    static void findAllConstantsInSwitchStmt(SwitchStmtNode *node, vector<ConstantValue *> &consts) {
+    static void findAllConstantsInSwitchStmt(SwitchStmtNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
         if (node->expr != nullptr) {
@@ -220,7 +219,7 @@ public:
         }
     }
 
-    static void findConstsInWhileStmt(WhileStmtNode *node, vector<ConstantValue *> &consts) {
+    static void findConstsInWhileStmt(WhileStmtNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
         if (node->expr != nullptr) {
@@ -239,7 +238,7 @@ public:
         }
     }
 
-    static void findConstsInDoWhile(DoWhileStmtNode *node, vector<ConstantValue *> &consts) {
+    static void findConstsInDoWhile(DoWhileStmtNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
         findConstantInExpr(node->expr, consts);
@@ -247,7 +246,7 @@ public:
         findAllConstInStmtNode(node->stmt, consts);
     }
 
-    static void findConstsInForStmt(ForStmtNode *node, vector<ConstantValue *> &consts) {
+    static void findConstsInForStmt(ForStmtNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
         findConstantInExpr(node->expr_left, consts);
@@ -266,7 +265,7 @@ public:
 
     }
 
-    static void findConstsInForEachStmt(ForEachStmtNode *node, vector<ConstantValue *> &consts) {
+    static void findConstsInForEachStmt(ForEachStmtNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
         findConstantInExpr(node->expr_right, consts);
@@ -284,12 +283,12 @@ public:
         }
     }
 
-    static void findConstsInConstDeclNode(ConstDeclNode *node, vector<ConstantValue *> &consts) {
+    static void findConstsInConstDeclNode(ConstDeclNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
         addConstant(node->id, new string("LRTL/Value;"), consts);
     }
 
-    static void findConstantInExpr(ExprNode *node, vector<ConstantValue *> &consts) {
+    static void findConstantInExpr(ExprNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
         switch (node->exprType) {
@@ -369,11 +368,9 @@ public:
     }
 
     // Выделил в отдельную функцию, чтоб было не так больно исправлять
-    static void addConstant(string *id, string *type, vector<ConstantValue *> &consts) {
-        // Проверяю, что константа еще не добавлена
-        if (ConstantValue::getConstantByString(&consts, id) == nullptr)
-            ConstantValue::CreateUtf8(id,
-                                      &consts); // Тут дескриптор и не нужен, потому что это не класс и не метод, а просто имя константы
+    static void addConstant(string *id, string *type, vector<ConstantValue> &consts) {
+        ConstantValue::CreateUtf8(id,
+                                  consts); // Тут дескриптор и не нужен, потому что это не класс и не метод, а просто имя константы
     }
 };
 

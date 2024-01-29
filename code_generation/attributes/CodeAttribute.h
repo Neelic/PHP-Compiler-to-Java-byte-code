@@ -20,11 +20,11 @@
 
 class CodeAttribute {
 private:
-    ConstantValue *name;
+    ConstantValue name;
     int maxStack;
     int maxLocals;
     vector<ValueAndBytes> *code;
-    vector<ConstantValue *> *consts;
+    vector<ConstantValue> &consts ;
     vector<string *> params; // Список id локальных переменных
 
     int idClassConst = -1;
@@ -49,7 +49,7 @@ private:
     }
 
 public:
-    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes> *code, vector<ConstantValue *> *consts,
+    CodeAttribute(int maxStack, int maxLocals, vector<ValueAndBytes> *code, vector<ConstantValue> &consts ,
                   vector<string *> &params)
             : maxStack(maxStack), maxLocals(maxLocals), code(code), consts(consts), params(params) {
         auto nameStr = string("Code");
@@ -63,7 +63,7 @@ public:
     vector<ValueAndBytes> attributeToBytes() const {
         auto res = vector<ValueAndBytes>();
 
-        res.emplace_back(ConstantValue::getIdConst(consts, *name), 2);
+        res.emplace_back(ConstantValue::getIdConst(consts, name), 2);
         res.emplace_back(getAttrLength(), 4);
         res.emplace_back(maxStack, 2);
         res.emplace_back(maxLocals, 2);
@@ -82,7 +82,7 @@ public:
     }
 
     static const CodeAttribute *
-    fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue *> *consts) {
+    fromStmtList(StmtList *node, int maxLocals, vector<string *> &params, vector<ConstantValue> &consts ) {
         if (node == nullptr) return nullptr;
 
         auto code_res = new vector<ValueAndBytes>();
@@ -1317,7 +1317,7 @@ public:
         return ConstantValue::getIdConstByString(consts, className, C_Class);
     }
 
-    int idMethodRef(string *className, string *nameMethod, string *typeMethod) const {
+    int idMethodRef(string *className, string *nameMethod, string *typeMethod) {
         idClass(className);
 
         if (ConstantValue::getIdConstByString(consts, new string(*nameMethod + *typeMethod), C_NameAndType) == -1) {
@@ -1399,7 +1399,7 @@ public:
     }
 
     // Переводит Value(bool) в int, нужно для комманд сравнения. После выполнения в стеке должна лежать int 1 или 0
-    void convertBoolToInt(vector<ValueAndBytes> *code_res) const {
+    void convertBoolToInt(vector<ValueAndBytes> *code_res) {
 
         //Приводит Value(bool) к Value(int)
         Commands::doCommandTwoBytes(invokevirtual,

@@ -16,10 +16,10 @@ private:
     ConstantValue *name;
     int bytesLength = 2;
     ConstantValue *value;
-    vector<ConstantValue *> *consts;
+    vector<ConstantValue> consts;
 
 public:
-    ConstantValueAttribute(ConstantValue *name, ConstantValue *value, vector<ConstantValue *> *consts) {
+    ConstantValueAttribute(ConstantValue *name, ConstantValue *value, vector<ConstantValue> &consts) {
         if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
         if (value->getTypeConst() != C_Utf8) throw runtime_error("Value is not Utf-8");
 

@@ -16,20 +16,20 @@
 
 class FieldBytes {
 private:
-    vector<ConstantValue *> *consts;
+    vector<ConstantValue> consts;
     Flags flags;
     ConstantValue fieldName;
     ConstantValue descriptor;
     vector<ConstantValueAttribute *> attributes;
 public:
-    FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags &flags, vector<ConstantValue *> *consts) :
+    FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags &flags, vector<ConstantValue> &consts) :
             descriptor(descriptor), fieldName(fieldName), flags(flags), consts(consts) {
         if (fieldName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Field name is not utf-8 type");
         if (descriptor.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Descriptor is not utf-8 type");
     }
 
     FieldBytes(ConstantValue &fieldName, ConstantValue &descriptor, Flags &flags,
-               vector<ConstantValueAttribute *> &attributes, vector<ConstantValue *> *consts) :
+               vector<ConstantValueAttribute *> &attributes, vector<ConstantValue> &consts) :
             descriptor(descriptor), fieldName(fieldName), flags(flags), consts(consts), attributes(attributes) {
         if (fieldName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Field name is not utf-8 type");
         if (descriptor.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("Descriptor is not utf-8 type");
@@ -60,18 +60,17 @@ public:
         return res;
     }
 
-    static FieldBytes *fromConstDeclNode(ConstDeclNode *node, Flags flag, vector<ConstantValue *> *consts) {
+    static FieldBytes *fromConstDeclNode(ConstDeclNode *node, Flags flag, vector<ConstantValue> &consts) {
         if (node == nullptr) return nullptr;
 
 
         auto tmp_name = ConstantValue::CreateUtf8(node->id, consts);
 
-        auto tmp_type = ConstantValue::getConstantByString(consts, new string("LRTL/Value;"))
-                        ?: ConstantValue::CreateUtf8(new string("LRTL/Value;"), consts);
+        auto tmp_type = ConstantValue::CreateUtf8(new string("LRTL/Value;"), consts);
 
         auto tmp = new FieldBytes(
-                *tmp_name,
-                *tmp_type,
+                tmp_name,
+                tmp_type,
                 flag,
                 consts
         );
@@ -79,7 +78,7 @@ public:
         return tmp;
     }
 
-    static FieldBytes *fromStmtExpr(ClassExprNode *node, vector<ConstantValue *> *consts) {
+    static FieldBytes *fromStmtExpr(ClassExprNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return nullptr;
 
         FieldBytes *tmp;
@@ -102,12 +101,11 @@ public:
             case ClassExprType::get_value_class_type:
                 auto tmp_name = ConstantValue::CreateUtf8(node->id, consts);
 
-                auto tmp_type = ConstantValue::getConstantByString(consts, new string("LRTL/Value;"))
-                                ?: ConstantValue::CreateUtf8(new string("LRTL/Value;"), consts);
+                auto tmp_type = ConstantValue::CreateUtf8(new string("LRTL/Value;"), consts);
 
                 tmp = new FieldBytes(
-                        *tmp_name,
-                        *tmp_type,
+                        tmp_name,
+                        tmp_type,
                         tmp_flags,
                         consts
                 );

@@ -6,6 +6,8 @@
 #define PHP_COMPILER_CLASSBYTES_H
 
 
+#include <utility>
+
 #include "ValueAndBytes.h"
 #include "code_generation/ConstantValue.h"
 #include "FieldBytes.h"
@@ -17,24 +19,24 @@ private:
     static ValueAndBytes magicConst;
     static ValueAndBytes versionClassFile;
 
-    ConstantValue *name;
-    ConstantValue *superClass;
+    ConstantValue name;
+    ConstantValue superClass;
     Flags flags;
     vector<FieldBytes *> fields;
     vector<const MethodBytes *> methods;
     SourceFileAttribute *sourceFile;
 
-    vector<ConstantValue *> *consts;
+    vector<ConstantValue> consts;
 
     bool isCreatedClassConst = false;
     bool isCreatedSuperClassConst = false;
 
 public:
-    ClassBytes(Flags flags, ConstantValue *name, ConstantValue *superClass, SourceFileAttribute *file,
-               vector<ConstantValue *> *consts)
-            : flags(flags), name(name), superClass(superClass), sourceFile(file), consts(consts) {
-        if (name->getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
-        if (superClass->getTypeConst() != C_Utf8) throw runtime_error("Super class is not Utf-8");
+    ClassBytes(Flags flags, const ConstantValue& name, const ConstantValue& superClass, SourceFileAttribute *file,
+               vector<ConstantValue> consts)
+            : flags(flags), name(name), superClass(superClass), sourceFile(file), consts(std::move(consts)) {
+        if (name.getTypeConst() != C_Utf8) throw runtime_error("Name is not Utf-8");
+        if (superClass.getTypeConst() != C_Utf8) throw runtime_error("Super class is not Utf-8");
     }
 
     void addField(FieldBytes *field) {
@@ -45,16 +47,16 @@ public:
         methods.push_back(method);
     }
 
-    vector<ConstantValue *> *getConsts() {
+    vector<ConstantValue> getConsts() {
         return consts;
     }
 
-    ConstantValue *createClassConst() {
+    ConstantValue createClassConst() {
         isCreatedClassConst = true;
         return ConstantValue::CreateClass(name, consts);
     }
 
-    ConstantValue *createSuperClassConst() {
+    ConstantValue createSuperClassConst() {
         isCreatedSuperClassConst = true;
         return ConstantValue::CreateClass(superClass, consts);
     }
@@ -68,23 +70,23 @@ public:
         auto version = ValueAndBytes(65, 4);
         res.push_back(version);
         //consts
-        auto countConsts = ValueAndBytes((int) consts->size(), 2);
+        auto countConsts = ValueAndBytes((int) consts.size(), 2);
         res.push_back(countConsts);
-        for (auto constValue: *consts) {
-            auto tagConst = constValue->getTypeConst();
+        for (const auto& constValue: consts) {
+            auto tagConst = constValue.getTypeConst();
             auto bytesConst = ValueAndBytes(tagConst, 1);
             res.push_back(bytesConst); //tag const
-            if (tagConst == C_Utf8) res.emplace_back(constValue->getValue()->getBytes(), 2);
-            res.push_back(*constValue->getValue()); //value const
+            if (tagConst == C_Utf8) res.emplace_back(constValue.getValue().getBytes(), 2);
+            res.push_back(constValue.getValue()); //value const
         }
         //flags
         res.push_back(*flags.flagToBytes());
         //this class
         res.emplace_back(
-                ConstantValue::getIdConstByString(consts, name->getIdString(), C_Class), 2);
+                ConstantValue::getIdConstByString(consts, name.getIdString(), C_Class), 2);
         //super class
         res.emplace_back(
-                ConstantValue::getIdConstByString(consts, superClass->getIdString(), C_Class), 2);
+                ConstantValue::getIdConstByString(consts, superClass.getIdString(), C_Class), 2);
         //interfaces
         res.emplace_back((int) 0, 2);
         //fields
@@ -96,7 +98,7 @@ public:
         //methods
         res.emplace_back((int) methods.size(), 2);
         for (auto method: methods) {
-            auto methodBytes = method->methodToBytes();
+            auto methodBytes = method->methodToBytes(consts);
             res.insert(res.end(), methodBytes.begin(), methodBytes.end());
         }
         //source file attribute
@@ -109,7 +111,7 @@ public:
 
     static ClassBytes *
     fromClassStmtDeclNode(ClassStmtDeclNode *node, Flags &flags, string *superClass, SourceFileAttribute *sourceFile,
-                          vector<ConstantValue *> *consts) {
+                          vector<ConstantValue> consts) {
 
         if (node == nullptr) return nullptr;
 
@@ -150,7 +152,7 @@ public:
 
     // От старта
     static ClassBytes *fromStartStmt(StartNode *node, SourceFileAttribute *sourceFile,
-                                     vector<ConstantValue *> *consts) {
+                                     vector<ConstantValue> consts) {
         if (node == nullptr) return nullptr;
 
         auto tmp_name = ConstantValue::CreateUtf8(new string("<main>"), consts);
@@ -211,7 +213,7 @@ public:
     // На будущее
     static ClassBytes *fromInterfaceStmtDecl(InterfaceStmtDeclNode *node, Flags &flags, string *superClass,
                                              SourceFileAttribute *sourceFile,
-                                             vector<ConstantValue *> *consts) {
+                                             vector<ConstantValue> consts) {
         if (node == nullptr) return nullptr;
 
         auto tmp_name = ConstantValue::CreateUtf8(node->expr_definition->id, consts);

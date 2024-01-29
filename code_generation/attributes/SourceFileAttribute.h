@@ -10,14 +10,14 @@
 
 class SourceFileAttribute {
 private:
-    ConstantValue *nameAttr;
-    ConstantValue *fileName;
-    vector<ConstantValue *> *consts;
+    ConstantValue nameAttr;
+    ConstantValue fileName;
+    vector<ConstantValue> consts;
 
 public:
-    SourceFileAttribute(ConstantValue *fileName, vector<ConstantValue *> *consts)
+    SourceFileAttribute(const ConstantValue& fileName, const vector<ConstantValue>& consts)
             : fileName(fileName), consts(consts) {
-        if (fileName->getTypeConst() != ConstantType::C_Utf8) throw runtime_error("File name is not utf-8 type");
+        if (fileName.getTypeConst() != ConstantType::C_Utf8) throw runtime_error("File name is not utf-8 type");
         auto tmpStr = string("SourceFile");
         nameAttr = ConstantValue::CreateUtf8(&tmpStr, consts);
     }
@@ -25,9 +25,9 @@ public:
     vector<ValueAndBytes> attributeToBytes() {
         auto res = vector<ValueAndBytes>();
 
-        res.emplace_back(ConstantValue::getIdConst(consts, *nameAttr), 2);
+        res.emplace_back(ConstantValue::getIdConst(consts, nameAttr), 2);
         res.emplace_back(2, 4);
-        res.emplace_back(ConstantValue::getIdConst(consts, *fileName), 2);
+        res.emplace_back(ConstantValue::getIdConst(consts, fileName), 2);
 
         return res;
     }
