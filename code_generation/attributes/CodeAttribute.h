@@ -725,7 +725,7 @@ public:
                     ConstantValue::CreateFloat(node->float_val, consts); //copy pointer
                 //load float to stack
                 Commands::doCommand(ldc,
-                                    ConstantValue::getIdConstByString(consts,to_string(node->float_val), C_Float),
+                                    ConstantValue::getIdConstByString(consts, to_string(node->float_val), C_Float),
                                     &res);
                 Commands::doCommandTwoBytes(
                         invokespecial,
@@ -764,8 +764,8 @@ public:
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //op
                 if (node->left->exprType == variable) isVar = "$";
-                if (findParamId(*node->left->id) == -1) params->emplace_back(isVar + *node->left->id);
-                Commands::doCommand(astore, findParamId(*node->left->id), &res);
+                if (findParamId(isVar + *node->left->id) == -1) params->emplace_back(isVar + *node->left->id);
+                Commands::doCommand(astore, findParamId(isVar + *node->left->id), &res);
                 break;
                 ///Math ops
             case plus_op:
@@ -1060,7 +1060,7 @@ public:
                 break;
                 ///Local params
             case variable:
-                if (findParamId(*node->id) == -1) {
+                if (findParamId('$' + *node->id) == -1) {
                     params->emplace_back('$' + *node->id);
                     Commands::doCommandTwoBytes(_new, idClassConst, &res);
                     Commands::doCommand(dup, &res);
@@ -1071,9 +1071,9 @@ public:
                                     string("<init>"),
                                     string("()V")
                             ), &res); //id на Value(String)
-                    Commands::doCommand(aload, findParamId(string('$' + *node->id)), &res);
+                    Commands::doCommand(astore, findParamId(string('$' + *node->id)), &res);
                 }
-                Commands::doCommand(aload, findParamId(*node->id), &res);
+                Commands::doCommand(aload, findParamId('$' + *node->id), &res);
                 break;
             case id_type:
                 if (findParamId(*node->id) == -1) {
