@@ -203,7 +203,8 @@ public:
                 Commands::doCommandTwoBytes(_new, idClass("RTL/Functions"),
                                             &res); // Создаю объект класса RTL/Functions
 
-                getCodeFromExpr(node->expr_right, currLine, 1);// Нахожу параметр
+                code_tmp = getCodeFromExpr(node->expr_right, currLine, 1);// Нахожу параметр
+                res.insert(res.end(), code_tmp.begin(), code_tmp.end());
 
                 Commands::doCommandTwoBytes(invokestatic, idMethodRef(
                         string("RTL/Functions"),

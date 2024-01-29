@@ -46,11 +46,11 @@ int main(int argc, char *argv[]) {
     ClassBytes *a = ClassBytes::fromStartStmt(
             startNode,
             new SourceFileAttribute(
-                    ConstantValue::CreateUtf8(string("Main.java"), &consts),
+                    ConstantValue::CreateUtf8(string("_main.java"), &consts),
                     &consts),
             &consts);
     auto classBytes = a->classToBytes();
-    auto out = WriteBytesToFile(new string("Main.class"));
+    auto out = WriteBytesToFile(new string("_main.class"));
     out.write(classBytes);
     out.close();
 
