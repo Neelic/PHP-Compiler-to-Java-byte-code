@@ -204,7 +204,8 @@ public:
         Commands::doCommand(aload_0, _code);
         Commands::doCommandTwoBytes(invokespecial,
                                     ConstantValue::getIdConstByString(_consts,
-                                                                      string("java/lang/Object.<init>()V")),
+                                                                      string("java/lang/Object.<init>()V"),
+                                                                      C_MethodRef),
                                     _code);
         Commands::doCommand(_return, _code);
 
