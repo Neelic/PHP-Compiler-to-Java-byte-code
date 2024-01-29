@@ -26,12 +26,12 @@ int main(int argc, char *argv[]) {
     if (lex_res)
         return lex_res;
 
-    printTreeGraph(startNode);
-
-    GRAPH_STR += "}";
-    file = fopen("graph.dot", "w");
-    fputs(GRAPH_STR.c_str(), file);
-    fclose(file);
+//    printTreeGraph(startNode);
+//
+//    GRAPH_STR += "}";
+//    file = fopen("graph.dot", "w");
+//    fputs(GRAPH_STR.c_str(), file);
+//    fclose(file);
 
     try {
         inspectGlobalScope(startNode);
