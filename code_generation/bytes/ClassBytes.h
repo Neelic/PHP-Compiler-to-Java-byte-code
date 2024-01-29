@@ -170,6 +170,8 @@ public:
         );
         auto stmtList = vector<StmtNode *>();
 
+        tmp_class->addMethod(MethodBytes::generateInitMethod(consts));
+
         for (auto i: node->top_stmt_list->vector) {
             switch (i->type) {
                 case function_top_type:

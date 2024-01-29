@@ -100,6 +100,33 @@ public:
         };
     }
 
+    static MethodBytes generateInitMethod(vector<ConstantValue> *_consts) {
+
+        auto descriptorString = string("()V");
+        auto nameString = string("java/lang/Object");
+
+        auto constDescriptor = ConstantValue::CreateUtf8(descriptorString, _consts);
+        auto constName = ConstantValue::CreateUtf8(nameString, _consts);
+
+        auto _code = new vector<ValueAndBytes>();
+
+        Commands::doCommand(aload_0, _code);
+        Commands::doCommandTwoBytes(invokespecial, 1, _code);
+        Commands::doCommand(_return, _code);
+
+        auto _codeAttr = new const CodeAttribute(10, 1000, _code, _consts, new vector<string>());
+
+
+        return {
+                Flags(ACC_PUBLIC),
+                constName,
+                constDescriptor,
+                _codeAttr,
+                _consts
+        };
+    }
+
+
     static void getAllConstants(FunctionStmtDeclNode *node, vector<ConstantValue> &consts) {
         if (node == nullptr) return;
 
