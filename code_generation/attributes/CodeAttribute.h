@@ -90,7 +90,8 @@ public:
     }
 
     static const CodeAttribute *
-    fromStmtList(StmtList *node, int maxLocals, vector<string> *params, vector<ConstantValue> *consts) {
+    fromStmtList(StmtList *node, int maxLocals, vector<string> *params, vector<ConstantValue> *consts,
+                 string returnType = "void") {
         if (node == nullptr) return nullptr;
 
         auto code_res = new vector<ValueAndBytes>();
@@ -115,7 +116,13 @@ public:
 
         res->code->insert(res->code->end(), code_tmp.begin(), code_tmp.end());
 
-        Commands::doCommand(_return, res->code);
+        if (returnType == "void") {
+            Commands::doCommand(_return, res->code);
+        } else {
+            res->setPredConstCode("null", res->code);
+            Commands::doCommand(areturn, res->code);
+        }
+
 
         return res;
     }
