@@ -103,14 +103,17 @@ public:
                 params
         );
 
+        auto code_tmp = vector<ValueAndBytes>();
 
         for (auto i: *params) {
 //            Commands::doCommandTwoBytes(_new,);
         }
 
         for (auto i: node->vector) {
-            res->getCodeFromStmtNode(i, 0);
+            code_tmp = res->getCodeFromStmtNode(i, 0);
         }
+
+        res->code->insert(res->code->end(), code_tmp.begin(), code_tmp.end());
 
         Commands::doCommand(_return, res->code);
 
@@ -215,9 +218,6 @@ public:
 
                 break;
         }
-
-        // Записываю код в code
-        code->insert(code->end(), res.begin(), res.end());
 
         return res;
     }
