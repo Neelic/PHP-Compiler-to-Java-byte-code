@@ -119,7 +119,7 @@ public:
         if (returnType == "void") {
             Commands::doCommand(_return, res->code);
         } else {
-            res->setPredConstCode("null", res->code);
+            Commands::doCommand(aconst_null, res->code);
             Commands::doCommand(areturn, res->code);
         }
 
@@ -1292,7 +1292,7 @@ public:
                 Commands::doCommandTwoBytes(
                         invokestatic,
                         idMethodRef(
-                                string("<main>"),
+                                string("_main"),
                                 *node->id,
                                 string("(" + repeatStr(n, "LRTL/Value;") + ")LRTL/Value;")
                         ),

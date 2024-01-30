@@ -64,7 +64,7 @@ public:
         }
 
         // Для каждого параметра функции кроме последнего
-        for (int i = 0; i < (int) (node->function_def->expr_func_list->vector.size() - 1); i++) {
+        for (int i = 0; i < (int) (node->function_def->expr_func_list->vector.size()); i++) {
             descriptor += "LRTL/Value;";
             params->push_back(
                     string("$" + *node->function_def->expr_func_list->vector[i]->get_value_func->id_value));
@@ -106,7 +106,7 @@ public:
                 *Flags::convertToFlags(flagList),
                 constName,
                 constDesc,
-                CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts),
+                CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts, "not"),
                 consts
         };
     }

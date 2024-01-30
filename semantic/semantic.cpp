@@ -292,7 +292,6 @@ void inspectFunction(FunctionStmtDeclNode *node, string *parentId) {
 
     if (node->function_def->expr_func_list != nullptr) {
 
-        varList.reserve(node->function_def->expr_func_list->vector.size());
         for (auto &tmp: node->function_def->expr_func_list->vector) {
             varList.push_back(tmp->get_value_func->id_value);
         }
@@ -334,8 +333,6 @@ void inspectFunctionDef(FunctionDefNode *node) {
         inspectExprFunc(i);
         prevNode = i;
     }
-
-    delete prevNode;
 }
 
 // Проверка параметров функции
