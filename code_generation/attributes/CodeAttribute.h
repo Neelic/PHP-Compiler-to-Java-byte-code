@@ -1178,16 +1178,6 @@ public:
                 //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
-                //cast to array
-                Commands::doCommandTwoBytes(
-                        invokevirtual,
-                        idMethodRef(
-                                string("RTL/Value"),
-                                string("toArray"),
-                                string("()LRTL/Value;")
-                        ), //id на Value.toArray()
-                        &res
-                );
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
