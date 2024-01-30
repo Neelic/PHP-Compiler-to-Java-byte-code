@@ -1095,7 +1095,7 @@ public:
                     Commands::doCommand(astore, findParamId(string('$' + *node->id)), &res);
                 }
                 Commands::doCommand(aload, findParamId('$' + *node->id), &res);
-                if (isNeedToStore) idToStore = findParamId('$' + *node->id);
+                if (isNeedToStore && idToStore == -1) idToStore = findParamId('$' + *node->id);
                 break;
             case id_type:
                 if (findParamId(*node->id) == -1) {
@@ -1286,7 +1286,10 @@ public:
                         ), //id на Value.toArray()
                         &res
                 );
-                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
+                if (idToStore != -1) {
+                    Commands::doCommand(astore, idToStore, &res);
+                    idToStore = -1;
+                }
                 break;
                 /// Function call
             case call_func:
