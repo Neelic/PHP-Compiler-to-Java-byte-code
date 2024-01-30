@@ -100,6 +100,8 @@ public:
 
     static StmtNode *CreateFromTEchoStmt(ExprNode *expr_left);
 
+    static StmtNode *CreateFromTReadLineStmt();
+
     static StmtNode *CreateFromContinueStmt();
 
     std::string *idTag() const;

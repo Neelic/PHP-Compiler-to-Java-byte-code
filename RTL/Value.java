@@ -993,33 +993,37 @@ public class Value {
         return (new Value(other)).mod(this);
     }
 
-    public void addToArray(String index, Value other) {
-        if (other == null || index == null) return;
+    public Value addToArray(String index, Value other) {
+        if (other == null || index == null) return new Value();
 
         if (typeVal != TypeValue.arrayVal) {
             throw new FatalError("Uncaught Error: cannot use a scalar value as an array");
         }
 
-        arrayVal.put(index, other);
+        var newArrayVal = new HashMap<String, Value>(arrayVal);
+        newArrayVal.put(index, other);
+        var result = new Value(newArrayVal);
 
         try {
             int ind = Integer.parseInt(index);
 
-            if (ind > lastArrayIndex) lastArrayIndex = ind;
+            if (ind > lastArrayIndex) result.lastArrayIndex = ind;
         } catch (NumberFormatException ignored) {
         }
+
+        return result;
     }
 
-    public void addToArray(Value index, Value other) {
-        addToArray(index.toStringVal().getString(), other);
+    public Value addToArray(Value index, Value other) {
+        return addToArray(index.toStringVal().getString(), other);
     }
 
-    public void addToArray(Value other) {
+    public Value addToArray(Value other) {
         if (typeVal == TypeValue.stringVal) {
             throw new FatalError("Uncaught Error: [] operator not supported for strings");
         }
 
-        addToArray(String.valueOf(lastArrayIndex + 1), other);
+        return addToArray(String.valueOf(lastArrayIndex + 1), other);
     }
 
     public Value getArrayVal(String index) {

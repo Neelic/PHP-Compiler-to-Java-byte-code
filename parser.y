@@ -154,6 +154,7 @@ class ElseIfDotList;
 %token USE
 %token GLOBAL
 %token T_ECHO
+%token T_READLINE
 
 %token CLASS
 %token ABSTRACT
@@ -322,6 +323,7 @@ stmt:     expr_may_empty ';'                                                    
         | html_stmt                                                                   {$$=StmtNode::CreateFromHtmlStmt($1);}
         | BREAK ';'                                                                   {$$=StmtNode::CreateFromBreakStmt();}
         | T_ECHO expr ';'                                                             {$$=StmtNode::CreateFromTEchoStmt($2);}
+        | T_READLINE '(' ')' ';'                                                      {$$=StmtNode::CreateFromTReadLineStmt();}
         | CONTINUE ';'                                                                {$$=StmtNode::CreateFromContinueStmt();}
         ;
 

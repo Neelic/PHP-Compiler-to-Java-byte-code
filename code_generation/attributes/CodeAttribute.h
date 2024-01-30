@@ -225,6 +225,12 @@ public:
                         string("(LRTL/Value;)V")), &res); // Выполняю функцию
 
                 break;
+            case t_readline_stmt:
+                Commands::doCommandTwoBytes(invokestatic, idMethodRef(
+                        string("RTL/Functions"),
+                        string("readline"),
+                        string("()LRTL/Value;")), &res); // Выполняю функцию
+                break;
         }
 
         return res;
@@ -1135,10 +1141,14 @@ public:
                         idMethodRef(
                                 string("RTL/Value"),
                                 string("addToArray"),
-                                string("(LRTL/Value;LRTL/Value;)V")
+                                string("(LRTL/Value;LRTL/Value;)LRTL/Value;")
                         ),
                         &res
                 );
+                if (idToStore != -1) {
+                    Commands::doCommand(astore, idToStore, &res);
+//                    Commands::doCommand(aload, idToStore, &res);
+                }
                 isNeedToStore = false;
                 break;
             case add_array_val:
@@ -1169,10 +1179,14 @@ public:
                         idMethodRef(
                                 string("RTL/Value"),
                                 string("addToArray"),
-                                string("(LRTL/Value;)V")
+                                string("(LRTL/Value;)LRTL/Value;")
                         ),
                         &res
                 );
+                if (idToStore != -1) {
+                    Commands::doCommand(astore, idToStore, &res);
+                    Commands::doCommand(aload, idToStore, &res);
+                }
                 isNeedToStore = false;
                 break;
             case get_array_val:
