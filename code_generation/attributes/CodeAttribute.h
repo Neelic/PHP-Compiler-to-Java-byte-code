@@ -182,7 +182,8 @@ public:
                 if (node->expr_left == nullptr) {
                     Commands::doCommand(_return, &res);
                 } else {
-                    getCodeFromExpr(node->expr_left, currLine, 1);
+                    code_tmp = getCodeFromExpr(node->expr_left, currLine, 1);
+                    res.insert(res.end(), code_tmp.begin(), code_tmp.end());
                     Commands::doCommand(areturn, &res);
                 }
                 break;

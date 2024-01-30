@@ -1,5 +1,7 @@
 package RTL;
 
+import java.util.Scanner;
+
 public class Functions {
     public static void echo(Value value) {
         if (value == null) return;
@@ -43,5 +45,10 @@ public class Functions {
 
     public static void print(boolean value) {
         System.out.print(value);
+    }
+
+    public static Value readline() {
+        Scanner in = new Scanner(System.in);
+        return new Value(in.nextLine());
     }
 }
