@@ -91,7 +91,7 @@ public:
 
     static const CodeAttribute *
     fromStmtList(StmtList *node, int maxLocals, vector<string> *params, vector<ConstantValue> *consts,
-                 string returnType = "void", bool isMain = true) {
+                 const string &returnType = "void", bool isMain = true) {
         if (node == nullptr) return nullptr;
 
         auto code_res = new vector<ValueAndBytes>();
@@ -107,8 +107,16 @@ public:
         auto code_tmp = vector<ValueAndBytes>();
 
         if (!isMain) {
-            for (auto i: *params) {
+            for (int i = 0; i < (int) params->size(); i++) {
                 //TODO: тут дублировать параметры
+                Commands::doCommand(aload, i, res->code);
+                Commands::doCommandTwoBytes(invokevirtual,
+                                            res->idMethodRef(
+                                                    "RTL/Value",
+                                                    "getCopy",
+                                                    "()LRTL/Value;"
+                                            ), res->code);
+                Commands::doCommand(astore, i, res->code);
             }
         }
 
@@ -1084,7 +1092,7 @@ public:
                         &tmpVec
                 );
 
-                Commands::doCommandTwoBytes(ifeq, countByteSize(tmpVec)+3, &res);
+                Commands::doCommandTwoBytes(ifeq, countByteSize(tmpVec) + 3, &res);
 
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 break;
