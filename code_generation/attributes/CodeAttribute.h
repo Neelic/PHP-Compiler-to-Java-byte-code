@@ -112,9 +112,9 @@ public:
 
         for (auto i: node->vector) {
             code_tmp = res->getCodeFromStmtNode(i, 0);
+            res->code->insert(res->code->end(), code_tmp.begin(), code_tmp.end());
         }
 
-        res->code->insert(res->code->end(), code_tmp.begin(), code_tmp.end());
 
         if (returnType == "void") {
             Commands::doCommand(_return, res->code);
@@ -261,6 +261,7 @@ public:
             case if_else:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
                 expr_code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+                convertBoolToInt(&expr_code_tmp);
                 // Считаю, сколько строк было в подготовке условия
                 byteCount += countByteSize(expr_code_tmp);
                 // Записываю подготовку условия в код
