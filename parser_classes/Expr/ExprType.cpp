@@ -72,4 +72,5 @@ enum ExprType
     new_get_value_decl,
     new_get_value_decl_no_params,
     null_keyword,
+    t_readline,
 };

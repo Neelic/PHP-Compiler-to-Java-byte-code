@@ -8,4 +8,4 @@ function fib($n) {
     }
 }
 
-echo fib(7); //13
+echo fib((int) readline()); //13

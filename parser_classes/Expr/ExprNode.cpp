@@ -13,6 +13,7 @@ ExprNode *ExprNode::CreateFromId(std::string *id) {
 ExprNode *ExprNode::CreateFromFunctionCall(std::string *id, ExprList *listParams) {
     auto *tmp = new ExprNode();
     tmp->id = id;
+    if (listParams == nullptr) listParams = new ExprList();
     tmp->listParams = listParams;
     tmp->exprType = ExprType::call_func;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
@@ -615,6 +616,13 @@ std::string *ExprNode::idTag() const {
 ExprNode *ExprNode::CreateFromNull() {
     auto *tmp = new ExprNode();
     tmp->exprType = ExprType::null_keyword;
+    tmp->cur_id = ExprNode::GLOBAL_ID++;
+    return tmp;
+}
+
+ExprNode *ExprNode::CreateFromTReadLine() {
+    auto *tmp = new ExprNode();
+    tmp->exprType = ExprType::t_readline;
     tmp->cur_id = ExprNode::GLOBAL_ID++;
     return tmp;
 }

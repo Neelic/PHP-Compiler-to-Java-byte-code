@@ -323,7 +323,6 @@ stmt:     expr_may_empty ';'                                                    
         | html_stmt                                                                   {$$=StmtNode::CreateFromHtmlStmt($1);}
         | BREAK ';'                                                                   {$$=StmtNode::CreateFromBreakStmt();}
         | T_ECHO expr ';'                                                             {$$=StmtNode::CreateFromTEchoStmt($2);}
-        | T_READLINE '(' ')' ';'                                                      {$$=StmtNode::CreateFromTReadLineStmt();}
         | CONTINUE ';'                                                                {$$=StmtNode::CreateFromContinueStmt();}
         ;
 
@@ -399,6 +398,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | '+' expr %prec U_PLUS                                      {$$=ExprNode::CreateFromUnaryPlus($2);}
         | '!' expr                                                   {$$=ExprNode::CreateFromBooleanOpNot($2);}
         | CLONE expr                                                 {$$=ExprNode::CreateFromCloneOp($2);}
+        | T_READLINE '(' ')'                                         {$$=ExprNode::CreateFromTReadLine();}
         | expr '?' expr ':' expr                                     {$$=ExprNode::CreateFromTernaryOp($1, $3, $5);}
         | expr '?' ':' expr                                          {$$=ExprNode::CreateFromTernaryOp($1, nullptr, $4);}
         | expr '[' expr ']'                                          {$$=ExprNode::CreateFromGetArrayVal($1, $3);}

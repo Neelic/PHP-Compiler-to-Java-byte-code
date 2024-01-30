@@ -661,7 +661,7 @@ public class Value {
                 case intVal -> {
                     switch (other.getType()) {
                         case intVal -> {
-                            return new Value(intVal / other.getInt());
+                            return new Value((float) intVal / other.getInt());
                         }
                         case floatVal -> {
                             return new Value(intVal / other.getFloat());
@@ -995,8 +995,6 @@ public class Value {
 
     public Value addToArray(String index, Value other) {
         if (other == null || index == null) return new Value();
-        System.out.println(index);
-        System.out.println(other.toStringVal().getString());
 
         if (typeVal != TypeValue.arrayVal) {
             throw new FatalError("Uncaught Error: cannot use a scalar value as an array");
@@ -1677,6 +1675,7 @@ public class Value {
     }
 
     public Value and(Value other) {
+        if (!this.toBoolVal().getBool()) return new Value(false);
         return new Value(this.toBoolVal().getBool() && other.toBoolVal().getBool());
     }
 

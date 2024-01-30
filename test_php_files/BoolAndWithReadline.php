@@ -11,7 +11,7 @@ function right(){
 	return true;
 }
 
-if ((boolean) readline && right()){
+if (((boolean) readline()) && right()){
 	echo "true!";
 } else {
 	echo "False!";

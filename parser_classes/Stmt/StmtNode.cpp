@@ -171,13 +171,6 @@ StmtNode *StmtNode::CreateFromContinueStmt() {
     return tmp;
 }
 
-StmtNode *StmtNode::CreateFromTReadLineStmt() {
-    auto *tmp = new StmtNode();
-    tmp->type = StmtType::t_readline_stmt;
-    tmp->cur_id = StmtNode::GLOBAL_ID++;
-    return tmp;
-}
-
 std::string *StmtNode::idTag() const {
     auto *tmp = new std::string(std::string("Stmt") + std::to_string(this->cur_id));
     return tmp;
