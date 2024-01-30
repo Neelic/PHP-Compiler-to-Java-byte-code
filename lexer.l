@@ -333,6 +333,7 @@ self              {printf("Found keyword: %s\n", yytext); return SELF;}
                                                 nestingCount++;
                                                 BEGIN(INITIAL);
                                                 yylval.sval=new std::string(str);
+                                                mis_char.push_back('$');
                                                 mis_char.push_back('.');
                                                 return STRING;
                                               }
