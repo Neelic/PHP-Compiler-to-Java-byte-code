@@ -661,7 +661,7 @@ public class Value {
                 case intVal -> {
                     switch (other.getType()) {
                         case intVal -> {
-                            return new Value(intVal / other.getInt());
+                            return new Value((float) intVal / other.getInt());
                         }
                         case floatVal -> {
                             return new Value(intVal / other.getFloat());

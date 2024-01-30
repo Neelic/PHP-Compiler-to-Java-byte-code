@@ -154,6 +154,7 @@ class ElseIfDotList;
 %token USE
 %token GLOBAL
 %token T_ECHO
+%token T_READLINE
 
 %token CLASS
 %token ABSTRACT
@@ -397,6 +398,7 @@ expr:     INT_NUMBER                                                 {$$=ExprNod
         | '+' expr %prec U_PLUS                                      {$$=ExprNode::CreateFromUnaryPlus($2);}
         | '!' expr                                                   {$$=ExprNode::CreateFromBooleanOpNot($2);}
         | CLONE expr                                                 {$$=ExprNode::CreateFromCloneOp($2);}
+        | T_READLINE '(' ')'                                         {$$=ExprNode::CreateFromTReadLine();}
         | expr '?' expr ':' expr                                     {$$=ExprNode::CreateFromTernaryOp($1, $3, $5);}
         | expr '?' ':' expr                                          {$$=ExprNode::CreateFromTernaryOp($1, nullptr, $4);}
         | expr '[' expr ']'                                          {$$=ExprNode::CreateFromGetArrayVal($1, $3);}

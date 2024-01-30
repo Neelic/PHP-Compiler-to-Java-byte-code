@@ -1,13 +1,12 @@
 #include <string>
 #include <vector>
 #include "ExprType.cpp"
+#include "ExprList.hpp"
 // #include "../Vector classes/ExprList.hpp"
 
 extern std::string GRAPH_STR;
 
 class GetValueNode;
-
-class ExprList;
 
 class ExprNode {
 public:
@@ -185,6 +184,8 @@ public:
     static ExprNode *CreateFromGetValueDeclNoParams(GetValueNode *get_value, std::string *id);
 
     static ExprNode *CreateFromNull();
+
+    static ExprNode *CreateFromTReadLine();
 
     std::string *idTag() const;
 };
