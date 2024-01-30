@@ -1195,12 +1195,15 @@ public:
                 isNeedToStore = false;
                 break;
             case get_array_val:
+                isNeedToStore = true;
                 //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                isNeedToStore = false;
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                isNeedToStore = true;
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
@@ -1211,6 +1214,9 @@ public:
                         ),
                         &res
                 );
+                if (isNeedToStore) {
+                    idToStore = -1;
+                }
                 break;
                 ///Casts
             case int_cast:
