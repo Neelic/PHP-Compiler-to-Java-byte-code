@@ -9,7 +9,7 @@ public class Value {
     private float floatVal;
     private String stringVal;
     private boolean boolVal;
-    private HashMap<String, Value> arrayVal = null;
+    private HashMap<String, Value> arrayVal = new HashMap<>();
     private ObjValue objVal = null;
     private int lastArrayIndex = -1;
     private boolean isRef = false;

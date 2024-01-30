@@ -1168,10 +1168,10 @@ public:
                         ), //id на Value.toArray()
                         &res
                 );
-                if (idToStore != -1) {
-                    Commands::doCommand(astore, idToStore, &res);
-                    Commands::doCommand(aload, idToStore, &res);
-                }
+//                if (idToStore != -1) {
+//                    Commands::doCommand(astore, idToStore, &res);
+//                    Commands::doCommand(aload, idToStore, &res);
+//                }
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
@@ -1191,6 +1191,16 @@ public:
                 //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //cast to array
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                string("RTL/Value"),
+                                string("toArray"),
+                                string("()LRTL/Value;")
+                        ), //id на Value.toArray()
+                        &res
+                );
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
@@ -1220,7 +1230,7 @@ public:
                         ), //id на Value.toIntVal()
                         &res
                 );
-                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
+//                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
             case float_cast:
                 //get on stack left part
@@ -1236,7 +1246,7 @@ public:
                         ), //id на Value.toFloatVal()
                         &res
                 );
-                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
+//                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
             case bool_cast:
                 //get on stack left part
@@ -1252,7 +1262,7 @@ public:
                         ), //id на Value.toBoolVal()
                         &res
                 );
-                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
+//                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
             case string_cast:
                 //get on stack left part
@@ -1268,7 +1278,7 @@ public:
                         ), //id на Value.toStringVal()
                         &res
                 );
-                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
+//                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
             case array_cast:
                 //get on stack left part
