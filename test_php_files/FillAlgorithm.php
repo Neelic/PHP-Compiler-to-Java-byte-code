@@ -16,22 +16,24 @@ for ($i = 0; $i < 10; $i = $i + 1){
 
 function _fill($arr_to_fill, $x, $y){
 	
-	if($arr_to_fill[$x][$y] == 1 || $arr_to_fill[$x][$y] == 2) return;
+	if($arr_to_fill[$x][$y] == 0){
+        $arr_to_fill[$x][$y] = 2;
+
+            if($x + 1  < 10){
+                $arr_to_fill = _fill($arr_to_fill, $x+1, $y);
+            }
+            if($x > 0){
+                $arr_to_fill = _fill($arr_to_fill, $x-1, $y);
+            }
+            if($y + 1  < 10){
+                $arr_to_fill = _fill($arr_to_fill, $x, $y+1);
+            }
+            if($y > 0){
+                $arr_to_fill = _fill($arr_to_fill, $x, $y-1);
+            }
+	}
 	
-	$arr_to_fill[$x][$y] = 2;
-	
-	if($x + 1  < 10){
-		$arr_to_fill = _fill($arr_to_fill, $x+1, $y);
-	}
-	if($x > 0){
-		$arr_to_fill = _fill($arr_to_fill, $x-1, $y);
-	}
-	if($y + 1  < 10){
-		$arr_to_fill = _fill($arr_to_fill, $x, $y+1);
-	}
-	if($y > 0){
-		$arr_to_fill = _fill($arr_to_fill, $x, $y-1);
-	}
+
 
 	return $arr_to_fill;
 }
