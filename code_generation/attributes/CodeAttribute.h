@@ -1134,6 +1134,7 @@ public:
                 if (idToStore != -1) {
                     Commands::doCommand(astore, idToStore, &res);
                     Commands::doCommand(aload, idToStore, &res);
+                    idToStore = -1;
                 }
                 //get on stack central part
                 tmpVec = getCodeFromExpr(node->central, currLine, toStack);
@@ -1168,10 +1169,12 @@ public:
                         ), //id на Value.toArray()
                         &res
                 );
-//                if (idToStore != -1) {
-//                    Commands::doCommand(astore, idToStore, &res);
-//                    Commands::doCommand(aload, idToStore, &res);
-//                }
+                if (idToStore != -1) {
+                    Commands::doCommand(astore, idToStore, &res);
+                    Commands::doCommand(aload, idToStore, &res);
+                    idToStore = -1;
+                }
+                isNeedToStore = false;
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
@@ -1185,12 +1188,13 @@ public:
                         ),
                         &res
                 );
-                isNeedToStore = false;
                 break;
             case get_array_val:
+                isNeedToStore = true;
                 //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                isNeedToStore = false;
                 //cast to array
                 Commands::doCommandTwoBytes(
                         invokevirtual,
@@ -1201,6 +1205,11 @@ public:
                         ), //id на Value.toArray()
                         &res
                 );
+                if (idToStore != -1) {
+                    Commands::doCommand(astore, idToStore, &res);
+                    Commands::doCommand(aload, idToStore, &res);
+                    idToStore = -1;
+                }
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());

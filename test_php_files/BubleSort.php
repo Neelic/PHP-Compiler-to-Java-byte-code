@@ -2,7 +2,6 @@
 $count = (int) readline();
 for ($v = 0; $v < $count; $v = $v + 1) {
     $arr[] = (int) readline();
-    echo $arr[$v];
 }
 
 for ($i = 0; $i < $count; $i=$i+1) {
