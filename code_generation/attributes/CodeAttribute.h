@@ -91,7 +91,7 @@ public:
 
     static const CodeAttribute *
     fromStmtList(StmtList *node, int maxLocals, vector<string> *params, vector<ConstantValue> *consts,
-                 string returnType = "void") {
+                 string returnType = "void", bool isMain = true) {
         if (node == nullptr) return nullptr;
 
         auto code_res = new vector<ValueAndBytes>();
@@ -106,9 +106,12 @@ public:
 
         auto code_tmp = vector<ValueAndBytes>();
 
-        for (auto i: *params) {
-//            Commands::doCommandTwoBytes(_new,);
+        if (!isMain) {
+            for (auto i: *params) {
+                //TODO: тут дублировать параметры
+            }
         }
+
 
         for (auto i: node->vector) {
             code_tmp = res->getCodeFromStmtNode(i, 0);

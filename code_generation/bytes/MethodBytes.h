@@ -108,7 +108,7 @@ public:
                 *Flags::convertToFlags(flagList),
                 constName,
                 constDesc,
-                CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts, "not"),
+                CodeAttribute::fromStmtList(node->stmt_list, 1000, params, consts, "not", false),
                 consts
         };
     }
