@@ -9,7 +9,7 @@ public class Value {
     private float floatVal;
     private String stringVal;
     private boolean boolVal;
-    private HashMap<String, Value> arrayVal = null;
+    private HashMap<String, Value> arrayVal = new HashMap<>();
     private ObjValue objVal = null;
     private int lastArrayIndex = -1;
     private boolean isRef = false;
@@ -995,12 +995,14 @@ public class Value {
 
     public Value addToArray(String index, Value other) {
         if (other == null || index == null) return new Value();
+        System.out.println(index);
+        System.out.println(other.toStringVal().getString());
 
         if (typeVal != TypeValue.arrayVal) {
             throw new FatalError("Uncaught Error: cannot use a scalar value as an array");
         }
 
-        var newArrayVal = new HashMap<String, Value>(arrayVal);
+        var newArrayVal = new HashMap<>(arrayVal);
         newArrayVal.put(index, other);
         var result = new Value(newArrayVal);
 
