@@ -74,7 +74,9 @@ public:
 
         auto constName = ConstantValue::CreateUtf8(*node->function_def->func_id, consts);
 
-        auto constDesc = ConstantValue::CreateUtf8(descriptor, consts);
+        auto constDesc = (ConstantValue::getIdConstByString(consts, descriptor) == -1) ?
+                         ConstantValue::CreateUtf8(descriptor, consts) :
+                         ConstantValue::getConstantByString(consts, descriptor);
 
         ConstantValue constParent;
         ConstantValue constParentName;
@@ -123,7 +125,9 @@ public:
 
         auto constName = ConstantValue::CreateUtf8(*node->func_id, consts);
 
-        auto constDesc = ConstantValue::CreateUtf8(descriptor, consts);
+        auto constDesc = (ConstantValue::getIdConstByString(consts, descriptor) == -1) ?
+                ConstantValue::CreateUtf8(descriptor, consts) :
+                ConstantValue::getConstantByString(consts, descriptor);
 
         ConstantValue constParent;
         ConstantValue constParentName;

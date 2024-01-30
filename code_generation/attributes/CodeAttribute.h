@@ -1038,12 +1038,20 @@ public:
                 );
                 break;
             case bool_and:
-                //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                //get on stack left part
+                Commands::doCommandTwoBytes(invokevirtual,
+                                            idMethodRef(
+                                                    string("RTL/Value"),
+                                                    string("toBoolVal"),
+                                                    string("()LRTL/Value;")
+                                            ), &res);
+                Commands::doCommand(dup, &res);
+                convertBoolToInt(&res);
+
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
-                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
@@ -1052,8 +1060,12 @@ public:
                                 string("and"),
                                 string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.and(Value)
-                        &res
+                        &tmpVec
                 );
+
+                Commands::doCommandTwoBytes(ifeq, countByteSize(tmpVec)+3, &res);
+
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 break;
             case bool_or:
                 //get on stack left part
@@ -1272,7 +1284,6 @@ public:
                         ), //id на Value.toArray()
                         &res
                 );
-                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
                 /// Function call
             case call_func:
@@ -1290,6 +1301,12 @@ public:
                         ),
                         &res
                 );
+                break;
+            case t_readline:
+                Commands::doCommandTwoBytes(invokestatic, idMethodRef(
+                        string("RTL/Functions"),
+                        string("readline"),
+                        string("()LRTL/Value;")), &res); // Выполняю функцию
                 break;
         }
 
