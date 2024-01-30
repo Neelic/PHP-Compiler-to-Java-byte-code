@@ -661,17 +661,18 @@ public class Value {
                 case intVal -> {
                     switch (other.getType()) {
                         case intVal -> {
+                            if (other.getInt() == 0) throw new ArithmeticException();
                             return new Value((float) intVal / other.getInt());
                         }
                         case floatVal -> {
+                            if (other.getFloat() == 0) throw new ArithmeticException();
                             return new Value(intVal / other.getFloat());
                         }
                         case boolVal -> {
+                            if (other.toIntVal().getInt() == 0) throw new ArithmeticException();
                             return new Value(intVal / other.toIntVal().getInt());
                         }
-                        case nullVal -> {
-                            return new Value(intVal / 0);
-                        }
+                        case nullVal -> throw new ArithmeticException();
                         case stringVal -> {
                             Value newVal = other.toFloatVal();
 
@@ -682,16 +683,19 @@ public class Value {
                 case floatVal -> {
                     switch (other.getType()) {
                         case intVal -> {
+                            if (other.getInt() == 0) throw new ArithmeticException();
                             return new Value(floatVal / other.getInt());
                         }
                         case floatVal -> {
+                            if (other.getFloat() == 0) throw new ArithmeticException();
                             return new Value(floatVal / other.getFloat());
                         }
                         case boolVal -> {
+                            if (other.toFloatVal().getFloat() == 0) throw new ArithmeticException();
                             return new Value(floatVal / other.toFloatVal().getFloat());
                         }
                         case nullVal -> {
-                            return new Value(1 / 0);
+                            throw new ArithmeticException();
                         }
                         case stringVal -> {
                             Value newVal = other.toFloatVal();
@@ -703,6 +707,7 @@ public class Value {
                 case boolVal -> {
                     switch (other.getType()) {
                         case intVal -> {
+                            if (other.getInt() == 0) throw new ArithmeticException();
                             if (!isRef()) return new Value((boolVal ? 1 : 0) / other.getInt());
 
                             typeVal = TypeValue.intVal;
@@ -710,6 +715,7 @@ public class Value {
                             return this;
                         }
                         case floatVal -> {
+                            if (other.getFloat() == 0) throw new ArithmeticException();
                             if (!isRef()) return new Value((boolVal ? 1 : 0) / other.getFloat());
 
                             typeVal = TypeValue.floatVal;
@@ -717,6 +723,7 @@ public class Value {
                             return this;
                         }
                         case boolVal -> {
+                            if (other.toIntVal().getInt() == 0) throw new ArithmeticException();
                             if (!isRef()) return new Value((boolVal ? 1 : 0) / (other.getBool() ? 1 : 0));
 
                             typeVal = TypeValue.intVal;
@@ -724,7 +731,7 @@ public class Value {
                             return this;
                         }
                         case nullVal -> {
-                            if (!isRef()) return new Value(1 / 0);
+                            throw new ArithmeticException();
                         }
                         case stringVal -> {
                             Value newVal = other.toFloatVal();
@@ -736,16 +743,19 @@ public class Value {
                 case nullVal -> {
                     switch (other.getType()) {
                         case intVal -> {
+                            if (other.getInt() == 0) throw new ArithmeticException();
                             return new Value(0 / other.getInt());
                         }
                         case floatVal -> {
+                            if (other.getFloat() == 0) throw new ArithmeticException();
                             return new Value(0 / other.getFloat());
                         }
                         case boolVal -> {
+                            if (other.toIntVal().getInt() == 0) throw new ArithmeticException();
                             return new Value(0 / (other.getBool() ? 1 : 0));
                         }
                         case nullVal -> {
-                            return new Value(0 / 0);
+                            throw new ArithmeticException();
                         }
                         case stringVal -> {
                             Value newVal = other.toFloatVal();

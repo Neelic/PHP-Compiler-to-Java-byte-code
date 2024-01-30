@@ -9,7 +9,7 @@ echo "\n";
 $a = 3*2;
 echo $a;
 echo "\n";
-$a = 5/4;
+$a = 5/ readline();
 echo $a;
 echo "\n";
 
