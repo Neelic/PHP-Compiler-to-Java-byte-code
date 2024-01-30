@@ -1095,7 +1095,7 @@ public:
                     Commands::doCommand(astore, findParamId(string('$' + *node->id)), &res);
                 }
                 Commands::doCommand(aload, findParamId('$' + *node->id), &res);
-                if (isNeedToStore && idToStore == -1) idToStore = findParamId('$' + *node->id);
+                if (isNeedToStore) idToStore = findParamId('$' + *node->id);
                 break;
             case id_type:
                 if (findParamId(*node->id) == -1) {
@@ -1129,12 +1129,14 @@ public:
                     Commands::doCommand(astore, idToStore, &res);
                     Commands::doCommand(aload, idToStore, &res);
                 }
+                isNeedToStore = false;
                 //get on stack central part
                 tmpVec = getCodeFromExpr(node->central, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+                isNeedToStore = true;
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
@@ -1148,6 +1150,7 @@ public:
                 if (idToStore != -1) {
                     Commands::doCommand(astore, idToStore, &res);
 //                    Commands::doCommand(aload, idToStore, &res);
+                    idToStore = -1;
                 }
                 isNeedToStore = false;
                 break;
@@ -1171,6 +1174,7 @@ public:
                     Commands::doCommand(aload, idToStore, &res);
                 }
                 //get on stack right part
+                isNeedToStore = false;
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //op
@@ -1186,6 +1190,7 @@ public:
                 if (idToStore != -1) {
                     Commands::doCommand(astore, idToStore, &res);
                     Commands::doCommand(aload, idToStore, &res);
+                    idToStore = -1;
                 }
                 isNeedToStore = false;
                 break;
