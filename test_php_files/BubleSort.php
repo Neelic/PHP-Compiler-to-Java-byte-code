@@ -1,6 +1,5 @@
 <?php
-$count = 5;
-$arr[] = 0;
+$count = readline();
 
 for ($v = 0; $v < $count; $v = $v + 1) {
      $arr[] = readline();
@@ -17,7 +16,7 @@ for ($i = 0; $i < $count; $i=$i+1) {
 }
 
 echo "Сортированный массив\n";
-for ($i = 0; $i < 10; $i=$i+1) {
+for ($i = 0; $i < $count; $i=$i+1) {
     echo $arr[$i];
     echo "\n";
 }

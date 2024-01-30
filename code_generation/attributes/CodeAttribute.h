@@ -387,6 +387,12 @@ public:
         int byteCount = currLine;
         int skipBytes = 0;
 
+        if (node->stmtList != nullptr) {
+            for (auto i: node->stmtList->vector) {
+                findAllConstInStmtNode(i, &res);
+            }
+        }
+
         // Условие продолжения цикла
         code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
         convertBoolToInt(&code_tmp);
@@ -425,6 +431,10 @@ public:
         int byteCount = currLine;
         int skipBytes = 0;
 
+        if (node->stmt != nullptr) {
+            findAllConstInStmtNode(node->stmt, &res);
+        }
+
         // Тело цикла
         main_code = getCodeFromStmtNode(node->stmt, byteCount);
         res.insert(res.end(), main_code.begin(), main_code.end()); // Тело while
@@ -453,6 +463,14 @@ public:
 
         int byteCount = currLine;
         int skipBytes = 0;
+
+        if (node->stmtList != nullptr) {
+            for (auto i: node->stmtList->vector) {
+                findAllConstInStmtNode(i, &res);
+            }
+        } else if (node->stmt != nullptr) {
+            findAllConstInStmtNode(node->stmt, &res);
+        }
 
         // Записываем первое выражение из for
         code_tmp = getCodeFromExpr(node->expr_left, currLine, 0);
@@ -1435,33 +1453,39 @@ public:
         return -1;
     }
 
-    void initializeNewVariable(const string &varName, vector<ValueAndBytes> *code_res) {
-        auto classId = string("RTL/Value;");
+    void initializeNewVariable(const string &varName, vector<ValueAndBytes> *code_res, bool isVar = true) {
+        auto classId = string("RTL/Value");
         auto constructor = string("RTL/Value.()V");
 
-        auto arrayElementVar = findParamId(varName);
+        idClassConst = idClass(string("RTL/Value"));
 
-        if (arrayElementVar != -1) {
-            return; // Если переменная уже есть
+        if (!isVar && findParamId(varName) == -1) {
+            params->emplace_back(varName);
+            Commands::doCommandTwoBytes(_new, idClassConst, code_res);
+            Commands::doCommand(dup, code_res);
+            Commands::doCommandTwoBytes(
+                    invokespecial,
+                    idMethodRef(
+                            string("RTL/Value"),
+                            string("<init>"),
+                            string("()V")
+                    ), code_res); //id на Value(String)
+            Commands::doCommand(astore, findParamId(string(varName)), code_res);
         }
 
-        Commands::doCommandTwoBytes(_new,
-                                    ConstantValue::getIdConstByString(consts, classId,
-                                                                      ConstantType::C_Class),
-                                    code_res);
-
-        Commands::doCommand(dup, code_res);
-
-        Commands::doCommandTwoBytes(
-                invokespecial,
-                idMethodRef(
-                        string("RTL/Value"),
-                        string("<init>"),
-                        string("()V")), code_res); //id на Value(String)// Вызываю конструктор, по идее
-
-        Commands::doCommand(astore, (int) params->size(), code_res); // Сохраняю ссылку на объект в новый параметр
-
-        params->push_back(varName); // Сохраняю имя переменной в учете
+        if (isVar && findParamId('$' + varName) == -1) {
+            params->emplace_back('$' + varName);
+            Commands::doCommandTwoBytes(_new, idClassConst, code_res);
+            Commands::doCommand(dup, code_res);
+            Commands::doCommandTwoBytes(
+                    invokespecial,
+                    idMethodRef(
+                            string("RTL/Value"),
+                            string("<init>"),
+                            string("()V")
+                    ), code_res); //id на Value(String)
+            Commands::doCommand(astore, findParamId(string('$' + varName)), code_res);
+        }
     }
 
     // Переводит Value(bool) в int, нужно для комманд сравнения. После выполнения в стеке должна лежать int 1 или 0
@@ -1479,6 +1503,261 @@ public:
                                                 string("getInt"),
                                                 string("()I")),
                                     code_res);
+    }
+
+    void findAllConstInStmtNode(StmtNode *node, vector<ValueAndBytes> *code_res) {
+
+        if (node == nullptr) return;
+
+        auto res = vector<ConstantValue *>();
+
+        switch (node->type) {
+            case expr:
+                findConstantInExpr(node->expr_left, code_res);
+                break;
+            case if_stmt:
+                findAllConstantsInIfStmt(node->if_stmt, code_res);
+                break;
+            case switch_stmt:
+                findAllConstantsInSwitchStmt(node->switch_stmt, code_res);
+                break;
+            case stmt_list:
+                for (auto i: node->stmtList->vector)
+                    findAllConstInStmtNode(i, code_res);
+                break;
+            case static_var:
+                for (auto i: node->static_var->vector) {
+                    if (i->id != nullptr) {
+                        addConstant(*i->id, new string("LRTL/Value;"), code_res);
+                    }
+                }
+                break;
+            case global_var:
+                for (auto i: node->global_var->vector) {
+                    if (i->id != nullptr) {
+                        addConstant(*i->id, new string("LRTL/Value;"), code_res);
+                    }
+                }
+                break;
+            case while_stmt:
+                findConstsInWhileStmt(node->while_stmt, code_res);
+                break;
+            case do_while_stmt:
+                findConstsInDoWhile(node->do_while_stmt, code_res);
+                break;
+            case for_stmt:
+                findConstsInForStmt(node->for_stmt, code_res);
+                break;
+            case foreach_stmt:
+                findConstsInForEachStmt(node->foreach_stmt, code_res);
+                break;
+            case const_decl:
+                for (auto i: node->const_decl->vector) {
+                    findConstsInConstDeclNode(i, code_res);
+                }
+                break;
+        }
+    }
+
+    void findAllConstantsInIfStmt(IfStmtNode *node, vector<ValueAndBytes> *code_res) {
+        if (node == nullptr) return;
+
+        if (node->expr != nullptr)
+            findConstantInExpr(node->expr, code_res);
+        if (node->stmt_main != nullptr)
+            findAllConstInStmtNode(node->stmt_main, code_res);
+        if (node->stmt_else != nullptr)
+            findAllConstInStmtNode(node->stmt_else, code_res);
+        if (node->stmtListMain != nullptr) {
+            for (auto i: node->stmtListMain->vector) {
+                findAllConstInStmtNode(i, code_res);
+            }
+        }
+        if (node->stmtListElse != nullptr) {
+            for (auto i: node->stmtListElse->vector) {
+                findAllConstInStmtNode(i, code_res);
+            }
+        }
+        if (node->listElse != nullptr) {
+            for (auto i: node->listElse->vector) {
+                findAllConstantsInIfStmt(i, code_res);
+            }
+        }
+    }
+
+    void findAllConstantsInSwitchStmt(SwitchStmtNode *node, vector<ValueAndBytes> *code_res) {
+        if (node == nullptr) return;
+
+        if (node->expr != nullptr) {
+            findConstantInExpr(node->expr, code_res);
+        }
+
+        if (node->defaultStmtList != nullptr) {
+            for (auto i: node->defaultStmtList->vector) {
+                if (i->expr != nullptr)
+                    findConstantInExpr(i->expr, code_res);
+                if (i->stmtList != nullptr) {
+                    for (auto j: i->stmtList->vector) {
+                        findAllConstInStmtNode(j, code_res);
+                    }
+                }
+            }
+
+        }
+    }
+
+    void findConstsInWhileStmt(WhileStmtNode *node, vector<ValueAndBytes> *code_res) {
+        if (node == nullptr) return;
+
+        if (node->expr != nullptr) {
+            findConstantInExpr(node->expr, code_res);
+        }
+
+        switch (node->type) {
+            case while_stmt_type:
+                findAllConstInStmtNode(node->stmt, code_res);
+                break;
+            case end_while_stmt_type:
+                for (auto i: node->stmtList->vector) {
+                    findAllConstInStmtNode(i, code_res);
+                }
+                break;
+        }
+    }
+
+    void findConstsInDoWhile(DoWhileStmtNode *node, vector<ValueAndBytes> *code_res) {
+        if (node == nullptr) return;
+
+        findConstantInExpr(node->expr, code_res);
+
+        findAllConstInStmtNode(node->stmt, code_res);
+    }
+
+    void findConstsInForStmt(ForStmtNode *node, vector<ValueAndBytes> *code_res) {
+        if (node == nullptr) return;
+
+        findConstantInExpr(node->expr_left, code_res);
+
+        switch (node->type) {
+
+            case for_stmt_type:
+                findAllConstInStmtNode(node->stmt, code_res);
+                break;
+            case for_end_stmt_type:
+                for (auto i: node->stmtList->vector) {
+                    findAllConstInStmtNode(node->stmt, code_res);
+                }
+                break;
+        }
+
+    }
+
+    void findConstsInForEachStmt(ForEachStmtNode *node, vector<ValueAndBytes> *code_res) {
+        if (node == nullptr) return;
+
+        findConstantInExpr(node->expr_right, code_res);
+
+        if (node->id != nullptr) {
+            addConstant(*node->id, new string("LRTL/Value;"), code_res, false);
+        }
+
+        if (node->stmt != nullptr) {
+            findAllConstInStmtNode(node->stmt, code_res);
+        } else if (node->stmtList != nullptr) {
+            for (auto i: node->stmtList->vector) {
+                findAllConstInStmtNode(node->stmt, code_res);
+            }
+        }
+    }
+
+    void findConstsInConstDeclNode(ConstDeclNode *node, vector<ValueAndBytes> *code_res) {
+        if (node == nullptr) return;
+        addConstant(*node->id, new string("LRTL/Value;"), code_res, false);
+    }
+
+    void findConstantInExpr(ExprNode *node, vector<ValueAndBytes> *code_res) {
+        if (node == nullptr) return;
+
+        switch (node->exprType) {
+            case assign_ref_op:
+            case assign_op:
+                findConstantInExpr(node->right, code_res);
+                break;
+            case variable:
+                addConstant(*node->id, new string("LRTL/Value;"), code_res);
+                break;
+            case ExprType::u_minus_op:
+            case ExprType::u_plus_op:
+            case ExprType::int_cast:
+            case clone_op:
+            case float_cast:
+            case string_cast:
+            case array_cast:
+            case object_cast:
+            case bool_cast:
+            case class_inst_field_ref_op:
+            case class_inst_field_by_ref_op:
+                findConstantInExpr(node->left, code_res);
+                break;
+            case class_inst_method_by_ref_op_dots:
+                findConstantInExpr(node->left, code_res);
+                break;
+            case set_class_field_op:
+                findConstantInExpr(node->right, code_res);
+                break;
+            case class_method_ref_op:
+                findConstantInExpr(node->left, code_res);
+                break;
+            case class_inst_field_ref_dots_op:
+                findConstantInExpr(node->left, code_res);
+                break;
+            case class_inst_field_by_ref_dots_op:
+                findConstantInExpr(node->left, code_res);
+                break;
+            case instance_of:
+                findConstantInExpr(node->left, code_res);
+                break;
+            case ExprType::plus_op:
+            case ExprType::minus_op:
+            case ExprType::mult_op:
+            case ExprType::div_op:
+            case ExprType::mod_op:
+            case ExprType::pow_op:
+            case ExprType::concat_op:
+            case ExprType::bool_more:
+            case ExprType::bool_less:
+            case ExprType::bool_and:
+            case ExprType::bool_equal:
+            case ExprType::bool_or:
+            case ExprType::bool_equal_strict:
+            case ExprType::bool_equal_more:
+            case ExprType::bool_equal_less:
+            case ExprType::logic_and:
+            case ExprType::logic_or:
+            case ExprType::logic_xor:
+            case ExprType::call_func:
+            case ExprType::new_decl_no_id:
+                findConstantInExpr(node->left, code_res);
+                findConstantInExpr(node->right, code_res);
+                break;
+            case ternary_op:
+            case get_array_val:
+            case add_array_val:
+            case set_array_val:
+                findConstantInExpr(node->left, code_res);
+                findConstantInExpr(node->right, code_res);
+                findConstantInExpr(node->central, code_res);
+                break;
+            case ref_op:
+                findConstantInExpr(node->right, code_res);
+            default:
+                break;
+        }
+    }
+
+    // Выделил в отдельную функцию, чтоб было не так больно исправлять
+    void addConstant(const string &id, string *type, vector<ValueAndBytes> *code_res, bool isVar = true) {
+        initializeNewVariable(id, code_res, isVar);
     }
 
 };
