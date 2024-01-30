@@ -1168,10 +1168,10 @@ public:
                         ), //id на Value.toArray()
                         &res
                 );
-//                if (idToStore != -1) {
-//                    Commands::doCommand(astore, idToStore, &res);
-//                    Commands::doCommand(aload, idToStore, &res);
-//                }
+                if (idToStore != -1) {
+                    Commands::doCommand(astore, idToStore, &res);
+                    Commands::doCommand(aload, idToStore, &res);
+                }
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
