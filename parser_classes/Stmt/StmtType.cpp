@@ -24,6 +24,7 @@ enum StmtType
     break_stmt,
     continue_stmt,
     t_echo_stmt,
+    t_readline_stmt,
 };
 
 #endif

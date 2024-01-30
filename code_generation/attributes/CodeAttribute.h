@@ -225,6 +225,12 @@ public:
                         string("(LRTL/Value;)V")), &res); // Выполняю функцию
 
                 break;
+            case t_readline_stmt:
+                Commands::doCommandTwoBytes(invokestatic, idMethodRef(
+                        string("RTL/Functions"),
+                        string("readline"),
+                        string("()LRTL/Value;")), &res); // Выполняю функцию
+                break;
         }
 
         return res;
