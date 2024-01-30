@@ -1060,6 +1060,17 @@ public class Value {
         return getArrayVal(index.toStringVal().getString());
     }
 
+    public Value getCopy() {
+        switch (typeVal) {
+            case arrayVal -> {
+                return new Value(new HashMap<>(arrayVal));
+            }
+            default -> {
+                return this;
+            }
+        }
+    }
+
     public Value toIntVal() {
         switch (typeVal) {
             case stringVal -> {
