@@ -1,12 +1,12 @@
 <?php
-$arr[] = 5;
-$arr[] = 3;
-$arr[] = 1;
-$arr[] = 2;
-$arr[] = 4;
+$count = (int) readline();
+for ($v = 0; $v < $count; $v = $v + 1) {
+    $arr[] = (int) readline();
+    echo $arr[$v];
+}
 
-for ($i = 0; $i < 4; $i=$i+1) {
-    for ($j = 0; $j < 4; $j=$j+1) {
+for ($i = 0; $i < $count; $i=$i+1) {
+    for ($j = 0; $j < $count; $j=$j+1) {
         if ($arr[$j] > $arr[$j + 1]) {
             $tmp = $arr[$j];
             $arr[$j] = $arr[$j + 1];
@@ -15,7 +15,8 @@ for ($i = 0; $i < 4; $i=$i+1) {
     }
 }
 
-for ($i = 0; $i < 5; $i=$i+1) {
+echo "Сортированный массив\n";
+for ($i = 0; $i < $count; $i=$i+1) {
     echo $arr[$i];
     echo "\n";
 }
