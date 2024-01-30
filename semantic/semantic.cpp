@@ -1205,9 +1205,10 @@ void inspectExpr(ExprNode *node, vector<string *> &variablesScope, const vector<
             break;
         case ExprType::assign_op:
         case ExprType::assign_ref_op:
-            if (*node->left->id == "this" && node->get_value != nullptr && node->get_value->count == 1)
-                //Throw fatal error
-                throw runtime_error(string("Fatal error: Cannot re-assign $this in " + *file_name));
+//            if (node->left->exprType == variable && *node->left->id == "this" && node->get_value != nullptr &&
+//                node->get_value->count == 1)
+//                //Throw fatal error
+//                throw runtime_error(string("Fatal error: Cannot re-assign $this in " + *file_name));
             //if use right-side variable is not declared
             if (node->right->exprType == ExprType::variable && !isDeclaredVariable(node->right->id, variables)) {
                 node->right = ExprNode::CreateFromAssignOp(node->right, ExprNode::CreateFromNull());

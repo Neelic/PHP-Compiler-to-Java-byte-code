@@ -486,8 +486,9 @@ public:
 
     // Выделил в отдельную функцию, чтоб было не так больно исправлять
     static void addConstant(const string &id, string *type, vector<ConstantValue> &consts) {
-        ConstantValue::CreateUtf8(id,
-                                  &consts); // Тут дескриптор и не нужен, потому что это не класс и не метод, а просто имя константы
+        if (ConstantValue::getIdConstByString(&consts, id) == -1)
+            ConstantValue::CreateUtf8(id,
+                                      &consts); // Тут дескриптор и не нужен, потому что это не класс и не метод, а просто имя константы
     }
 };
 

@@ -92,7 +92,7 @@ public:
         constant.value = ValueAndBytes(value);
         constant.id = value;
 
-        if (isContainsConst(consts, constant)) throw runtime_error("Const is already exist");
+        if (isContainsConst(consts, constant)) throw runtime_error("Const " + value +" is already exist");
         consts->push_back(constant);
 
         return constant;

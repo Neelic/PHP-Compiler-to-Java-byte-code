@@ -681,6 +681,12 @@ public:
 
     }
 
+private:
+    int idToStore = -1;
+    bool isNeedToStore = false;
+
+public:
+
     vector<ValueAndBytes> getCodeFromExpr(ExprNode *node, int currLine, int toStack) {
         vector<ValueAndBytes> res;
         if (node == nullptr) return res;
@@ -1070,6 +1076,7 @@ public:
                     Commands::doCommand(astore, findParamId(string('$' + *node->id)), &res);
                 }
                 Commands::doCommand(aload, findParamId('$' + *node->id), &res);
+                if (isNeedToStore) idToStore = findParamId('$' + *node->id);
                 break;
             case id_type:
                 if (findParamId(*node->id) == -1) {
@@ -1080,11 +1087,12 @@ public:
                                 "Fatal Error: Undefined constant \"" +
                                 *node->id + "\"");
                 }
-
                 Commands::doCommand(aload, findParamId(*node->id), &res);
+                if (isNeedToStore) findParamId(*node->id);
                 break;
                 ///Array
             case set_array_val:
+                isNeedToStore = true;
                 //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
@@ -1093,11 +1101,15 @@ public:
                         invokevirtual,
                         idMethodRef(
                                 string("RTL/Value"),
-                                string("toArrayVal"),
+                                string("toArray"),
                                 string("()LRTL/Value;")
                         ), //id на Value.toArrayVal()
                         &res
                 );
+                if (idToStore != -1) {
+                    Commands::doCommand(astore, idToStore, &res);
+                    Commands::doCommand(aload, idToStore, &res);
+                }
                 //get on stack central part
                 tmpVec = getCodeFromExpr(node->central, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
@@ -1114,8 +1126,10 @@ public:
                         ),
                         &res
                 );
+                isNeedToStore = false;
                 break;
             case add_array_val:
+                isNeedToStore = true;
                 //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
@@ -1124,11 +1138,15 @@ public:
                         invokevirtual,
                         idMethodRef(
                                 string("RTL/Value"),
-                                string("toArrayVal"),
+                                string("toArray"),
                                 string("()LRTL/Value;")
-                        ), //id на Value.toArrayVal()
+                        ), //id на Value.toArray()
                         &res
                 );
+                if (idToStore != -1) {
+                    Commands::doCommand(astore, idToStore, &res);
+                    Commands::doCommand(aload, idToStore, &res);
+                }
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
@@ -1142,6 +1160,7 @@ public:
                         ),
                         &res
                 );
+                isNeedToStore = false;
                 break;
             case get_array_val:
                 //get on stack left part
@@ -1152,9 +1171,9 @@ public:
                         invokevirtual,
                         idMethodRef(
                                 string("RTL/Value"),
-                                string("toArrayVal"),
+                                string("toArray"),
                                 string("()LRTL/Value;")
-                        ), //id на Value.toArrayVal()
+                        ), //id на Value.toArray()
                         &res
                 );
                 //get on stack right part
@@ -1186,6 +1205,7 @@ public:
                         ), //id на Value.toIntVal()
                         &res
                 );
+                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
             case float_cast:
                 //get on stack left part
@@ -1201,6 +1221,7 @@ public:
                         ), //id на Value.toFloatVal()
                         &res
                 );
+                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
             case bool_cast:
                 //get on stack left part
@@ -1216,6 +1237,7 @@ public:
                         ), //id на Value.toBoolVal()
                         &res
                 );
+                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
             case string_cast:
                 //get on stack left part
@@ -1231,6 +1253,7 @@ public:
                         ), //id на Value.toStringVal()
                         &res
                 );
+                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
             case array_cast:
                 //get on stack left part
@@ -1241,11 +1264,12 @@ public:
                         invokevirtual,
                         idMethodRef(
                                 string("RTL/Value"),
-                                string("toArrayVal"),
+                                string("toArray"),
                                 string("()LRTL/Value;")
-                        ), //id на Value.toArrayVal()
+                        ), //id на Value.toArray()
                         &res
                 );
+                if (isNeedToStore && idToStore != -1) Commands::doCommand(astore, idToStore, &res);
                 break;
                 /// Function call
             case call_func:
