@@ -239,6 +239,7 @@ public:
             case only_if:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true, при переходе вперед нужно добавлять размер самого сравнения, то бишь 3
                 expr_code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+                convertBoolToInt(&expr_code_tmp);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), expr_code_tmp.begin(), expr_code_tmp.end());
                 // Нахожу код тела
@@ -277,6 +278,7 @@ public:
             case end_if:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
                 expr_code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+                convertBoolToInt(&expr_code_tmp);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), expr_code_tmp.begin(), expr_code_tmp.end());
                 // Нахожу код тела
@@ -294,6 +296,7 @@ public:
             case if_else_endif:
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
                 expr_code_tmp = getCodeFromExpr(node->expr, byteCount + 3, 1);
+                convertBoolToInt(&expr_code_tmp);
                 // Считаю, сколько строк было в подготовке условия
                 byteCount += countByteSize(expr_code_tmp);
                 // Записываю подготовку условия в код
@@ -334,6 +337,7 @@ public:
 
                 // Eсли вызывается из условия if, то должен оставить на верху стека 0 или 1, 0 = false, 1 = true
                 expr_code_tmp = getCodeFromExpr(node->expr, byteCount, 1);
+                convertBoolToInt(&expr_code_tmp);
                 // Записываю подготовку условия в код
                 res.insert(res.end(), expr_code_tmp.begin(), expr_code_tmp.end());
                 // Нахожу код тела
@@ -1423,7 +1427,7 @@ public:
         Commands::doCommandTwoBytes(invokevirtual,
                                     idMethodRef(string("RTL/Value"),
                                                 string("getInt"),
-                                                string("()LRTL/Value;")),
+                                                string("()I")),
                                     code_res);
     }
 
