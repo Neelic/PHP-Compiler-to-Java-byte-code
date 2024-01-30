@@ -1006,9 +1006,6 @@ public class Value {
     public void addToArray(String index, Value other) {
         if (other == null || index == null) return;
 
-        System.out.println(index);
-        System.out.println(other.toStringVal().getString());
-
         if (typeVal != TypeValue.arrayVal) {
             throw new FatalError("Uncaught Error: cannot use a scalar value as an array");
         }
