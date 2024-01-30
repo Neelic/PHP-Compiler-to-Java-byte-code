@@ -3,8 +3,8 @@
 $arr_vect[] = 0;
 $arr_matr[] = $arr_vect;
 
-for ($i = 0; $i < 10; $i++){
-	for ($j = 0; $j<10; $j++){
+for ($i = 0; $i < 10; $i = $i + 1){
+	for ($j = 0; $j<10; $j = $j +1){
 		if($j == 5 ){
 			$arr_vect[$j] = 1;
 		} else {
@@ -17,12 +17,12 @@ for ($i = 0; $i < 10; $i++){
 
 $res = "";
 
-for ($i = 0; $i < 10; $i++){
-	for ($j = 0; $j<10; $j++){
-		$res .= $arr_matr[$i][$j];
+for ($i = 0; $i < 10; $i = $i + 1){
+	for ($j = 0; $j<10; $j = $j + 1){
+		$res = $res . $arr_matr[$i][$j];
 	}
 	
-	$res .= "\n";
+	$res = $res . "\n";
 }
 
 echo $res;
