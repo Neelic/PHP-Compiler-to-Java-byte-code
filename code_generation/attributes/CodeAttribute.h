@@ -189,7 +189,7 @@ public:
                 break;
             case const_decl:
                 for (auto i: node->const_decl->vector) {
-                    initializeNewVariable(*i->id, &res);
+                    initializeNewVariable(*i->id, &res, false);
                     //get on stack right part
                     code_tmp = getCodeFromExpr(i->expr, currLine, 1);
                     res.insert(res.end(), code_tmp.begin(), code_tmp.end());
@@ -199,7 +199,7 @@ public:
                 break;
             case static_var:
                 for (auto i: node->static_var->vector) {
-                    initializeNewVariable(*i->id, &res);
+                    initializeNewVariable(*i->id, &res, false);
                     //get on stack right part
                     code_tmp = getCodeFromExpr(i->expr, currLine, 1);
                     res.insert(res.end(), code_tmp.begin(), code_tmp.end());
