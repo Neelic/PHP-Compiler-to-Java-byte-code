@@ -9,9 +9,11 @@ echo "\n";
 $a = 3*2;
 echo $a;
 echo "\n";
-$a = 5/ readline();
+$a = 5/ 2;
 echo $a;
 echo "\n";
+
+echo "----------\n";
 
 $a = 3 + 2.5;
 echo $a;
@@ -26,6 +28,8 @@ $a = 8/1.2;
 echo $a;
 echo "\n";
 
+echo "----------\n";
+
 $a = 3.5 + 2;
 echo $a;
 echo "\n";
@@ -38,6 +42,8 @@ echo "\n";
 $a = 8.4/2;
 echo $a;
 echo "\n";
+
+echo "----------\n";
 
 $a = 3.3 + 2.5;
 echo $a;
