@@ -1100,9 +1100,18 @@ public:
                 //get on stack left part
                 tmpVec = getCodeFromExpr(node->left, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
+
+                Commands::doCommandTwoBytes(invokevirtual,
+                                            idMethodRef(
+                                                    string("RTL/Value"),
+                                                    string("toBoolVal"),
+                                                    string("()LRTL/Value;")
+                                            ), &res);
+                Commands::doCommand(dup, &res);
+                convertBoolToInt(&res);
+
                 //get on stack right part
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
-                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //op
                 Commands::doCommandTwoBytes(
                         invokevirtual,
@@ -1111,8 +1120,10 @@ public:
                                 string("or"),
                                 string("(LRTL/Value;)LRTL/Value;")
                         ), //id на Value.or(Value)
-                        &res
+                        &tmpVec
                 );
+                Commands::doCommandTwoBytes(ifne, countByteSize(tmpVec) + 3, &res);
+                res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 break;
                 ///Local params
             case variable:
