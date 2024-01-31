@@ -2,135 +2,36 @@
 
 //Заполняем нулями
 
-$arr_vect[] = 0;
-$arr_vect[] = 0;
-$arr_vect[] = 0;
-$arr_vect[] = 0;
-$arr_vect[] = 0;
-$arr_vect[] = 1; //
-$arr_vect[] = 0;
-$arr_vect[] = 0;
-$arr_vect[] = 0;
-$arr_vect[] = 0;
+$a1[ ] = 0;$a1[ ] = 0;$a1[ ] = 0;$a1[ ] = 0;$a1[ ] = 0;$a1[ ] = 0;$a1[ ] = 0;$a1[ ] = 0;$a1[ ] = 0;$a1[ ] = 0;
+$arr_matr[] = $a1;
 
-$arr_matr[] = $arr_vect;
+$a1[0] = 0;$a1[1] = 1;$a1[2] = 1;$a1[3] = 1;$a1[4] = 1;$a1[5] = 1;$a1[6] = 1;$a1[7] = 1;$a1[8] = 1;$a1[9] = 0;
 
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 0;
-$arr_vect[4] = 0;
-$arr_vect[5] = 1; //
-$arr_vect[6] = 0;
-$arr_vect[7] = 0;
-$arr_vect[8] = 0;
-$arr_vect[9] = 0;
+$arr_matr[] =$a1;
+$a1[0] = 0;$a1[1] = 0;$a1[2] = 0;$a1[3] = 0;$a1[4] = 0;$a1[5] = 0;$a1[6] = 0;$a1[7] = 0;$a1[8] = 0;$a1[9] = 0;
 
-$arr_matr[] = $arr_vect;
+$arr_matr[] =$a1;
+$a1[0] = 0;$a1[1] = 1;$a1[2] = 1;$a1[3] = 1;$a1[4] = 1;$a1[5] = 1;$a1[6] = 1;$a1[7] = 1;$a1[8] = 1;$a1[9] = 1;
 
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 0;
-$arr_vect[4] = 1; //
-$arr_vect[5] = 0;
-$arr_vect[6] = 0;
-$arr_vect[7] = 0;
-$arr_vect[8] = 0;
-$arr_vect[9] = 0;
+$arr_matr[] =$a1;
+$a1[0] = 0;$a1[1] = 0;$a1[2] = 0;$a1[3] = 0;$a1[4] = 0;$a1[5] = 0;$a1[6] = 0;$a1[7] = 0;$a1[8] = 0;$a1[9] = 0;
 
-$arr_matr[] = $arr_vect;
+$arr_matr[] =$a1;
+$a1[0] = 1;$a1[1] = 1;$a1[2] = 1;$a1[3] = 1;$a1[4] = 1;$a1[5] = 1;$a1[6] = 1;$a1[7] = 1;$a1[8] = 1;$a1[9] = 0;
 
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 1; //
-$arr_vect[4] = 0;
-$arr_vect[5] = 0;
-$arr_vect[6] = 0;
-$arr_vect[7] = 0;
-$arr_vect[8] = 0;
-$arr_vect[9] = 0;
+$arr_matr[] =$a1;
+$a1[0] = 0;$a1[1] = 0;$a1[2] = 0;$a1[3] = 0;$a1[4] = 0;$a1[5] = 1;$a1[6] = 0;$a1[7] = 0;$a1[8] = 0;$a1[9] = 0;
 
-$arr_matr[] = $arr_vect;
+$arr_matr[] =$a1;
+$a1[0] = 0;$a1[1] = 1;$a1[2] = 1;$a1[3] = 1;$a1[4] = 1;$a1[5] = 1;$a1[6] = 1;$a1[7] = 1;$a1[8] = 1;$a1[9] = 1;
 
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 1; //
-$arr_vect[4] = 0;
-$arr_vect[5] = 0;
-$arr_vect[6] = 0;
-$arr_vect[7] = 0;
-$arr_vect[8] = 0;
-$arr_vect[9] = 0;
+$arr_matr[] =$a1;
+$a1[0] = 0;$a1[1] = 0;$a1[2] = 0;$a1[3] = 1;$a1[4] = 0;$a1[5] = 0;$a1[6] = 0;$a1[7] = 1;$a1[8] = 0;$a1[9] = 0;
 
-$arr_matr[] = $arr_vect;
+$arr_matr[] =$a1;
+$a1[0] = 0;$a1[1] = 0;$a1[2] = 0;$a1[3] = 0;$a1[4] = 1;$a1[5] = 0;$a1[6] = 0;$a1[7] = 0;$a1[8] = 1;$a1[9] = 0;
 
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 0;
-$arr_vect[4] = 1; //
-$arr_vect[5] = 0;
-$arr_vect[6] = 0;
-$arr_vect[7] = 0;
-$arr_vect[8] = 0;
-$arr_vect[9] = 0;
-
-$arr_matr[] = $arr_vect;
-
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 0;
-$arr_vect[4] = 0;
-$arr_vect[5] = 1; //
-$arr_vect[6] = 0;
-$arr_vect[7] = 0;
-$arr_vect[8] = 0;
-$arr_vect[9] = 0;
-
-$arr_matr[] = $arr_vect;
-
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 0;
-$arr_vect[4] = 0;
-$arr_vect[5] = 0;
-$arr_vect[6] = 1; //
-$arr_vect[7] = 0;
-$arr_vect[8] = 0;
-$arr_vect[9] = 0;
-
-$arr_matr[] = $arr_vect;
-
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 0;
-$arr_vect[4] = 0;
-$arr_vect[5] = 0;
-$arr_vect[6] = 0;
-$arr_vect[7] = 1; //
-$arr_vect[8] = 0;
-$arr_vect[9] = 0;
-
-$arr_matr[] = $arr_vect;
-
-$arr_vect[0] = 0;
-$arr_vect[1] = 0;
-$arr_vect[2] = 0;
-$arr_vect[3] = 0;
-$arr_vect[4] = 0;
-$arr_vect[5] = 0;
-$arr_vect[6] = 0;
-$arr_vect[7] = 0;
-$arr_vect[8] = 1; //
-$arr_vect[9] = 0;
-
-$arr_matr[] = $arr_vect;
+$arr_matr[] = $a1;
 
 /*
 0 0 0 0 0 1 0 0 0 0

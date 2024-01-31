@@ -11,7 +11,7 @@ function right(){
 	return true;
 }
 
-if ( readline()< 5 || left()){
+if ( readline()< 5 || right()){
 	echo "true!\n";
 } else {
 	echo "False!\n";

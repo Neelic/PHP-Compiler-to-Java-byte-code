@@ -97,7 +97,7 @@ public:
         auto code_res = new vector<ValueAndBytes>();
 
         auto *res = new CodeAttribute(
-                (int) 10,
+                (int) 200,
                 1000,
                 code_res,
                 consts,
@@ -1187,6 +1187,15 @@ public:
                         invokevirtual,
                         idMethodRef(
                                 string("RTL/Value"),
+                                string("getCopy"),
+                                string("()LRTL/Value;")
+                        ),
+                        &res
+                );
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                string("RTL/Value"),
                                 string("addToArray"),
                                 string("(LRTL/Value;LRTL/Value;)V")
                         ),
@@ -1219,6 +1228,15 @@ public:
                 tmpVec = getCodeFromExpr(node->right, currLine, toStack);
                 res.insert(res.end(), tmpVec.begin(), tmpVec.end());
                 //op
+                Commands::doCommandTwoBytes(
+                        invokevirtual,
+                        idMethodRef(
+                                string("RTL/Value"),
+                                string("getCopy"),
+                                string("()LRTL/Value;")
+                        ),
+                        &res
+                );
                 Commands::doCommandTwoBytes(
                         invokevirtual,
                         idMethodRef(
